@@ -33,7 +33,33 @@ input {
   border: none; /* Elimina el borde */
   outline: none;
   padding-left: 7px;
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+
 }
+p{
+  font-size: 20px;
+}
+a{
+  font-size: 20px;
+}
+
+button{
+  background-color: red; /* Fondo rojo */
+  color: white; /* Texto blanco */
+  border: none; /* Elimina cualquier borde */
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 10px 20px; /* Añade un poco de espacio interno */
+  cursor: pointer; /* Cambia el cursor al pasar por el botón */
+  font-weight: bold; /* Opcional: hace el texto en negrita */
+
+}
+
+button:active{
+  background-color: #660000;
+}
+
 
 
 .container {
@@ -41,10 +67,20 @@ input {
   flex-direction: column; /* Acomoda los elementos en columna (vertical) */
   align-items: flex-start;
   border-radius: 12px; /* Redondea las esquinas */
-  padding: 20px; /* Espacio interior del cuadro */
+  padding: 20px 40px; /* Espacio interior del cuadro */
   background-color: #D9D9D9; /* Color de fondo del cuadro */
-
+  gap:10px;
 }
+
+
+
+.centered-button {
+  align-self: center; /* Centra solo este botón */
+  margin-top: 10px; /* Opcional: Añade un espacio superior para separarlo del input */
+}
+
+
+
 
 @keyframes App-logo-spin {
   from {
