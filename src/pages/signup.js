@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+  const navigate= useNavigate()
   const [userCredentials, setUserCredentials] = useState({
     email: '',
+    nombre:'Daniel',
+    rol:'developer',
+    username:'Dane',
+    telefono:'000000',
     password: '',
     confirmPassword: ''
+
   });
 
   const handleChange = (e) => {
@@ -19,21 +26,19 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/signup', {
+      const response = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: userCredentials.email,
-          password: userCredentials.password,
-        }),
+        body: JSON.stringify(userCredentials),
       });
 
       if (response.ok) {
         const data = await response.json();
         alert("Registro exitoso");
-        console.log(data);
+        navigate('/login')
+        
       } else {
         alert("Error en el registro");
       }
