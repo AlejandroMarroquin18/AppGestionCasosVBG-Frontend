@@ -6,33 +6,16 @@ const RestorePassword = () => {
     const [statusMessage,setMessage]= useState(null);
     const [email,setEmail]=useState('')
     const [codigo,setCodigo]=useState('')
-    //const [codigoInput,setCodigoInput]=useState(new Array(6).fill(''))
     const [password,setPassword]=useState('')
     const [confirmPassword,setConfirmPasswordInput]=useState('')
     const [content,setContent]=useState('default')//default,validacion,changepassword
 
     const handleEmailChange=(e)=>setEmail(e.target.value)
     const handleCodigoChange=(e)=>setCodigo(e.target.value)
-    /**
-    const handleCodigoChange=(e,index)=>{
-        console.log(e.target.value)
-        setCodigoInput([...codigoInput.map((data,i)=>(i === index? e.target.value:data))])
-        
-        if(e.target.value && e.target.nextSibling){
-            e.target.nextSibling.focus()
-        }else if(e.target.previousSibling){
-            e.target.previousSibling.focus()
-        }
-        
-    }
-     */
+    
     const handlePasswordChangeInput=(e)=>setPassword(e.target.value)
     const handleConfirmPasswordChangeInput=(e)=>setConfirmPasswordInput(e.target.value)
 
-    const testChange=(number)=>{
-        const stados=['validacion', 'changepassword']
-        setContent(stados[number])
-    }
 
     const handleRestorePassword= async ()=>{
         try {

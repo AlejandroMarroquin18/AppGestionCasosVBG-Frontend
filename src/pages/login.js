@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import GoogleLoginButton from './googleAuthButton';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -65,10 +67,11 @@ const Login = () => {
           <button className='centered-button' onClick={handleLogin}>
             Iniciar Sesión
           </button>
+          <div><GoogleLoginButton/></div>
           <a href='restorepassword' className='centered-button '>Olvidé mi Contraseña</a>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </div>
-          
+        
       </header>
     </div>
 
