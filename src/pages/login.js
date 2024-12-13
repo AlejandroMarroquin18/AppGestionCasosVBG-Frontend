@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GoogleLoginButton from './googleAuthButton';
+import GoogleLoginButton from '../components/googleAuthButton';
+import './App.css';
 
 
 const Login = () => {
@@ -68,7 +69,7 @@ const Login = () => {
             Iniciar Sesión
           </button>
           <div><GoogleLoginButton/></div>
-          <a href='restorepassword' className='centered-button '>Olvidé mi Contraseña</a>
+          <a href='restorepassword' >Olvidé mi Contraseña</a>
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         </div>
         
