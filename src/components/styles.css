@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.lista-content {
+    font-size: 18px; /* Aumenta el tamaño de la fuente */
+}
+
+.lista-content table, 
+.lista-content th, 
+.lista-content td {
+    font-size: 20px; /* Tamaño específico para la tabla si se desea menor que el contenido general */
+}
+
+.lista-content button, 
+.lista-content input, 
+.lista-content select {
+    font-size: 26px; /* Tamaño de la fuente para controles de formulario y botones */
+}
