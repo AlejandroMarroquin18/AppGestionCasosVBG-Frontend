@@ -69,14 +69,31 @@ button:active{
   border-radius: 12px; /* Redondea las esquinas */
   padding: 20px 40px; /* Espacio interior del cuadro */
   background-color: #D9D9D9; /* Color de fondo del cuadro */
-  gap:10px;
+  gap: 10px;
+  max-width: 22%; 
+  margin: 0 auto; /* Centra el contenedor horizontalmente */
 }
 
 
 
 .centered-button {
+  padding: 10px 20px; /* Ajusta el relleno */
+    font-size: clamp(12px, 2.5vw, 18px); /* Tamaño de fuente adaptable */
+    height: auto; /* Para que la altura dependa del contenido */
+    line-height: 1.2; /* Ajusta la separación del texto */
+    border: none;
+    border-radius: 5px; /* Opcional: redondear bordes */
+    background-color: #ff0000; /* Color de fondo */
+    color: white; /* Color del texto */
+    cursor: pointer;
   align-self: center; /* Centra solo este botón */
   margin-top: 10px; /* Opcional: Añade un espacio superior para separarlo del input */
+}
+
+a{
+  align-self: center; /* Centra solo este botón */
+  margin-top: 10px; 
+  text-decoration: underline;
 }
 
 
