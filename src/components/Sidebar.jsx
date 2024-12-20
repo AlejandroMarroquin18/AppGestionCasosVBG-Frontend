@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiList, FiBarChart2, FiCalendar, FiUser } from 'react-icons/fi';
+import { FiList, FiBarChart2, FiCalendar, FiUser, FiBook } from 'react-icons/fi';
 import './styles.css';
 
 const Sidebar = ({ activeRoute }) => {
   const menuItems = [
-    { id: 'complaints', title: 'Lista de quejas', icon: FiList, path: "/lista" },
     { id: 'statistics', title: 'Estadísticas', icon: FiBarChart2, path: "/estadisticas" },
+    { id: 'complaints', title: 'Lista de quejas', icon: FiList, path: "/lista" },
     { id: 'agenda', title: 'Agenda', icon: FiCalendar, path: "/agenda" },
+    { id: 'workshop', title: 'Talleres', icon: FiBook, path: "/talleres" },
     { id: 'account', title: 'Cuenta', icon: FiUser, path: "/cuenta" },
   ];
 

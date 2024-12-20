@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import Agenda from './components/Agenda';
 import ComplaintsList from './components/complaintsList';
 import Statistics from './components/Statistics';
+import Workshop from './components/Workshop';
 import Login from './pages/login';
 import SignUp from './pages/signup';
 import RestorePassword from './pages/restorepassword';
@@ -20,10 +21,11 @@ function App() {
         {!noSidebarRoutes.includes(location.pathname) && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
-            <Route path="/" element={<Navigate replace to="/lista" />} />
+            <Route path="/" element={<Navigate replace to="/estadisticas" />} />
             <Route path="/lista" element={<ComplaintsList />} />
             <Route path="/estadisticas" element={<Statistics />} />
             <Route path="/agenda" element={<Agenda />} />
+            <Route path="/talleres" element={<Workshop />} />
             
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />

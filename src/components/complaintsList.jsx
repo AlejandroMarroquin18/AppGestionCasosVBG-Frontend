@@ -15,6 +15,8 @@ const ComplaintsList = () => {
       location: "Zarzal",
       code: "123456789",
       type: "Acompañamiento psicológico",
+      fecha: "2022-12-01",
+      estado: "En revisión",
     },
     {
       id: 2,
@@ -22,6 +24,8 @@ const ComplaintsList = () => {
       location: "Melendez",
       code: "123456789",
       type: "Acompañamiento integral",
+      fecha: "2022-12-02",
+      estado: "Remitido",
     },
     {
       id: 3,
@@ -29,6 +33,8 @@ const ComplaintsList = () => {
       location: "Buga",
       code: "123456789",
       type: "Acompañamiento psicológico",
+      fecha: "2022-12-03",
+      estado: "En revisión",
     },
     {
       id: 4,
@@ -36,6 +42,8 @@ const ComplaintsList = () => {
       location: "Santander",
       code: "123456789",
       type: "Acompañamiento integral",
+      fecha: "2022-12-04",
+      estado: "Remitido",
     },
     {
       id: 5,
@@ -43,6 +51,8 @@ const ComplaintsList = () => {
       location: "B/ventura",
       code: "123456789",
       type: "Acompañamiento psicológico",
+      fecha: "2022-12-05",
+      estado: "En revisión",
     },
   ];
 
@@ -66,15 +76,18 @@ const ComplaintsList = () => {
       <h1 className="text-3xl font-bold mb-6">Lista de quejas</h1>
 
       <div className="flex justify-between mb-4 items-center">
-        <div style={{ maxWidth: "500px" }} className="flex w-full">
+        <div
+          style={{ maxWidth: "500px" }}
+          className="flex w-full overflow-hidden rounded-xl border border-gray-300"
+        >
           <input
             type="text"
             placeholder="Buscar por código"
-            className="border rounded-l px-4 py-2 w-full"
+            className="px-4 py-2 w-full border-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="bg-gray-200 px-4 py-2 rounded-r">
+          <button className="bg-gray-200 px-4 py-2">
             <FiSearch />
           </button>
         </div>
@@ -115,6 +128,8 @@ const ComplaintsList = () => {
             <th className="border p-2">Sede</th>
             <th className="border p-2">Código</th>
             <th className="border p-2">Tipo de acompañamiento</th>
+            <th className="border p-2">Fecha</th>
+            <th className="border p-2">Estado</th>
             <th className="border p-2">Detalles</th>
           </tr>
         </thead>
@@ -132,8 +147,10 @@ const ComplaintsList = () => {
               <td className="border p-2">{complaint.location}</td>
               <td className="border p-2">{complaint.code}</td>
               <td className="border p-2">{complaint.type}</td>
+              <td className="border p-2">{complaint.fecha}</td>
+              <td className="border p-2">{complaint.estado}</td>
               <td className="border p-2">
-                <button className="text-red-600 hover:underline">
+                <button className="text-red-600 bg-white hover:underline">
                   Ver detalles
                 </button>
               </td>
@@ -146,7 +163,7 @@ const ComplaintsList = () => {
         className="fixed bottom-0 left-auto right-0 w-[calc(100%-250px)] bg-white p-4 flex justify-between items-center border-t shadow"
         style={{ zIndex: 50 }}
       >
-        <button className="text-red-600 hover:underline">
+        <button className="text-red-600 bg-white hover:underline">
           Descargar como CSV
         </button>
         <div className="flex items-center space-x-2">
