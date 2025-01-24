@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import WorkshopForm from "./WorkshopForm"; 
 import WorkshopList from "./WorkshopList";
+import WorkshopStats from "./WorkshopStats";
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 
 // Simulamos los talleres de ejemplo
 const workshopsData = [
@@ -67,59 +69,17 @@ const workshopsData = [
 ];
 
 const Workshop = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [showWorkshops, setShowWorkshops] = useState(false);
-  const [workshops, setWorkshops] = useState(workshopsData);
-
-  const handleCreateWorkshop = () => {
-    setShowForm(true);
-    setShowWorkshops(false); // Ocultar la lista de talleres cuando se crea uno nuevo
-  };
-
-  const handleViewWorkshops = () => {
-    setShowForm(false);
-    setShowWorkshops(true); // Mostrar la lista de talleres
-  };
-
-  const handleSaveWorkshop = (newWorkshop) => {
-    setWorkshops((prevWorkshops) => [...prevWorkshops, newWorkshop]);
-    setShowForm(false); // Volver al menú inicial
-  };
-
-  const handleBackToMenu = () => {
-    setShowForm(false);
-    setShowWorkshops(false); // Volver al menú inicial
-  };
+  const navigate = useNavigate();
 
   return (
-    <div>
-      {showForm ? (
-        <WorkshopForm onSubmit={handleSaveWorkshop} />
-      ) : showWorkshops ? (
-        <WorkshopList workshops={workshops} onBackToMenu={handleBackToMenu} /> 
-      ) : (
-        <div className="flex items-start justify-center h-screen bg-white">
-          <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mt-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-              Gestión de Talleres
-            </h2>
-            <div className="flex flex-col space-y-4">
-              <button
-                className="bg-red-600 text-white px-32 py-4 rounded-lg font-semibold text-lg hover:bg-red-700"
-                onClick={handleCreateWorkshop}
-              >
-                Crear Taller
-              </button>
-              <button
-                className="bg-red-600 text-white px-32 py-4 rounded-lg font-semibold text-lg hover:bg-red-700"
-                onClick={handleViewWorkshops}
-              >
-                Ver Talleres
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="flex items-start justify-center h-screen bg-white">
+      <Routes>
+        <Route path="/crear" element={<WorkshopForm onSave={workshop => {
+          navigate('/talleres/ver');
+        }} />} />
+        <Route path="/ver" element={<WorkshopList workshops={workshopsData} onBackToMenu={() => navigate('/talleres')} />} />
+        <Route path="/estadisticas" element={<WorkshopStats />} />
+      </Routes>
     </div>
   );
 };

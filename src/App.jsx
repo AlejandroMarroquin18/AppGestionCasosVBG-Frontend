@@ -2,7 +2,7 @@ import {  BrowserRouter as Router, Routes, Route, Navigate, useLocation } from '
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Agenda from './components/Agenda';
-import ComplaintsList from './components/complaintsList';
+import Complaints from './components/Complaints';
 import Statistics from './components/Statistics';
 import Workshop from './components/Workshop';
 import Login from './pages/login';
@@ -17,15 +17,16 @@ function App() {
     <div className="flex flex-col h-screen">
       {!noSidebarRoutes.includes(location.pathname) && <Header />}
       <div className="flex flex-1 overflow-hidden">
-        {/* Solo renderiza el Sidebar si la ruta no está en la lista de rutas sin Sidebar */}
         {!noSidebarRoutes.includes(location.pathname) && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
             <Route path="/" element={<Navigate replace to="/estadisticas" />} />
-            <Route path="/lista" element={<ComplaintsList />} />
+            <Route path="/quejas/*" element={<Complaints />} />
             <Route path="/estadisticas" element={<Statistics />} />
             <Route path="/agenda" element={<Agenda />} />
+            <Route path="/agenda/*" element={<Agenda />} />
             <Route path="/talleres" element={<Workshop />} />
+            <Route path="/talleres/*" element={<Workshop />} />
             
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />

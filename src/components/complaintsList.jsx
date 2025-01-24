@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import "./styles.css";
 
@@ -7,61 +7,14 @@ const ComplaintsList = () => {
   const [selectedComplaints, setSelectedComplaints] = useState({});
   const [locationFilter, setLocationFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [complaints, setComplaints] = useState([]);  // Estado para almacenar las quejas
 
-  const complaints = [
-    {
-      id: 1,
-      name: "Marel Rodriguez",
-      location: "Zarzal",
-      code: "123456789",
-      type: "Acompañamiento psicológico",
-      fecha: "2022-12-01",
-      estado: "En revisión",
-    },
-    {
-      id: 2,
-      name: "Marel Rodriguez",
-      location: "Melendez",
-      code: "123456789",
-      type: "Acompañamiento integral",
-      fecha: "2022-12-02",
-      estado: "Remitido",
-    },
-    {
-      id: 3,
-      name: "Marel Rodriguez",
-      location: "Buga",
-      code: "123456789",
-      type: "Acompañamiento psicológico",
-      fecha: "2022-12-03",
-      estado: "En revisión",
-    },
-    {
-      id: 4,
-      name: "Marel Rodriguez",
-      location: "Santander",
-      code: "123456789",
-      type: "Acompañamiento integral",
-      fecha: "2022-12-04",
-      estado: "Remitido",
-    },
-    {
-      id: 5,
-      name: "Marel Rodriguez",
-      location: "B/ventura",
-      code: "123456789",
-      type: "Acompañamiento psicológico",
-      fecha: "2022-12-05",
-      estado: "En revisión",
-    },
-  ];
-
-  const filteredComplaints = complaints.filter((complaint) => {
-    return (
-      (complaint.location.includes(locationFilter) || locationFilter === "") &&
-      (complaint.type.includes(typeFilter) || typeFilter === "")
-    );
-  });
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/quejas/')
+      .then(response => response.json())
+      .then(data => setComplaints(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
 
   const toggleComplaintSelection = (id) => {
     const newSelections = {
@@ -71,8 +24,17 @@ const ComplaintsList = () => {
     setSelectedComplaints(newSelections);
   };
 
+  const filteredComplaints = complaints.filter(complaint => {
+    const matchesLocation = locationFilter === "" || (complaint.sede && complaint.sede.includes(locationFilter));
+    const matchesType = typeFilter === "" || (complaint.tipo_de_acompanamiento && complaint.tipo_de_acompanamiento.includes(typeFilter));
+    const matchesCode = searchTerm === "" || (complaint.codigo && complaint.codigo.includes(searchTerm));
+  
+    return matchesLocation && matchesType && matchesCode;
+  });
+   
+
   return (
-    <div className="lista-content p-6 text-base relative">
+    <div className="lista-content p-6 text-base relative bg-white">
       <h1 className="text-3xl font-bold mb-6">Lista de quejas</h1>
 
       <div className="flex justify-between mb-4 items-center">
@@ -110,10 +72,10 @@ const ComplaintsList = () => {
             className="border p-2"
           >
             <option value="">Filtrar por Tipo</option>
-            <option value="Acompañamiento psicológico">
+            <option value="Psicológico">
               Acompañamiento psicológico
             </option>
-            <option value="Acompañamiento integral">
+            <option value="Integral">
               Acompañamiento integral
             </option>
           </select>
@@ -137,16 +99,14 @@ const ComplaintsList = () => {
           {filteredComplaints.map((complaint) => (
             <tr
               key={complaint.id}
-              className={`${
-                selectedComplaints[complaint.id] ? "bg-gray-200" : ""
-              }`}
+              className={`${selectedComplaints[complaint.id] ? "bg-gray-200" : ""}`}
               onClick={() => toggleComplaintSelection(complaint.id)}
             >
               <td className="border p-2">{complaint.id}</td>
-              <td className="border p-2">{complaint.name}</td>
-              <td className="border p-2">{complaint.location}</td>
-              <td className="border p-2">{complaint.code}</td>
-              <td className="border p-2">{complaint.type}</td>
+              <td className="border p-2">{complaint.nombre}</td>
+              <td className="border p-2">{complaint.sede}</td>
+              <td className="border p-2">{complaint.codigo}</td>
+              <td className="border p-2">{complaint.tipo_de_acompanamiento}</td>
               <td className="border p-2">{complaint.fecha}</td>
               <td className="border p-2">{complaint.estado}</td>
               <td className="border p-2">
