@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import ComplaintsList from "./ComplaintsList";
+import ComplaintsList from "./complaintsList";
 import ComplaintsStats from "./ComplaintsStats";
 import ComplaintsDetails from "./ComplaintsDetails"; 
 

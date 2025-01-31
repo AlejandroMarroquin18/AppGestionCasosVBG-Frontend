@@ -104,6 +104,15 @@ const Queja = () => {
             'acompañamiento_ante_instancias_gubernamentales':'',
             'interponer_queja_al_comite_asusntos_internos_disciplinarios':'',
             'observaciones':'',
+            'nombre' :'',
+            'sede' :'',
+            'codigo' :'',
+            'tipo_de_acompanamiento' :'',
+            'fecha' :'',
+            'estado' :'',
+            'detalles' :'',
+            'facultad' : '',
+            'unidad' : '',
             })
 
 
