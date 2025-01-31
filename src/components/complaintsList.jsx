@@ -5,7 +5,6 @@ import {
   FiChevronRight,
   FiFilter,
 } from "react-icons/fi";
-import "./styles.css";
 
 const ComplaintsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,20 +104,21 @@ const ComplaintsList = () => {
               style={{
                 position: "absolute",
                 top: "100%",
-                right: "0px",
+                right: "0",
                 backgroundColor: "white",
                 border: "1px solid #ccc",
-                padding: "10px",
                 zIndex: 100,
                 boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+                width: "350px",
+                overflow: "hidden",
               }}
             >
-              <div className="filter-group">
-                <h4>Sede</h4>
+              <div className="filter-group mb-4">
+                <h4 className="mb-1 text-xl font-semibold">Sede</h4>
                 <select
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
-                  className="border p-2"
+                  className="border w-full text-sm h-10" 
                 >
                   <option value="">Todos</option>
                   <option value="Zarzal">Zarzal</option>
@@ -128,12 +128,12 @@ const ComplaintsList = () => {
                   <option value="Buenaventura">B/ventura</option>
                 </select>
               </div>
-              <div className="filter-group">
-                <h4>Tipo</h4>
+              <div className="filter-group mb-4">
+                <h4 className="mb-1 text-xl font-semibold">Tipo</h4>
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="border p-2"
+                  className="border w-full text-sm h-10" 
                 >
                   <option value="">Todos</option>
                   <option value="Psicológico">
@@ -141,32 +141,32 @@ const ComplaintsList = () => {
                   </option>
                   <option value="Integral">Acompañamiento integral</option>
                 </select>
-                <div className="filter-group">
-                  <h4>Facultad</h4>
-                  <select
-                    value={facultyFilter}
-                    onChange={(e) => setFacultyFilter(e.target.value)}
-                    className="border p-2"
-                  >
-                    <option value="">Todos</option>
-                    <option value="Artes">Artes Integradas</option>
-                    <option value="Ciencias Naturales">
-                      Ciencias Naturales y Exactas
-                    </option>
-                    <option value="Ciencias de la Administración">
-                      Ciencias de la Administración
-                    </option>
-                    <option value="Salud">Salud</option>
-                    <option value="Ciencias Sociales">
-                      Ciencias Sociales y Económicas
-                    </option>
-                    <option value="Humanidades">Humanidades</option>
-                    <option value="Ingeniería">Ingeniería</option>
-                    <option value="Educación">Educación y pedagogía</option>
-                    <option value="Psicología">Psicología</option>
-                    <option value="Derecho">Derecho y Ciencia Política</option>
-                  </select>
-                </div>
+              </div>
+              <div className="filter-group">
+                <h4 className="mb-1 text-xl font-semibold">Facultad</h4>
+                <select
+                  value={facultyFilter}
+                  onChange={(e) => setFacultyFilter(e.target.value)}
+                  className="border w-full text-sm h-10" 
+                >
+                  <option value="">Todos</option>
+                  <option value="Artes">Artes Integradas</option>
+                  <option value="Ciencias Naturales">
+                    Ciencias Naturales y Exactas
+                  </option>
+                  <option value="Ciencias de la Administración">
+                    Ciencias de la Administración
+                  </option>
+                  <option value="Salud">Salud</option>
+                  <option value="Ciencias Sociales">
+                    Ciencias Sociales y Económicas
+                  </option>
+                  <option value="Humanidades">Humanidades</option>
+                  <option value="Ingeniería">Ingeniería</option>
+                  <option value="Educación">Educación y pedagogía</option>
+                  <option value="Psicología">Psicología</option>
+                  <option value="Derecho">Derecho y Ciencia Política</option>
+                </select>
               </div>
             </div>
           )}
