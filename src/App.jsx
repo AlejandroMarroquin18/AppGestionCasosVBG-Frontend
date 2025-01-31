@@ -8,10 +8,11 @@ import Workshop from './components/Workshop';
 import Login from './pages/login';
 import SignUp from './pages/signup';
 import RestorePassword from './pages/restorepassword';
+import Queja from './pages/queja/queja';
 
 function App() {
   const location = useLocation();
-  const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword'];
+  const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword','/reportarvbg'];
 
   return (
     <div className="flex flex-col h-screen">
@@ -27,6 +28,8 @@ function App() {
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/talleres" element={<Workshop />} />
             
+
+            <Route path ="/reportarvbg" element={<Queja/>}/>
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />
             <Route path="/restorepassword" element={<RestorePassword />} />
