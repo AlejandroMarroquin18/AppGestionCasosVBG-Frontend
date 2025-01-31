@@ -119,18 +119,6 @@ const WorkshopForm = ({ onSubmit }) => {
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Código del Taller
-            </label>
-            <input
-              type="text"
-              name="code"
-              value={formData.code}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
           <div className="col-span-2">
             <label className="block text-gray-700 font-semibold mb-2">
               Detalles

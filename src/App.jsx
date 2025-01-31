@@ -3,7 +3,6 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Agenda from './components/Agenda';
 import Complaints from './components/Complaints';
-import Statistics from './components/Statistics';
 import Workshop from './components/Workshop';
 import Login from './pages/login';
 import SignUp from './pages/signup';
@@ -22,7 +21,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate replace to="/estadisticas" />} />
             <Route path="/quejas/*" element={<Complaints />} />
-            <Route path="/estadisticas" element={<Statistics />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/agenda/*" element={<Agenda />} />
             <Route path="/talleres" element={<Workshop />} />

@@ -19,15 +19,15 @@ const Sidebar = ({ activeRoute }) => {
   };
 
   const menuItems = [
-    { id: 'statistics', title: 'Estadísticas', icon: FiBarChart2, path: "/estadisticas" },
+    //{ id: 'statistics', title: 'Estadísticas', icon: FiBarChart2, path: "/estadisticas" },
     { 
       id: 'complaints', 
       title: 'Quejas', 
       icon: FiFolderPlus, 
       path: "/quejas",
       submenu: [
-        { title: 'Lista de quejas', path: '/quejas/lista', icon: FiList },
         { title: 'Estadísticas', path: '/quejas/estadisticas', icon: FiBarChart2 },
+        { title: 'Lista de quejas', path: '/quejas/lista', icon: FiList },
       ]
     },
     {
@@ -36,8 +36,8 @@ const Sidebar = ({ activeRoute }) => {
       icon: FiCalendar, 
       path: "/agenda",
       submenu: [
-        { title: 'Citas', path: '/agenda/list', icon: FiCalendar },
         { title: 'Estadísticas', path: '/agenda/estadisticas', icon: FiBarChart2 },
+        { title: 'Citas', path: '/agenda/list', icon: FiCalendar },
       ]
     },
     {
@@ -46,9 +46,9 @@ const Sidebar = ({ activeRoute }) => {
       icon: FiBook, 
       path: "/talleres",
       submenu: [
+        { title: 'Estadísticas', path: '/talleres/estadisticas', icon: FiBarChart2 },
         { title: 'Crear taller', path: '/talleres/crear', icon: FiPlusSquare },
         { title: 'Ver talleres', path: '/talleres/ver', icon: FiEye },
-        { title: 'Estadísticas', path: '/talleres/estadisticas', icon: FiBarChart2 }
       ]
     }
   ];

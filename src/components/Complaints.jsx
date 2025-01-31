@@ -1,7 +1,8 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import ComplaintsList from "./complaintsList";
+import { Routes, Route } from "react-router-dom";
+import ComplaintsList from "./ComplaintsList";
 import ComplaintsStats from "./ComplaintsStats";
+import ComplaintsDetails from "./ComplaintsDetails"; 
 
 const Complaints = () => {
   return (
@@ -9,6 +10,7 @@ const Complaints = () => {
       <Routes>
         <Route path="/lista" element={<ComplaintsList />} />
         <Route path="/estadisticas" element={<ComplaintsStats />} />
+        <Route path="/detalles/:id" element={<ComplaintsDetails />} />
       </Routes>
     </div>
   );
