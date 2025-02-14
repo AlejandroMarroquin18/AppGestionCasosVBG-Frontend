@@ -29,9 +29,17 @@ const Login = () => {
   
       const data = await response.json();
   
+      localStorage.setItem('userToken', data.token);
+      localStorage.setItem('userName', data.user.nombre);
+      localStorage.setItem('userRole', data.user.rol);
+       // Verificar los datos almacenados
+      console.log("Token:", localStorage.getItem('userToken'));
+      console.log("Nombre del Usuario:", localStorage.getItem('userName'));
+      console.log("Rol del Usuario:", localStorage.getItem('userRole'));
+  
       console.log(data.status);
       if (response.status === 200) {
-        navigate('/');
+        navigate('/'); 
       }
   
     } catch (error) {

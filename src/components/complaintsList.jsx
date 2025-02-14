@@ -182,7 +182,7 @@ const ComplaintsList = () => {
             <th className="border p-2">Sede</th>
             <th className="border p-2">Código</th>
             <th className="border p-2">Facultad</th>
-            <th className="border p-2">Unidad Académica</th>
+            <th className="border p-2">Unidad académica</th>
             <th className="border p-2">Acompañamiento</th>
             <th className="border p-2">Fecha de solicitud</th>
             <th className="border p-2">Estado</th>

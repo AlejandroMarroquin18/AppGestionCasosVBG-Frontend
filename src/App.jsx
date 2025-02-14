@@ -20,7 +20,7 @@ function App() {
         {!noSidebarRoutes.includes(location.pathname) && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
-            <Route path="/" element={<Navigate replace to="/estadisticas" />} />
+            <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
             <Route path="/quejas/*" element={<Complaints />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/agenda/*" element={<Agenda />} />
