@@ -16,11 +16,11 @@ const Header = () => {
           <img
             src="/logo.png"
             alt="Logo"
-            className="h-28 w-28 object-contain"
+            className="h-20 w-28 object-contain"
           />
         </div>
         <h1 className="text-3xl font-bold">
-          Sistema de gestión de casos de VBG
+          Sistema de Gestión de Casos de VBG
         </h1>
       </div>
       {/* Botón de cerrar sesión */}

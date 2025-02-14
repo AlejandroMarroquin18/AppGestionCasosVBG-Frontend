@@ -1,12 +1,32 @@
-import React, { useState } from "react";
+import React, { useState ,useRef} from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const AgendaList = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [newEvent,setNewEvent]=useState(
+    {
+      id: 3,
+      date: "",
+      title: "",
+      details: {
+        name: "",
+        email: "",
+        location: "",
+        caseId: "",
+      },
+    }
+
+
+  )
+
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const selectedRef=useRef(null)
+  
 
   // Ejemplo de datos para los eventos
-  const events = [
+  const [events, setEvents] = useState([
     {
       id: 1,
       date: "2024-12-05",
@@ -29,7 +49,7 @@ const AgendaList = () => {
         caseId: "123456",
       },
     },
-  ];
+  ]);
 
   // Obtiene los días del mes
   const getDaysInMonth = (month, year) => {
@@ -48,6 +68,51 @@ const AgendaList = () => {
     const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + direction));
     setCurrentDate(newDate);
   };
+  const handleEmptyDay=(e,day)=>{
+    console.log("hola")
+    const rect = e.target.getBoundingClientRect();
+    setPopupPosition({ top: rect.bottom + window.scrollY, left: rect.left });
+    setSelectedDay(day)
+    console.log(day)
+
+  }
+  const handleChangeInput =(field,value)=>{
+    setNewEvent({
+      ...newEvent,
+      [field]: value,
+  });
+
+  }
+
+  const sendEvent = () => {
+    
+    const fecha = new Date();
+    const fechaFormateada = `${currentYear}-${(currentMonth + 1)
+      .toString()
+      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`;
+  
+    const eventToAdd = {
+      ...newEvent,
+      date: fechaFormateada,
+      id: events.length + 1
+    };
+  
+    // Añade el evento usando la variable temporal
+    setEvents([...events, eventToAdd]);
+  
+    // Reinicia el formulario
+    setNewEvent({
+      id: events.length + 2, // Para evitar IDs duplicados
+      date: "",
+      title: "",
+      details: {
+        name: "",
+        email: "",
+        location: "",
+        caseId: "",
+      },
+    });
+  };
 
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
@@ -55,8 +120,8 @@ const AgendaList = () => {
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-    <div><h1 className="text-3xl font-bold mb-6">Agenda</h1></div>
+    <div style={{position:"relative"}} className="p-6 bg-gray-100 min-h-screen">
+    <div ><h1 className="text-3xl font-bold mb-6">Agenda</h1></div>
       {/* Encabezado del calendario */}
       <div className="flex items-center justify-between mb-4">
         <button
@@ -106,7 +171,7 @@ const AgendaList = () => {
               className={`p-4 border rounded ${
                 event ? "bg-green-100 hover:bg-green-200 cursor-pointer" : ""
               }`}
-              onClick={() => event && handleEventClick(event)}
+              onClick={(e) => {event ? handleEventClick(event):handleEmptyDay(e,day)}}
             >
               <div className="text-center font-semibold">{day}</div>
               {event && (
@@ -155,6 +220,49 @@ const AgendaList = () => {
           </div>
         </div>
       )}
+
+      {selectedDay && (
+        <div
+          style={{
+            position: "absolute",
+            
+            top: popupPosition.top,
+            left: popupPosition.left,
+            background: "white",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+            padding: "10px",
+            zIndex: 100
+          }}
+        >
+          
+          <h4 className="font-bold">{selectedDay}</h4>
+          <p>Nombre de la Reunión</p>
+          <input value={newEvent.title} onChange={(e)=>{handleChangeInput("title",e.target.value)}}/>
+          <p>Nombres de los asistentes</p>
+          <input value={newEvent.details.name} onChange={(e)=>handleChangeInput("details",{...newEvent.details,["name"] : e.target.value})} />
+          <p>Correo Electronico de Asistente</p>
+          <input value={newEvent.details.email} onChange={(e)=>handleChangeInput("details",{...newEvent.details,["email"]:e.target.value})} />
+          <p>Link o Lugar de reunión</p>
+          <input value={newEvent.details.location} onChange={(e)=>handleChangeInput("details",{...newEvent.details,["location"]:e.target.value})} />
+          <p>Id asociado al caso</p>
+          <input value={newEvent.details.caseId} onChange={(e)=>handleChangeInput("details",{...newEvent.details,["caseId"]:e.target.value})} />
+        
+
+          <button className="mt-2 bg-red-500 text-white px-2 py-1 rounded" onClick={sendEvent}>
+            Crear nueva reunion
+          </button>
+          <button
+            className="mt-2 bg-red-500 text-white px-2 py-1 rounded"
+            onClick={() => setSelectedDay(null)}
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
+
     </div>
   );
 };

@@ -60,6 +60,7 @@ const Queja = () => {
         'afectado_nombre':'',
         'afectado_sexo':'',
         'afectado_edad':'',
+        'afectado_codigo':'',////////////nuevo
         'afectado_comuna':'',
         'afectado_estrato_socioeconomico':'',
         'afectado_condicion_etnico_racial':'',
@@ -109,8 +110,8 @@ const Queja = () => {
             'codigo' :'',
             'tipo_de_acompanamiento' :'',
             'fecha' :'',
-            'estado' :'',
-            'detalles' :'',
+            'estado' :'1',
+            'detalles' :'no se',
             'facultad' : '',
             'unidad' : '',
             })
@@ -130,6 +131,8 @@ const Queja = () => {
             setpagina(pagina-1)
         }
     }
+    
+
 
     const nextPage = ()=>{
         
@@ -161,6 +164,8 @@ const Queja = () => {
         if (!response.ok) {
             const errorData = await response.json();
             console.error("Error detallado en la respuesta:", errorData);
+        }else{
+            //navigate('/');
         }
     
       } catch (error) {
@@ -170,7 +175,7 @@ const Queja = () => {
 
 
 
-        //navigate('/')
+        
     }
 
 
@@ -275,6 +280,11 @@ const Queja = () => {
                 </select>
             <p>Edad</p>
             <input value={datos_afectado.afectado_edad} onChange={(e)=>onchange(set_datos_afectado,"afectado_edad",e.target.value)}></input>
+            
+            <p>Codigo</p>
+            <input value={datos_afectado.afectado_codigo} onChange={(e)=>onchange(set_datos_afectado,"afectado_codigo",e.target.value)}></input>
+            
+            
             <p>Comunda donde reside</p>
             <input value={datos_afectado.afectado_comuna} onChange={(e)=>onchange(set_datos_afectado,"afectado_comuna",e.target.value)}></input>
             <p>Estrato socioeconónmico</p>
@@ -368,7 +378,7 @@ const Queja = () => {
             <input value={datos_afectado.afectado_correo} onChange={(e)=>onchange(set_datos_afectado,"afectado_correo",e.target.value)}></input>
             <p>Tipo de violencia basada en género u orientación sexual</p>
             <select value={datos_afectado.afectado_tipo_vbg_os} 
-                onChange={(e) => onchange(set_datos_afectado,"afectado_tipo_vbg_os",e.target.value)} >
+                onChange={(e) => onchange(set_datos_afectado,"afectado_tipo_vbg_os",e.target.value)}>
                     <option>-------------------------------------------------------------------</option>
                     {tipoVBG_opt.map((option,index)=>(
                         <option key={index} value={option}>
@@ -580,6 +590,9 @@ const Queja = () => {
             </div>
             
             <button onClick={previousPage}>Anterior</button>
+            {Array.from({ length: 4 }, (_, index) => (
+                <button key={index + 1} onClick={(e)=>setpagina(index)} >{index + 1}</button>
+            ))}
             <button onClick={pagina===3?sendform:nextPage}>{  pagina===3?'Enviar':'siguiente'}</button>
         </div>
         

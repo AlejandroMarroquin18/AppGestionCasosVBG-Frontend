@@ -72,7 +72,7 @@ const ComplaintsList = () => {
     <div className="lista-content p-6 text-base relative bg-white">
       <h1 className="text-3xl font-bold mb-6">Lista de quejas</h1>
 
-      <div className="search-and-filters flex justify-between w-full mb-4">
+      <div className="search-and-filters flex flex-col w-full mb-4">
         <div
           style={{ maxWidth: "500px" }}
           className="flex w-full overflow-hidden rounded-xl border border-gray-300 items-center"
@@ -90,29 +90,9 @@ const ComplaintsList = () => {
           </button>
         </div>
 
-        <div className="filters-button relative">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2"
-          >
-            <FiFilter /> Filtros
-          </button>
-
-          {showFilters && (
-            <div
-              className="filter-panel"
-              style={{
-                position: "absolute",
-                top: "100%",
-                right: "0",
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                zIndex: 100,
-                boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                width: "350px",
-                overflow: "hidden",
-              }}
-            >
+        
+          <div className="flex justify-between">
+            
               <div className="filter-group mb-4">
                 <h4 className="mb-1 text-xl font-semibold">Sede</h4>
                 <select
@@ -169,8 +149,9 @@ const ComplaintsList = () => {
                 </select>
               </div>
             </div>
-          )}
-        </div>
+            
+          
+        
       </div>
 
       {/* Table layout */}
@@ -199,16 +180,16 @@ const ComplaintsList = () => {
               onClick={() => toggleComplaintSelection(complaint.id)}
             >
               <td className="border p-2">{complaint.id}</td>
-              <td className="border p-2">{complaint.nombre}</td>
-              <td className="border p-2">{complaint.sede}</td>
-              <td className="border p-2">{complaint.codigo}</td>
-              <td className="border p-2">{complaint.facultad}</td>
-              <td className="border p-2">{complaint.unidad}</td>
+              <td className="border p-2">{complaint.afectado_nombre}</td>
+              <td className="border p-2">{complaint.afectado_sede}</td>
+              <td className="border p-2">{complaint.afectado_codigo}</td>
+              <td className="border p-2">{complaint.afectado_facultad}</td>
+              <td className="border p-2">{complaint.afectado_programa_academico}</td>
               <td className="border p-2">{complaint.tipo_de_acompanamiento}</td>
-              <td className="border p-2">{complaint.fecha}</td>
+              <td className="border p-2">{complaint.fecha_recepcion}</td>
               <td className="border p-2">{complaint.estado}</td>
               <td className="border p-2">
-                <button
+                <button 
                   onClick={() =>
                     (window.location.href = `/quejas/detalles/${complaint.id}/`)
                   }
