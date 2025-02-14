@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 
-const WorkshopForm = ({ onSubmit }) => {
+const WorkshopForm = () => {
   const [formData, setFormData] = useState({
     name: "",
-    startTime: "",
-    endTime: "",
+    date: "",
+    start_time: "",
+    end_time: "",
     details: "",
     location: "",
     modality: "presencial",
     slots: "",
-    email: "",
-    code: "",
+    facilitator: "",
   });
 
   const handleChange = (e) => {
@@ -18,9 +18,31 @@ const WorkshopForm = ({ onSubmit }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    console.log(formData);
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/talleres/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Taller creado:", data);
+        alert("Taller creado exitosamente!");
+        // Opcional: resetear el formulario o redireccionar al usuario
+      } else {
+        const errorData = await response.json();
+        console.error("Error al crear taller:", errorData);
+        alert("Error al crear taller, por favor revisa tus datos.");
+      }
+    } catch (error) {
+      console.error("Error en la red:", error);
+      alert("Error de conexión con el servidor");
+    }
   };
 
   return (
@@ -32,7 +54,7 @@ const WorkshopForm = ({ onSubmit }) => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Crear Taller
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xl">
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
               Nombre del Taller
@@ -47,12 +69,25 @@ const WorkshopForm = ({ onSubmit }) => {
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
+              Fecha del Taller
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
               Hora de Inicio
             </label>
             <input
               type="time"
-              name="startTime"
-              value={formData.startTime}
+              name="start_time"
+              value={formData.start_time}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             />
@@ -63,8 +98,8 @@ const WorkshopForm = ({ onSubmit }) => {
             </label>
             <input
               type="time"
-              name="endTime"
-              value={formData.endTime}
+              name="end_time"
+              value={formData.end_time}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             />
@@ -89,7 +124,7 @@ const WorkshopForm = ({ onSubmit }) => {
               name="modality"
               value={formData.modality}
               onChange={handleChange}
-              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             >
               <option value="presencial">Presencial</option>
               <option value="virtual">Virtual</option>
@@ -109,12 +144,12 @@ const WorkshopForm = ({ onSubmit }) => {
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
-              Correo Electrónico
+              Tallerista
             </label>
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              name="facilitator"
+              value={formData.facilitator}
               onChange={handleChange}
               className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             />

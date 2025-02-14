@@ -1,41 +1,63 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const WorkshopList = ({ workshops, onBackToMenu }) => {
+const WorkshopList = ({ onBackToMenu }) => {
+  const [workshops, setWorkshops] = useState([]);
+
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/talleres/");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setWorkshops(data);
+      } catch (error) {
+        console.error("Error fetching workshops:", error);
+        alert("Failed to fetch workshops");
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
+
   return (
-    <div className="flex items-start justify-center h-screen bg-white">
-      <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl mt-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-          Lista de Talleres
-        </h2>
-        <table className="min-w-full table-auto">
+    <div className="lista-content p-6 text-base relative bg-white">
+      <div className="w-full p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-6">Lista de talleres</h1>
+        <table className="w-full border-collapse text-center">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="px-4 py-2 border text-left">Nombre del Taller</th>
-              <th className="px-4 py-2 border text-left">Hora de Inicio</th>
-              <th className="px-4 py-2 border text-left">Hora de Finalización</th>
-              <th className="px-4 py-2 border text-left">Ubicación</th>
-              <th className="px-4 py-2 border text-left">Modalidad</th>
-              <th className="px-4 py-2 border text-left">Cupos</th>
-              <th className="px-4 py-2 border text-left">Correo</th>
-              <th className="px-4 py-2 border text-left">Código</th>
-              <th className="px-4 py-2 border text-left">Detalles</th>
-              <th className="px-4 py-2 border text-left">Estado</th>
+            <tr className="bg-gray-100 text-xl">
+              <th className="border p-2">Nombre del Taller</th>
+              <th className="border p-2">Fecha</th>
+              <th className="border p-2">Hora de Inicio</th>
+              <th className="border p-2">Hora de Finalización</th>
+              <th className="border p-2">Ubicación</th>
+              <th className="border p-2">Modalidad</th>
+              <th className="border p-2">Beneficiarios</th>
+              <th className="border p-2">Tallerista</th>
+              <th className="border p-2">Detalles</th>
+              <th className="border p-2">Estado</th>
             </tr>
           </thead>
           <tbody>
             {workshops.length > 0 ? (
               workshops.map((workshop, index) => (
-                <tr key={index} className="border-b">
-                  <td className="px-4 py-2">{workshop.name}</td>
-                  <td className="px-4 py-2">{workshop.startTime}</td>
-                  <td className="px-4 py-2">{workshop.endTime}</td>
-                  <td className="px-4 py-2">{workshop.location}</td>
-                  <td className="px-4 py-2">{workshop.mode}</td>
-                  <td className="px-4 py-2">{workshop.quota}</td>
-                  <td className="px-4 py-2">{workshop.email}</td>
-                  <td className="px-4 py-2">{workshop.code}</td>
-                  <td className="px-4 py-2">{workshop.details}</td>
-                  <td className="px-4 py-2">{workshop.status}</td>
+                <tr key={index} className="hover:bg-gray-200">
+                  <td className="border p-2">{workshop.name}</td>
+                  <td className="border p-2">{workshop.date}</td>
+                  <td className="border p-2">{workshop.start_time}</td>
+                  <td className="border p-2">{workshop.end_time}</td>
+                  <td className="border p-2">{workshop.location}</td>
+                  <td className="border p-2">{workshop.modality}</td>
+                  <td className="border p-2">{workshop.slots}</td>
+                  <td className="border p-2">{workshop.facilitator}</td>
+                  <td className="border p-2">{workshop.details}</td>
+                  <td className="border p-2">
+                    {new Date(workshop.date) > new Date()
+                      ? "Pendiente"
+                      : "Realizado"}
+                  </td>
                 </tr>
               ))
             ) : (
@@ -47,14 +69,6 @@ const WorkshopList = ({ workshops, onBackToMenu }) => {
             )}
           </tbody>
         </table>
-        <div className="mt-4 flex justify-center">
-        <button
-          className="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold"
-          onClick={onBackToMenu}
-        >
-          Volver al Menú Inicial
-        </button>
-      </div>
       </div>
     </div>
   );
