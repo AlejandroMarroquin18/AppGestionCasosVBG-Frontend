@@ -70,165 +70,164 @@ const ComplaintsList = () => {
 
   return (
     <div className="lista-content p-6 text-base relative bg-white">
-      <h1 className="text-3xl font-bold mb-6">Lista de quejas</h1>
+      <div className="w-full p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-6">Lista de quejas</h1>
 
-      <div className="search-and-filters flex flex-col w-full mb-4">
-        <div
-          style={{ maxWidth: "500px" }}
-          className="flex w-full overflow-hidden rounded-xl border border-gray-300 items-center"
-        >
-          <input
-            type="text"
-            placeholder="Buscar por código"
-            className="px-4 py-2 w-full border-none"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ height: "100%" }}
-          />
-          <button className="bg-red-600 hover:bg-red-500 text-white px-4 py-2">
-            <FiSearch size={24} />
-          </button>
+        <div className="search-and-filters flex flex-col w-full mb-4">
+          <div
+            style={{ maxWidth: "500px" }}
+            className="flex w-full overflow-hidden rounded-xl border border-gray-300 items-center"
+          >
+            <input
+              type="text"
+              placeholder="Buscar por código"
+              className="px-4 py-2 w-full border-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ height: "100%" }}
+            />
+            <button className="bg-red-600 hover:bg-red-500 text-white px-4 py-2">
+              <FiSearch size={24} />
+            </button>
+          </div>
+
+          <div className="flex justify-between">
+            <div className="filter-group mb-4">
+              <h4 className="mb-1 text-xl font-semibold">Sede</h4>
+              <select
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="border w-full text-sm h-10"
+              >
+                <option value="">Todos</option>
+                <option value="Zarzal">Zarzal</option>
+                <option value="Melendez">Melendez</option>
+                <option value="Buga">Buga</option>
+                <option value="Santander">Santander</option>
+                <option value="Buenaventura">B/ventura</option>
+              </select>
+            </div>
+            <div className="filter-group mb-4">
+              <h4 className="mb-1 text-xl font-semibold">Tipo</h4>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="border w-full text-sm h-10"
+              >
+                <option value="">Todos</option>
+                <option value="Psicológico">Acompañamiento psicológico</option>
+                <option value="Integral">Acompañamiento integral</option>
+              </select>
+            </div>
+            <div className="filter-group">
+              <h4 className="mb-1 text-xl font-semibold">Facultad</h4>
+              <select
+                value={facultyFilter}
+                onChange={(e) => setFacultyFilter(e.target.value)}
+                className="border w-full text-sm h-10"
+              >
+                <option value="">Todos</option>
+                <option value="Artes">Artes Integradas</option>
+                <option value="Ciencias Naturales">
+                  Ciencias Naturales y Exactas
+                </option>
+                <option value="Ciencias de la Administración">
+                  Ciencias de la Administración
+                </option>
+                <option value="Salud">Salud</option>
+                <option value="Ciencias Sociales">
+                  Ciencias Sociales y Económicas
+                </option>
+                <option value="Humanidades">Humanidades</option>
+                <option value="Ingeniería">Ingeniería</option>
+                <option value="Educación">Educación y pedagogía</option>
+                <option value="Psicología">Psicología</option>
+                <option value="Derecho">Derecho y Ciencia Política</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        
-          <div className="flex justify-between">
-            
-              <div className="filter-group mb-4">
-                <h4 className="mb-1 text-xl font-semibold">Sede</h4>
-                <select
-                  value={locationFilter}
-                  onChange={(e) => setLocationFilter(e.target.value)}
-                  className="border w-full text-sm h-10" 
-                >
-                  <option value="">Todos</option>
-                  <option value="Zarzal">Zarzal</option>
-                  <option value="Melendez">Melendez</option>
-                  <option value="Buga">Buga</option>
-                  <option value="Santander">Santander</option>
-                  <option value="Buenaventura">B/ventura</option>
-                </select>
-              </div>
-              <div className="filter-group mb-4">
-                <h4 className="mb-1 text-xl font-semibold">Tipo</h4>
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="border w-full text-sm h-10" 
-                >
-                  <option value="">Todos</option>
-                  <option value="Psicológico">
-                    Acompañamiento psicológico
-                  </option>
-                  <option value="Integral">Acompañamiento integral</option>
-                </select>
-              </div>
-              <div className="filter-group">
-                <h4 className="mb-1 text-xl font-semibold">Facultad</h4>
-                <select
-                  value={facultyFilter}
-                  onChange={(e) => setFacultyFilter(e.target.value)}
-                  className="border w-full text-sm h-10" 
-                >
-                  <option value="">Todos</option>
-                  <option value="Artes">Artes Integradas</option>
-                  <option value="Ciencias Naturales">
-                    Ciencias Naturales y Exactas
-                  </option>
-                  <option value="Ciencias de la Administración">
-                    Ciencias de la Administración
-                  </option>
-                  <option value="Salud">Salud</option>
-                  <option value="Ciencias Sociales">
-                    Ciencias Sociales y Económicas
-                  </option>
-                  <option value="Humanidades">Humanidades</option>
-                  <option value="Ingeniería">Ingeniería</option>
-                  <option value="Educación">Educación y pedagogía</option>
-                  <option value="Psicología">Psicología</option>
-                  <option value="Derecho">Derecho y Ciencia Política</option>
-                </select>
-              </div>
-            </div>
-            
-          
-        
-      </div>
-
-      {/* Table layout */}
-      <table className="w-full border-collapse text-center">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Nombre</th>
-            <th className="border p-2">Sede</th>
-            <th className="border p-2">Código</th>
-            <th className="border p-2">Facultad</th>
-            <th className="border p-2">Unidad académica</th>
-            <th className="border p-2">Acompañamiento</th>
-            <th className="border p-2">Fecha de solicitud</th>
-            <th className="border p-2">Estado</th>
-            <th className="border p-2">Detalles</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentComplaints.map((complaint) => (
-            <tr
-              key={complaint.id}
-              className={`${
-                selectedComplaints[complaint.id] ? "bg-gray-200" : ""
-              }`}
-              onClick={() => toggleComplaintSelection(complaint.id)}
-            >
-              <td className="border p-2">{complaint.id}</td>
-              <td className="border p-2">{complaint.afectado_nombre}</td>
-              <td className="border p-2">{complaint.afectado_sede}</td>
-              <td className="border p-2">{complaint.afectado_codigo}</td>
-              <td className="border p-2">{complaint.afectado_facultad}</td>
-              <td className="border p-2">{complaint.afectado_programa_academico}</td>
-              <td className="border p-2">{complaint.tipo_de_acompanamiento}</td>
-              <td className="border p-2">{complaint.fecha_recepcion}</td>
-              <td className="border p-2">{complaint.estado}</td>
-              <td className="border p-2">
-                <button 
-                  onClick={() =>
-                    (window.location.href = `/quejas/detalles/${complaint.id}/`)
-                  }
-                  className="text-red-600 bg-white hover:underline"
-                >
-                  Ver detalles
-                </button>
-              </td>
+        {/* Table layout */}
+        <table className="w-full border-collapse text-center">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2">ID</th>
+              <th className="border p-2">Nombre</th>
+              <th className="border p-2">Sede</th>
+              <th className="border p-2">Código</th>
+              <th className="border p-2">Facultad</th>
+              <th className="border p-2">Unidad académica</th>
+              <th className="border p-2">Acompañamiento</th>
+              <th className="border p-2">Fecha de solicitud</th>
+              <th className="border p-2">Estado</th>
+              <th className="border p-2">Detalles</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {currentComplaints.map((complaint) => (
+              <tr
+                key={complaint.id}
+                className={`${
+                  selectedComplaints[complaint.id] ? "bg-gray-200" : ""
+                }`}
+                onClick={() => toggleComplaintSelection(complaint.id)}
+              >
+                <td className="border p-2">{complaint.id}</td>
+                <td className="border p-2">{complaint.afectado_nombre}</td>
+                <td className="border p-2">{complaint.afectado_sede}</td>
+                <td className="border p-2">{complaint.afectado_codigo}</td>
+                <td className="border p-2">{complaint.afectado_facultad}</td>
+                <td className="border p-2">
+                  {complaint.afectado_programa_academico}
+                </td>
+                <td className="border p-2">
+                  {complaint.tipo_de_acompanamiento}
+                </td>
+                <td className="border p-2">{complaint.fecha_recepcion}</td>
+                <td className="border p-2">{complaint.estado}</td>
+                <td className="border p-2">
+                  <button
+                    onClick={() =>
+                      (window.location.href = `/quejas/detalles/${complaint.id}/`)
+                    }
+                    className="text-red-600 bg-white hover:underline"
+                  >
+                    Ver detalles
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      <div
-        className="fixed bottom-0 left-auto right-0 w-[calc(100%-250px)] bg-white p-4 flex justify-between items-center border-t shadow"
-        style={{ zIndex: 50 }}
-      >
-        <button className="text-red-600 bg-white hover:underline">
-          Descargar como CSV
-        </button>
-        <div className="flex items-center space-x-2">
-          <button
-            className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg shadow hover:shadow-lg transition duration-300 flex justify-center items-center"
-            style={{ width: "40px", height: "40px" }}
-            onClick={handlePreviousPage}
-          >
-            <FiChevronLeft />
+        <div
+          className="fixed bottom-0 left-auto right-0 w-[calc(100%-250px)] bg-white p-4 flex justify-between items-center border-t shadow"
+          style={{ zIndex: 50 }}
+        >
+          <button className="text-red-600 bg-white hover:underline">
+            Descargar como CSV
           </button>
-          <span>
-            {currentPage} de{" "}
-            {Math.ceil(filteredComplaints.length / complaintsPerPage)}
-          </span>
-          <button
-            className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg shadow hover:shadow-lg transition duration-300 flex justify-center items-center"
-            style={{ width: "40px", height: "40px" }}
-            onClick={handleNextPage}
-          >
-            <FiChevronRight />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg shadow hover:shadow-lg transition duration-300 flex justify-center items-center"
+              style={{ width: "40px", height: "40px" }}
+              onClick={handlePreviousPage}
+            >
+              <FiChevronLeft />
+            </button>
+            <span>
+              {currentPage} de{" "}
+              {Math.ceil(filteredComplaints.length / complaintsPerPage)}
+            </span>
+            <button
+              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-lg shadow hover:shadow-lg transition duration-300 flex justify-center items-center"
+              style={{ width: "40px", height: "40px" }}
+              onClick={handleNextPage}
+            >
+              <FiChevronRight />
+            </button>
+          </div>
         </div>
       </div>
     </div>

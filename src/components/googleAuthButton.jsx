@@ -44,15 +44,16 @@ const GoogleLoginButton = () => {
     };
 
     return (
-        <>
-            <p>Iniciar Sesión Con Google</p>
+        <div style={{ textAlign: 'center', margin: '20px' }}>
+            <p style={{ marginBottom: '10px' }}>Iniciar Sesión Con Google</p>
             <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={handleError}
                 clientId={clientId}
+                theme="filled_blue"
+                style={{ fontSize: '16px', fontWeight: 'bold' }} 
             />
-        </>
-        
+        </div>
     );
 };
 

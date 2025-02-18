@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import WorkshopForm from "./WorkshopForm"; 
 import WorkshopList from "./WorkshopList";
-import WorkshopStats from "./WorkshopStats";
+import WorkshopStats from "../pages/estadisticas/WorkshopStats";
 import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 
 // Simulamos los talleres de ejemplo

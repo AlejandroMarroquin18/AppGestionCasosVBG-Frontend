@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiBarChart2, FiList, FiCalendar, FiBook, FiPlusSquare, FiEye, FiFolderPlus } from 'react-icons/fi';
-import './styles.css';
 
 const Sidebar = ({ activeRoute }) => {
   const [open, setOpen] = useState('');
