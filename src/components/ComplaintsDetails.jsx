@@ -216,10 +216,6 @@ const ComplaintsDetails = () => {
     </div>
   );
 
-<<<<<<< HEAD
-  const trStyle= { padding: '8px', border: '1px solid #ccc'}
-  const tdStyle= { padding: '8px', border: '1px solid #ccc' }
-=======
   const sectionTitles = {
     reporta: reportaTitles,
     afectado: afectadaTitles,
@@ -248,7 +244,6 @@ const ComplaintsDetails = () => {
       </AccordionDetails>
     </Accordion>
   );
->>>>>>> cf620c9 (Eliminación de talleres y otros)
 
   return (
     <div className="details-container" style={{ background: 'white', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', margin: '20px' }}>

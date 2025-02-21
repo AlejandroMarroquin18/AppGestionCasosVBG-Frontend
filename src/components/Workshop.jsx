@@ -18,10 +18,7 @@ const Workshop = () => {
           }
         />
         <Route path="/ver" element={<WorkshopList />} />
-        <Route
-          path="/talleres/detalles/:workshopId"
-          element={<WorkshopDetails />}
-        />
+        <Route path="/detalles/:workshopId" element={<WorkshopDetails />} />
         <Route path="/estadisticas" element={<WorkshopStats />} />
       </Routes>
     </div>

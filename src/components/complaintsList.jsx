@@ -3,7 +3,7 @@ import {
   FiSearch,
   FiChevronLeft,
   FiChevronRight,
-  FiFilter,
+  FiEye,
 } from "react-icons/fi";
 
 const ComplaintsList = () => {
@@ -11,7 +11,6 @@ const ComplaintsList = () => {
   const [selectedComplaints, setSelectedComplaints] = useState({});
   const [locationFilter, setLocationFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
   const [complaints, setComplaints] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [complaintsPerPage] = useState(7);
@@ -191,9 +190,9 @@ const ComplaintsList = () => {
                     onClick={() =>
                       (window.location.href = `/quejas/detalles/${complaint.id}/`)
                     }
-                    className="text-red-600 bg-white hover:underline"
+                    className="text-white-500 hover:text-red-700"
                   >
-                    Ver detalles
+                   <FiEye size={24} />
                   </button>
                 </td>
               </tr>
