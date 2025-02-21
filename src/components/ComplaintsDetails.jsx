@@ -219,7 +219,7 @@ const ComplaintsDetails = () => {
     </div>
   );
 
-  const trStyle= { padding: '8px', border: '1px solid #ccc', fontWeight: 'bold' }
+  const trStyle= { padding: '8px', border: '1px solid #ccc'}
   const tdStyle= { padding: '8px', border: '1px solid #ccc' }
 
   return (
