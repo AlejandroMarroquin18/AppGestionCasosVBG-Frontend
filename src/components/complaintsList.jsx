@@ -176,7 +176,7 @@ const ComplaintsList = () => {
                 <td className="border p-2">{complaint.id}</td>
                 <td className="border p-2">{complaint.afectado_nombre}</td>
                 <td className="border p-2">{complaint.afectado_sede}</td>
-                <td className="border p-2">{complaint.afectado_codigo}</td>
+                <td className="border p-2">{complaint.codigo}</td>
                 <td className="border p-2">{complaint.afectado_facultad}</td>
                 <td className="border p-2">
                   {complaint.afectado_programa_academico}
