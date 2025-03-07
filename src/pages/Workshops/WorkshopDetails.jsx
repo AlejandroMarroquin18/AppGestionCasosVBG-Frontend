@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiTrash2 } from "react-icons/fi";
+import { getWorkshopDetails, updateWorkshop, deleteWorkshop } from "../../api";
+import DeleteModal from "../../components/DeleteModal";
 
 const Accordion = ({ title, children, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -22,36 +23,6 @@ const Accordion = ({ title, children, defaultOpen = false }) => {
   );
 };
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6">
-        <h2 className="text-lg font-bold mb-4 flex items-center">
-          <FiTrash2 className="mr-2" size={24} />
-          Confirmación
-        </h2>
-        <p className="mb-4">{message}</p>
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={onConfirm}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Confirmar
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
-          >
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const WorkshopDetails = () => {
   const workshopId = useParams().workshopId;
   const navigate = useNavigate();
@@ -62,16 +33,11 @@ const WorkshopDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
 
+
   useEffect(() => {
-    const fetchWorkshop = async () => {
+    const getWorkshop = async () => {
       try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/api/talleres/${workshopId}/`
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch with status: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await getWorkshopDetails(workshopId);
         setWorkshop(data);
       } catch (err) {
         setError(`Failed to load data: ${err.message}`);
@@ -80,7 +46,7 @@ const WorkshopDetails = () => {
       }
     };
 
-    fetchWorkshop();
+    getWorkshop();
   }, [workshopId]);
 
   const handleInputChange = (field, value) => {
@@ -89,18 +55,8 @@ const WorkshopDetails = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/talleres/${workshopId}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(workshop),
-        }
-      );
-      if (!response.ok) throw new Error("Error al guardar los cambios");
-      setIsEditing(false); // Exit editing mode on success
+      await updateWorkshop(workshopId, workshop);
+      setIsEditing(false);
     } catch (error) {
       console.error("Error al guardar los cambios:", error);
     }
@@ -108,19 +64,13 @@ const WorkshopDetails = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/talleres/${workshopId}/`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) throw new Error("Error al eliminar el taller");
+      await deleteWorkshop(workshopId);
       console.log("Taller eliminado correctamente");
       setMessage("Taller eliminado exitosamente");
       setIsModalOpen(true);
       setTimeout(() => {
         setIsModalOpen(false);
-        navigate("/talleres/ver"); // Use navigate instead of history.push
+        navigate("/talleres/ver");
       }, 2000);
     } catch (error) {
       console.error("Error eliminando el taller:", error);
@@ -143,9 +93,8 @@ const WorkshopDetails = () => {
   ];
 
   const openDeleteModal = () => {
-    if (!workshop) return; // Asegurarse de que el taller está cargado
-    const deleteMessage = `¿Estás seguro de que deseas eliminar el taller "${workshop.name}"?`;
-    setMessage(deleteMessage); // Configura el mensaje para incluir el nombre del taller
+    if (!workshop) return; 
+    setMessage(`¿Estás seguro de que deseas eliminar el taller "${workshop.name}"?`); 
     setIsModalOpen(true);
   };
 
@@ -253,11 +202,11 @@ const WorkshopDetails = () => {
           Eliminar Taller
         </button>
       </div>
-      <ConfirmationModal
+      <DeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDelete}
-        message={message} 
+        message={message}
       />
     </div>
   );

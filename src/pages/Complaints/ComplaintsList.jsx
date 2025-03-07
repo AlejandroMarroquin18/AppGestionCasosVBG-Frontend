@@ -5,6 +5,7 @@ import {
   FiChevronRight,
   FiEye,
 } from "react-icons/fi";
+import { getComplaints } from "../../api";
 
 const ComplaintsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,13 +18,17 @@ const ComplaintsList = () => {
   const [facultyFilter, setFacultyFilter] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/quejas/")
-      .then((response) => response.json())
-      .then((data) => {
+    const loadComplaints = async () => {
+      try {
+        const data = await getComplaints();
         const sortedData = data.sort((a, b) => a.id - b.id);
         setComplaints(sortedData);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+      } catch (error) {
+        console.error("Error getting data:", error);
+      }
+    };
+
+    loadComplaints();
   }, []);
 
   useEffect(() => {

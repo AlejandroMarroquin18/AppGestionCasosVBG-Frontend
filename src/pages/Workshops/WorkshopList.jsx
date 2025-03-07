@@ -1,92 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { FiSearch, FiTrash2, FiEye } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl p-6">
-        <h2 className="text-lg font-bold mb-4 flex items-center">
-          <FiTrash2 className="mr-2" size={24} />
-          Confirmación
-        </h2>
-        <p className="mb-4">{message}</p>
-        <div className="flex justify-center space-x-4">
-          <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-            Confirmar
-          </button>
-          <button onClick={onClose} className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { getWorkshops, deleteWorkshop } from "../../api";
+import DeleteModal from "../../components/DeleteModal";
 
 const WorkshopList = ({ onBackToMenu }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [workshops, setWorkshops] = useState([]);
   const [dateFilter, setDateFilter] = useState("");
   const [modalityFilter, setModalityFilter] = useState("");
-  const [locationFilter] = useState(""); // Make sure you want this to be a non-updatable constant
+  const [locationFilter] = useState(""); 
   const [statusFilter, setStatusFilter] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWorkshopId, setSelectedWorkshopId] = useState(null);
-  const [modalMessage, setModalMessage] = useState("");
+  const [modalMessage, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchWorkshops = async () => {
+    const loadWorkshops = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/talleres/");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setWorkshops(
-          data.map((workshop) => ({
-            ...workshop,
-            date: new Date(workshop.date),
-          }))
-        );
+        const data = await getWorkshops();
+        setWorkshops(data.map(workshop => ({
+          ...workshop,
+          date: new Date(workshop.date)
+        })));
       } catch (error) {
-        console.error("Error fetching workshops:", error);
-        alert("Failed to fetch workshops");
+        console.error("Error getting workshops:", error);
+        alert("Failed to get workshops");
       }
     };
-
-    fetchWorkshops();
+  
+    loadWorkshops();
   }, []);
 
-  const openModal = (workshop) => {
+  const openDeleteModal = (workshop) => {
     setSelectedWorkshopId(workshop.id);
-    setModalMessage(`¿Desea eliminar el taller "${workshop.name}"?`);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
+    setMessage(`¿Desea eliminar el taller "${workshop.name}"?`);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/talleres/${selectedWorkshopId}/`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to delete the workshop");
-      }
-      setWorkshops(
-        workshops.filter((workshop) => workshop.id !== selectedWorkshopId)
-      );
-      closeModal();
+      await deleteWorkshop(selectedWorkshopId);
+      setWorkshops(workshops.filter(workshop => workshop.id !== selectedWorkshopId));
+      setIsModalOpen(false);
     } catch (error) {
-      console.error("Error deleting workshop:", error);
+      console.error("Error eliminando el taller:", error);
+      setIsModalOpen(false);
     }
   };
 
@@ -199,7 +157,7 @@ const WorkshopList = ({ onBackToMenu }) => {
                   </td>
                   <td className="border p-2">
                     <button
-                      onClick={() => openModal(workshop)}
+                      onClick={() => openDeleteModal(workshop)}
                       className="text-white-500 hover:text-red-700"
                     >
                       <FiTrash2 size={24} />
@@ -229,9 +187,9 @@ const WorkshopList = ({ onBackToMenu }) => {
             )}
           </tbody>
         </table>
-        <ConfirmationModal
-          isOpen={modalOpen}
-          onClose={closeModal}
+        <DeleteModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           onConfirm={handleDelete}
           message={modalMessage}
         />

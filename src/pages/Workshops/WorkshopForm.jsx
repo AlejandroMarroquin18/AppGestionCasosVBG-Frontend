@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { createWorkshop } from "../../api";
+import SuccessModal from "../../components/SuccessModal";
 
 const WorkshopForm = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ const WorkshopForm = () => {
     slots: "",
     facilitator: "",
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,29 +24,18 @@ const WorkshopForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/talleres/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Taller creado:", data);
-        alert("Taller creado exitosamente!");
-        // Opcional: resetear el formulario o redireccionar al usuario
-      } else {
-        const errorData = await response.json();
-        console.error("Error al crear taller:", errorData);
-        alert("Error al crear taller, por favor revisa tus datos.");
-      }
+      const data = await createWorkshop(formData);
+      console.log("Taller creado:", data);
+      setSubmitSuccess(true); // Indica que el envío fue exitoso
     } catch (error) {
-      console.error("Error en la red:", error);
-      alert("Error de conexión con el servidor");
+      console.error(error.message);
+      alert(error.message);
     }
+  };
+
+  const handleModalClose = () => {
+    setSubmitSuccess(false);
   };
 
   return (
@@ -106,18 +99,6 @@ const WorkshopForm = () => {
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
-              Ubicación
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">
               Modalidad
             </label>
             <select
@@ -129,6 +110,18 @@ const WorkshopForm = () => {
               <option value="presencial">Presencial</option>
               <option value="virtual">Virtual</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Ubicación
+            </label>
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            />
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -175,6 +168,7 @@ const WorkshopForm = () => {
             Guardar Taller
           </button>
         </div>
+        {submitSuccess && <SuccessModal isOpen={submitSuccess} onClose={handleModalClose} message="¡Taller creado exitosamente!" />}
       </form>
     </div>
   );

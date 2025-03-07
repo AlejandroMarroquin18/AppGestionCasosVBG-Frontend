@@ -1,8 +1,8 @@
 import React from "react";
-import WorkshopForm from "./WorkshopForm";
-import WorkshopList from "./WorkshopList";
-import WorkshopDetails from "./WorkshopDetails";
-import WorkshopStats from "../pages/estadisticas/WorkshopStats";
+import WorkshopForm from "../pages/Workshops/WorkshopForm";
+import WorkshopList from "../pages/Workshops/WorkshopList";
+import WorkshopDetails from "../pages/Workshops/WorkshopDetails";
+import WorkshopStats from "../pages/Workshops/WorkshopStats";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
 const Workshop = () => {

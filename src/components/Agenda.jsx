@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import AgendaList from "./AgendaList";
-import AgendaStats from "../pages/estadisticas/AgendaStats";
+import AgendaStats from "./AgendaStats";
 
 
 const Agenda = () => {

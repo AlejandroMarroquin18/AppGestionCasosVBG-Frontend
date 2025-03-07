@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import ComplaintsList from "./complaintsList";
-import ComplaintStats from "../pages/estadisticas/ComplaintStats";
-import ComplaintsDetails from "./ComplaintsDetails";
+import ComplaintsList from "../pages/Complaints/ComplaintsList";
+import ComplaintStats from "../pages/Complaints/ComplaintStats";
+import ComplaintsDetails from "../pages/Complaints/ComplaintsDetails";
 
 const Complaints = () => {
   return (
