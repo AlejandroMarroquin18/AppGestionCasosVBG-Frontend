@@ -1,58 +1,51 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const GoogleLoginButton = () => {
-    const clientId = "TU_CLIENT_ID";
     const navigate = useNavigate();
 
-    const handleSuccess = async (response) => {
-        console.log("Inicio de sesión exitoso:", response);
+    const login = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            console.log("Tokens recibidos:", tokenResponse);
 
-        try {
-            const responsed = await fetch("http://localhost:8000/api/auth/google/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token: { credential: response.credential } }),
-            });
+            try {
+                const responsed = await fetch("http://localhost:8000/api/auth/google/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        token: tokenResponse.access_token, //  Se envía access_token en lugar de credential
+                    }),
+                });
 
-            const data = await responsed.json(); // Parsear la respuesta JSON
+                const data = await responsed.json();
 
-            if (responsed.ok) {
-                // Guardar el token y la información del usuario en localStorage
-                localStorage.setItem('userToken', data.token);
-                localStorage.setItem('userName', data.user.nombre);
-                localStorage.setItem('userRole', data.user.rol);
-                console.log("Usuario autenticado:", data);
+                if (responsed.ok) {
+                    localStorage.setItem("userToken", data.token); // Token de Django
+                    localStorage.setItem("accessToken", data.access_token); // Access Token de Google
+                    localStorage.setItem("userName", data.user.nombre);
+                    localStorage.setItem("userRole", data.user.rol);
+                    localStorage.setItem("userEmail",data.user.email)
 
-                console.log("name:", data.user.nombre);
-                console.log("rol:", data.user.rol);
-                navigate('/'); // Navegar a la página de inicio o dashboard
-            } else {
-                console.log("Error en la autenticación:", data);
-                throw new Error('Authentication failed');
+                    console.log("Usuario autenticado:", data);
+                    navigate("/");
+                } else {
+                    console.log("Error en la autenticación:", data);
+                }
+            } catch (error) {
+                console.error("Error en la conexión:", error);
             }
-        } catch (error) {
-            console.error("Error en la conexión o en el proceso de autenticación:", error);
-        }
-    };
-
-    const handleError = (error) => {
-        console.error("Falló el inicio de sesión:", error);
-    };
+        },
+        onError: (error) => console.error("Error en login:", error),
+        scope: "https://www.googleapis.com/auth/calendar", // 🔥 Agregar permisos para Google Calendar
+    });
 
     return (
-        <div style={{ textAlign: 'center', margin: '20px' }}>
-            <p style={{ marginBottom: '10px' }}>Iniciar Sesión Con Google</p>
-            <GoogleLogin
-                onSuccess={handleSuccess}
-                onError={handleError}
-                clientId={clientId}
-                theme="filled_blue"
-                style={{ fontSize: '16px', fontWeight: 'bold' }} 
-            />
+        <div style={{ textAlign: "center", margin: "20px" }}>
+            <p style={{ marginBottom: "10px" }}>Iniciar Sesión Con Google</p>
+            <button onClick={login} style={{ fontSize: "16px", fontWeight: "bold", padding: "10px", cursor: "pointer" }}>
+                Iniciar con Google
+            </button>
         </div>
     );
 };
