@@ -27,7 +27,7 @@ const Header = () => {
           />
         </div>
         <h1 className="text-3xl font-bold">
-          Sistema de Gestión de Casos de VBG
+          Sistema del Área de atención de VBG
         </h1>
       </div>
       <div className="relative">

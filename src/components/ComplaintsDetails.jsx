@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const ComplaintsDetails = () => {
-
   const navigate = useNavigate();
-
-  const [quejaDetails, setQuejaDetails] = useState(null);
-  const [quejaCopy,setQuejaCopy]=useState(null)
-  const [openModal,setOpenModal]=useState(false)
-
   const { id } = useParams();
-
-  const [editMode,setEditMode]=useState(false)
+  const [quejaDetails, setQuejaDetails] = useState(null);
+  const [quejaCopy, setQuejaCopy] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const dataTitles=[
           //persona que reporta
@@ -79,64 +77,64 @@ const ComplaintsDetails = () => {
           
           const reportaTitles=[
             //persona que reporta
-            'fecha de recepcion',
+            'Fecha de recepcion de la solicitud',
             'Nombre' ,
             'Sexo',
             'Edad',
             'Estamento' ,
-            'Vicerrectoria a la que se encuentra adscrito/a' ,
+            'Vicerrectoría a la que se encuentra adscrito/a' ,
             'Dependencia' ,
-            'Programa academico' ,
+            'Programa académico' ,
             'Facultad' ,
             'Sede' ,
             'Celular' ,
-            'Correo electronico' ]
+            'Correo electrónico' ]
           const afectadaTitles=[   //persona afectada
             'Nombre' ,
             'Sexo' ,
             'Edad' ,
-            'Código' ,
+            //'Código' ,
             'Comuna' ,
-            'Estrato socioeconomico' ,
-            'Condicion etnico racial' ,
+            'Estrato socioeconómico' ,
+            'Condición étnico racial' ,
             '¿Tiene algún tipo de discapacidad?' ,
             'Tipo de discapacidad' ,
-            'Identidad de genero' ,
+            'Identidad de género' ,
             'Orientación sexual' ,
             'Estamento' ,
-            'Vicerrectoria a la que se encuentra adscrito/a' ,
+            'Vicerrectoría a la que se encuentra adscrito/a' ,
             'Dependencia' ,
-            'Programa academico' ,
+            'Programa académico' ,
             'Facultad' ,
             'Sede' ,
             'Celular' ,
-            'Correo electronico' ,
-            'Tipo de violencia basada en genero u orientacion sexual' ,
+            'Correo electrónico' ,
+            'Tipo de violencia basada en género u orientación sexual' ,
             'Detalles del caso' ]
           const agresorTitles=[   //persona agresora
             'Nombre' ,
             'Sexo' ,
             'Edad' ,
-            'Condicion etnico racial' ,
+            'Condición étnico racial' ,
             '¿Tiene algún tipo de discapacidad?' ,
             'Tipo de discapacidad' ,
-            'Identidad de genero' ,
-            'Orientacion sexual' ,
+            'Identidad de género' ,
+            'Orientación sexual' ,
             'Estamento' ,
-            'Vicerrectoria a la que se encuentra adscrito/a' ,
+            'Vicerrectoría a la que se encuentra adscrito/a' ,
             'Dependencia' ,
-            'Programa academico' ,
-            'Dacultad' ,
+            'Programa académico' ,
+            'Facultad' ,
             'Sede' ]
           const detallesTitles=[   //detalles generales
-            'Desea Activar la Ruta de Atención Integral' ,
-            'Requiere recibir asesoría y orientación socio-pedagógica' ,
-            'Requiere recibir orientación psicológica' ,
-            'Requiere recibir asistencia jurídica' ,
-            'Requiere recibir acompañamiento para solicitud de medidas de protección inicial' ,
-            'Requiere recibir acompañamiento ante instancias gubernamentales' ,
-            'Requiere interponer una queja formal al Comité de Asuntos Internos Disciplinarios' ,
-            'observaciones' ,
+            '¿Desea activar la ruta de atención integral?' ,
+            '¿Requiere recibir asesoría y orientación socio-pedagógica?' ,
+            '¿Requiere recibir orientación psicológica?' ,
+            '¿Requiere recibir asistencia jurídica?' ,
+            '¿Requiere recibir acompañamiento para solicitud de medidas de protección inicial?' ,
+            '¿Requiere recibir acompañamiento ante instancias gubernamentales?' ,
+            '¿Requiere interponer una queja formal al Comité de Asuntos Internos Disciplinarios?' ,
+            'Observaciones' ,
             //relleno que se debe descartar
             'nombre'  ,
             'sede'  ,
@@ -165,7 +163,6 @@ const ComplaintsDetails = () => {
         [field]: value,
     });
   }
-
 
   const sendEdit=async()=>{  
     try {
@@ -215,90 +212,77 @@ const ComplaintsDetails = () => {
   
   if (!quejaDetails) return (
     <div className="flex justify-center items-center h-screen">
-      <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+      <div className="w-12 h-12 border-4 border-blue-500 rounded-full animate-spin"></div>
     </div>
   );
 
-  const trStyle= { padding: '8px', border: '1px solid #ccc'}
-  const tdStyle= { padding: '8px', border: '1px solid #ccc' }
+  const sectionTitles = {
+    reporta: reportaTitles,
+    afectado: afectadaTitles,
+    agresor: agresorTitles,
+    detalles: detallesTitles
+  };
+
+  const renderAccordionSection = (sectionKey, startIndex, endIndex, title) => (
+    <Accordion style={{ backgroundColor: '#f5f5f5', marginBottom: '10px' }}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} style={{ backgroundColor: '#e0e0e0' }}>
+        <Typography style={{ fontSize: '20px', fontWeight: 'bold' }}>{title}</Typography>
+      </AccordionSummary>
+      <AccordionDetails style={{ padding: '20px', fontSize: '18px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {Object.entries(quejaDetails).slice(startIndex, endIndex).map(([key, value], index) => (
+              <tr key={key} className="border border-gray-300">
+                <td style={{ padding: '8px', border: '1px solid #ccc', fontWeight: 'bold' }}>{sectionTitles[sectionKey][index]}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                  {!editMode ? value : <input value={quejaCopy[key]} onChange={(e) => changeDetails(key, e.target.value)} />}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </AccordionDetails>
+    </Accordion>
+  );
 
   return (
     <div className="details-container" style={{ background: 'white', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', margin: '20px' }}>
       <h1 className="text-3xl font-bold mb-6">Detalles de la queja</h1>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '18px' }}>
-        <thead>
-          <tr style={{ background: '#f0f0f0' }}>
-            <th style={{ padding: '10px' }} colSpan="2">Información de la persona que reporta el caso</th>
-          </tr>
-        </thead>
-        <tbody>
-        
-          {dataTitles.slice( 0,12).map((header, index) => (
-            <tr key={index} className="border border-gray-300">
-              <td style={trStyle}>{reportaTitles[index]}</td>
-              <td style={tdStyle}>{ !editMode ? quejaDetails[`${header}`] : <input value= {quejaCopy[header]} onChange={ (e)=>changeDetails(header,e.target.value) } />  }</td>
-            </tr>
-          ))}
-        </tbody>
-        <thead>
-          <tr style={{ background: '#f0f0f0' }}>
-            <th style={{ padding: '10px' }} colSpan="2">Información de la persona afectada</th>
-          </tr>
-        </thead>
-        <tbody>
-        
-          {dataTitles.slice(12,33).map((header, index) => (
-            <tr key={index} className="border border-gray-300">
-              <td style={trStyle}>{afectadaTitles[index]}</td>
-              <td style={tdStyle}>{ !editMode ? quejaDetails[`${header}`] : <input value= {quejaCopy[header]} onChange={ (e)=>changeDetails(header,e.target.value) } />  }</td>
-            </tr>
-          ))}
-        </tbody>
-        <thead>
-          <tr style={{ background: '#f0f0f0' }}>
-            <th style={{ padding: '10px' }} colSpan="2">Información de la persona agresora</th>
-          </tr>
-        </thead>
-        <tbody>
-        
-          {dataTitles.slice(33,47).map((header, index) => (
-            <tr key={index} className="border border-gray-300">
-              <td style={trStyle}>{agresorTitles[index]}</td>
-              <td style={tdStyle}>{ !editMode ? quejaDetails[`${header}`] : <input value= {quejaCopy[header]} onChange={ (e)=>changeDetails(header,e.target.value) } />  }</td>
-            </tr>
-          ))}
-        </tbody>
-        <thead>
-          <tr style={{ background: '#f0f0f0' }}>
-            <th style={{ padding: '10px' }} colSpan="2">Información adicional</th>
-          </tr>
-        </thead>
-        <tbody>
-              
-          {dataTitles.slice(47).map((header, index) => (
-            <tr key={index} className="border border-gray-300">
-              <td style={trStyle}>{detallesTitles[index]}</td>
-              <td style={tdStyle}>{ !editMode ? quejaDetails[`${header}`] : <input value= {quejaCopy[header]} onChange={ (e)=>changeDetails(header,e.target.value) } />  }</td>
-            </tr>
-          ))}
-        </tbody>
-
-      </table>
-      <button onClick={sendDelete}>Borrar</button>
-      <button onClick={()=>{setEditMode(!editMode)}}>{editMode ? "Cancelar Edicion" :"Editar"}</button>
-      {editMode && <button onClick={()=>setOpenModal(!openModal)}>Guardar</button>}
-      
-      {openModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md text-center">
-            <h2>¿Desea guardar los cambios?</h2>
-            <button onClick={sendEdit}>Sí, guardar</button>
-            <button onClick={()=>setOpenModal(!openModal)}>Cancelar</button>
-          </div>
+      {renderAccordionSection('reporta', 10, 22, 'Información de la persona que reporta')}
+      {renderAccordionSection('afectado', 22, 41, 'Información de la persona afectada')}
+      {renderAccordionSection('agresor', 42, 56, 'Información de la persona agresora')}
+      {renderAccordionSection('detalles', 56, 64, 'Información adicional')}
+    
+  
+      <div className="mt-5 flex justify-center gap-2">
+      <button onClick={sendDelete} className="bg-red-600 text-white px-5 py-2.5 rounded cursor-pointer hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+        Borrar
+      </button>
+      <button onClick={() => setEditMode(!editMode)} className="bg-red-600 text-white px-5 py-2.5 rounded cursor-pointer hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+        {editMode ? "Cancelar Edición" : "Editar"}
+      </button>
+      {editMode && (
+        <button onClick={() => setOpenModal(!openModal)} className="bg-red-600 text-white px-5 py-2.5 rounded cursor-pointer hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+          Guardar
+        </button>
+      )}
+    </div>
+    
+    {openModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-md text-center">
+          <h2>¿Desea guardar los cambios?</h2>
+          <button onClick={sendEdit} className="bg-red-500 text-white px-5 py-2.5 rounded cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+            Sí, guardar
+          </button>
+          <button onClick={() => setOpenModal(!openModal)} className="bg-red-500 text-white px-5 py-2.5 rounded cursor-pointer hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+            Cancelar
+          </button>
         </div>
+      </div>
       )}
     </div>
   );
-};
+};  
 
 export default ComplaintsDetails;

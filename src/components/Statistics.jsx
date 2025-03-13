@@ -43,7 +43,7 @@ const Statistics = ({
   return (
     <div className="w-full p-6 bg-white min-h-screen">
       <h1 className="text-3xl font-bold mb-6">{title}</h1>
-      <div className={primaryGridClass}>
+      <div className="grid grid-cols-2 p-3">
         {Object.keys(indicators).slice(0, numPrimaryColumns).map((key, index) => (
           <div key={index} className="bg-blue-200 p-4 rounded shadow text-center">
             <h2 className="text-xl font-semibold">{indicatorNames[key]}</h2>
@@ -51,7 +51,7 @@ const Statistics = ({
           </div>
         ))}
       </div>
-      <div className={secondaryGridClass}>
+      <div className="grid grid-cols-6 p-3">
         {Object.keys(indicators).slice(numPrimaryColumns).map((key, index) => (
           <div key={index} className="bg-green-200 p-4 rounded shadow text-center">
             <h2 className="text-xl font-semibold">{indicatorNames[key]}</h2>
