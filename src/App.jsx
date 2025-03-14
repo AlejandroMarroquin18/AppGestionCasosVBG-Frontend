@@ -1,4 +1,4 @@
-import {  BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Agenda from './components/Agenda';
@@ -8,16 +8,23 @@ import Login from './pages/login';
 import SignUp from './pages/signup';
 import RestorePassword from './pages/restorepassword';
 import Queja from './pages/queja/queja';
+import WorkshopRegistrationPage from "./pages/Workshops/WorkshopRegistrationPage";
 
 function App() {
   const location = useLocation();
-  const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword','/reportarvbg'];
+
+  // Array con las rutas que no deben mostrar el Header ni el Sidebar
+  const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword', '/reportarvbg', '/inscripcion'];
 
   return (
     <div className="flex flex-col h-screen">
-      {!noSidebarRoutes.includes(location.pathname) && <Header />}
+      {/* Mostrar Header solo si la ruta no está en la lista de noSidebarRoutes */}
+      {!noSidebarRoutes.some(route => location.pathname.startsWith(route)) && <Header />}
+      
       <div className="flex flex-1 overflow-hidden">
-        {!noSidebarRoutes.includes(location.pathname) && <Sidebar />}
+        {/* Mostrar Sidebar solo si la ruta no está en la lista de noSidebarRoutes */}
+        {!noSidebarRoutes.some(route => location.pathname.startsWith(route)) && <Sidebar />}
+        
         <main className="flex-1 overflow-auto">
           <Routes>
             <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
@@ -26,9 +33,11 @@ function App() {
             <Route path="/agenda/*" element={<Agenda />} />
             <Route path="/talleres" element={<Workshop />} />
             <Route path="/talleres/*" element={<Workshop />} />
-            
 
-            <Route path ="/reportarvbg" element={<Queja/>}/>
+            {/* RUTA DE INSCRIPCIÓN */}
+            <Route path="/inscripcion/:workshopId" element={<WorkshopRegistrationPage />} />
+
+            <Route path="/reportarvbg" element={<Queja />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />
             <Route path="/restorepassword" element={<RestorePassword />} />

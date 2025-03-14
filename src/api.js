@@ -20,20 +20,28 @@ export const getWorkshopDetails = async (workshopId) => {
   return response.json();
 };
 
-// Crear un taller
+//crear un taller
 export const createWorkshop = async (workshopData) => {
-  const response = await fetch(`${baseURL}/talleres/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(workshopData),
-  });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Error al crear taller: ${errorData.message}`);
+  try {
+    const response = await fetch(`${baseURL}/talleres/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(workshopData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del backend:", errorData); // Log de la respuesta de error
+      throw new Error(errorData.message || "Error desconocido");
+    }
+
+    return await response.json();  // Si la respuesta es correcta, devolver los datos
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    throw error;
   }
-  return await response.json();
 };
 
 // Actualizar los detalles de un taller
@@ -61,6 +69,24 @@ export const deleteWorkshop = async (workshopId) => {
     throw new Error("Failed to delete the workshop");
   }
   return true;
+};
+
+// Función para registrar un participante en un taller
+export const registerExternalParticipant = async (workshopId, participantData) => {
+  const response = await fetch(`${baseURL}/talleres/inscripcion/${workshopId}/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(participantData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Error al inscribirse: ${errorData.message}`);
+  }
+
+  return response.json();  // Retorna la respuesta del backend con los datos del participante
 };
 
 /*------------------ SOLICITUDES DE QUEJAS ------------------*/

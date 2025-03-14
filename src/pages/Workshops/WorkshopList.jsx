@@ -8,7 +8,7 @@ const WorkshopList = ({ onBackToMenu }) => {
   const [workshops, setWorkshops] = useState([]);
   const [dateFilter, setDateFilter] = useState("");
   const [modalityFilter, setModalityFilter] = useState("");
-  const [locationFilter] = useState(""); 
+  const [locationFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWorkshopId, setSelectedWorkshopId] = useState(null);
@@ -18,16 +18,18 @@ const WorkshopList = ({ onBackToMenu }) => {
     const loadWorkshops = async () => {
       try {
         const data = await getWorkshops();
-        setWorkshops(data.map(workshop => ({
-          ...workshop,
-          date: new Date(workshop.date)
-        })));
+        setWorkshops(
+          data.map((workshop) => ({
+            ...workshop,
+            date: new Date(workshop.date),
+          }))
+        );
       } catch (error) {
         console.error("Error getting workshops:", error);
         alert("Failed to get workshops");
       }
     };
-  
+
     loadWorkshops();
   }, []);
 
@@ -40,7 +42,9 @@ const WorkshopList = ({ onBackToMenu }) => {
   const handleDelete = async () => {
     try {
       await deleteWorkshop(selectedWorkshopId);
-      setWorkshops(workshops.filter(workshop => workshop.id !== selectedWorkshopId));
+      setWorkshops(
+        workshops.filter((workshop) => workshop.id !== selectedWorkshopId)
+      );
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error eliminando el taller:", error);
@@ -89,7 +93,7 @@ const WorkshopList = ({ onBackToMenu }) => {
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="border w-full text-sm h-10"
+                className="border w-full text-xs"
               />
             </div>
             <div className="filter-group mb-4">
@@ -148,7 +152,14 @@ const WorkshopList = ({ onBackToMenu }) => {
                   <td className="border p-2">{workshop.location}</td>
                   <td className="border p-2">{workshop.modality}</td>
                   <td className="border p-2">{workshop.slots}</td>
-                  <td className="border p-2">{workshop.facilitator}</td>
+                  <td className="border p-2">
+                    {workshop.facilitators.map((facilitator, idx) => (
+                      <span key={idx}>
+                        {facilitator.name}
+                        {idx < workshop.facilitators.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </td>
                   <td className="border p-2">{workshop.details}</td>
                   <td className="border p-2">
                     {new Date(workshop.date) > new Date()
