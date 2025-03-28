@@ -3,7 +3,6 @@ import { useState } from "react";
 const useGoogleCalendar = (accessToken) => {
     const [events, setEvents] = useState([]);
     const API_URL = "https://www.googleapis.com/calendar/v3";
-    const userEmail = localStorage.getItem("userEmail");
 
     //  Obtener eventos del calendario
     const fetchEvents = async (year) => {
@@ -50,7 +49,7 @@ const useGoogleCalendar = (accessToken) => {
     //  Crear un evento en Google Calendar
     const createEvent = async (eventData) => {
         try {
-            const response = await fetch(`${API_URL}/calendars/primary/events`, {
+            const response = await fetch(`${API_URL}/calendars/primary/events?conferenceDataVersion=1`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,

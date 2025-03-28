@@ -6,27 +6,32 @@ const GoogleLoginButton = () => {
     const navigate = useNavigate();
 
     const login = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            console.log("Tokens recibidos:", tokenResponse);
-
+        flow: "auth-code",  //  Usar flujo de autorización basado en código
+        ux_mode: "popup",
+        onSuccess: async (codeResponse) => {
+            console.log("Código recibido:", codeResponse);
+    
             try {
-                const responsed = await fetch("http://localhost:8000/api/auth/google/", {
+                const response = await fetch("http://localhost:8000/api/auth/google/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        token: tokenResponse.access_token, //  Se envía access_token en lugar de credential
-                    }),
+                    body: JSON.stringify({ code: codeResponse.code }), // 🔥 Enviar "code", no access_token
                 });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    const expiresIn = 3500 * 1000; // 1 hora en milisegundos
+                    const expirationTime = new Date().getTime() + expiresIn;
 
-                const data = await responsed.json();
-
-                if (responsed.ok) {
-                    localStorage.setItem("userToken", data.token); // Token de Django
-                    localStorage.setItem("accessToken", data.access_token); // Access Token de Google
+                    localStorage.setItem("userToken", data.token);
+                    localStorage.setItem("refreshToken", data.refresh_token);
+                    localStorage.setItem("accessToken", data.access_token);
                     localStorage.setItem("userName", data.user.nombre);
                     localStorage.setItem("userRole", data.user.rol);
-                    localStorage.setItem("userEmail",data.user.email)
-
+                    localStorage.setItem("userEmail", data.user.email);
+                    localStorage.setItem("tokenExpiration", expirationTime);
+    
                     console.log("Usuario autenticado:", data);
                     navigate("/");
                 } else {
@@ -37,7 +42,9 @@ const GoogleLoginButton = () => {
             }
         },
         onError: (error) => console.error("Error en login:", error),
-        scope: "https://www.googleapis.com/auth/calendar", // 🔥 Agregar permisos para Google Calendar
+        scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.events.readonly",
+        access_type: "offline",  // Necesario para obtener refresh_token
+        prompt: "consent",       // Obligará a Google a pedir permiso de nuevo
     });
 
     return (

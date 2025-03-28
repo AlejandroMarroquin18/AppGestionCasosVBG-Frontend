@@ -8,10 +8,19 @@ import Login from './pages/login';
 import SignUp from './pages/signup';
 import RestorePassword from './pages/restorepassword';
 import Queja from './pages/queja/queja';
+import useAuthCheck from './helpers/fetchWithAuth';
+import ProtectedRoute from './components/ProtectedRoute';
+
 
 function App() {
   const location = useLocation();
+  
   const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword','/reportarvbg'];
+  
+
+
+  useAuthCheck()
+
 
   return (
     <div className="flex flex-col h-screen">
@@ -20,19 +29,21 @@ function App() {
         {!noSidebarRoutes.includes(location.pathname) && <Sidebar />}
         <main className="flex-1 overflow-auto">
           <Routes>
-            <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
-            <Route path="/quejas/*" element={<Complaints />} />
-            <Route path="/agenda" element={<Agenda />} />
-            <Route path="/agenda/*" element={<Agenda />} />
-            <Route path="/talleres" element={<Workshop />} />
-            <Route path="/talleres/*" element={<Workshop />} />
-            
+            <Route element={<ProtectedRoute/>}>
+              <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
+              <Route path="/quejas/*" element={<Complaints />} />
+              <Route path="/agenda" element={<Agenda />} />
+              <Route path="/agenda/*" element={<Agenda />} />
+              <Route path="/talleres" element={<Workshop />} />
+              <Route path="/talleres/*" element={<Workshop />} />
+            </Route>
 
             <Route path ="/reportarvbg" element={<Queja/>}/>
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />
             <Route path="/restorepassword" element={<RestorePassword />} />
-            {/* Añade otras rutas según sea necesario */}
+            
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
       </div>
