@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { createWorkshop } from "../../api";
 import SuccessModal from "../../components/SuccessModal";
 import WarningModal from "../../components/WarningModal";
-import { QRCodeCanvas  } from "qrcode.react"; // Importamos el generador de QR
 
 const WorkshopForm = () => {
   const [formData, setFormData] = useState({
@@ -21,6 +20,7 @@ const WorkshopForm = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [workshopId, setWorkshopId] = useState(null); // Nueva variable de estado para el ID del taller
+  const [qrCodeUrl, setQrCodeUrl] = useState(""); // Nuevo estado para la URL del QR
 
   // Manejar cambios en los campos generales
   const handleChange = (e) => {
@@ -87,6 +87,7 @@ const WorkshopForm = () => {
       });
       console.log("Taller creado:", data);
       setWorkshopId(data.id); // Guardamos el ID del taller recién creado
+      setQrCodeUrl(data.qr_code_url); // Recibimos la URL del código QR del backend
       setSubmitSuccess(true);
       setShowSuccessModal(true);
     } catch (error) {
@@ -268,16 +269,6 @@ const WorkshopForm = () => {
           />
         )}
       </form>
-
-      {workshopId && (
-        <div className="mt-6">
-          <h3 className="text-2xl font-semibold text-gray-800">Código QR</h3>
-          <p className="text-lg text-gray-700">
-            Escanea este código para inscribirte en el taller:
-          </p>
-          <QRCodeCanvas  value={`http://localhost:3000/inscripcion/${workshopId}`} />
-        </div>
-      )}
     </div>
   );
 };

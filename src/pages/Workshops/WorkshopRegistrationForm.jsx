@@ -65,46 +65,46 @@ const ExternalRegistrationForm = () => {
       setSuccessMessage("");
       console.error("Error al enviar datos:", error); // Mostrar el error en caso de falla
     }
-  };  
+  };
 
   return (
-    <div className="w-full p-5">
-      <h2 className="text-3xl font-bold text-center mb-6">Inscripción al Taller</h2>
-      <form onSubmit={handleSubmit} className="bg-gray-100 p-6 rounded-lg shadow-md">
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-        {successMessage && <p className="text-green-500">{successMessage}</p>}
+    <div className="w-full max-w-3xl p-5 mx-auto">
+      <h2 className="text-4xl font-semibold text-center mb-8">Inscripción al taller</h2>
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg">
+        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
+        {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Nombre Completo</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Nombre completo</label>
           <input
             type="text"
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Correo Electrónico</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Correo electrónico</label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Tipo de Documento</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Tipo de documento</label>
           <select
             name="document_type"
             value={formData.document_type}
             onChange={handleChange}
-            className="w-full h-10 py-2 border border-gray-300 rounded"
+            className="w-full h-12 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="Cédula">Cédula</option>
@@ -114,49 +114,49 @@ const ExternalRegistrationForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Número de Documento</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Número de documento</label>
           <input
             type="text"
             name="document_number"
             value={formData.document_number}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Edad</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Edad</label>
           <input
             type="number"
             name="age"
             value={formData.age}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Programa Académico / Dependencia</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Programa académico / dependencia</label>
           <input
             type="text"
             name="program"
             value={formData.program}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Identidad de Género</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Identidad de género</label>
           <select
             name="gender_identity"
             value={formData.gender_identity}
             onChange={handleChange}
-            className="w-full px-4 h-10 border border-gray-300 rounded"
+            className="w-full h-12 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="Cisgénero">Cisgénero</option>
@@ -167,13 +167,13 @@ const ExternalRegistrationForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">¿Usted se autoreconoce como?</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">¿Usted se autoreconoce como?</label>
           <select
             name="self_recognition"
             value={formData.self_recognition}
             onChange={handleChange}
-            className="w-full px-4 h-10 border border-gray-300 rounded"
+            className="w-full h-12 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="Negra/o/e y/o afrodescendiente">Negra/o/e y/o afrodescendiente</option>
@@ -184,13 +184,13 @@ const ExternalRegistrationForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Discapacidad</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Discapacidad</label>
           <select
             name="disability"
             value={formData.disability}
             onChange={handleChange}
-            className="w-full px-4 h-10 border border-gray-300 rounded"
+            className="w-full h-12 px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="Ninguna">Ninguna</option>
             <option value="Motriz">Motriz</option>
@@ -202,36 +202,34 @@ const ExternalRegistrationForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">Correo Institucional</label>
+        <div className="mb-6">
+          <label className="block text-xl font-medium mb-2">Correo institucional</label>
           <input
             type="email"
             name="institutional_email"
             value={formData.institutional_email}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-xl font-semibold mb-2">
-            <input
-              type="checkbox"
-              name="terms_accepted"
-              checked={formData.terms_accepted}
-              onChange={handleChange}
-              className="mr-2"
-              required
-            />
-            Acepto los términos y condiciones
-          </label>
+        <div className="mb-6 flex items-center">
+          <input
+            type="checkbox"
+            name="terms_accepted"
+            checked={formData.terms_accepted}
+            onChange={handleChange}
+            className="mr-4"
+            required
+          />
+          <span className="text-lg">Acepto los términos y condiciones</span>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-8">
           <button
             type="submit"
-            className="w-full py-3 bg-blue-600 text-white rounded-lg"
+            className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500"
           >
             Inscribirse
           </button>

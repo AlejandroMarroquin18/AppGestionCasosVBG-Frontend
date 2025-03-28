@@ -1,166 +1,156 @@
-import React from "react";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement,  LineElement, ArcElement, BarElement, Title, Tooltip, Legend } from "chart.js";
+import React, { useState, useEffect } from "react";
+import { Doughnut, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, BarElement, Title, Tooltip, Legend } from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(ChartDataLabels, CategoryScale, LinearScale, BarElement, PointElement, ArcElement, LineElement, Title, Tooltip, Legend);
 
-const calculatePercentage = (data) => {
-  const total = data.reduce((acc, value) => acc + value, 0); // Suma de todos los valores
-  return data.map(value => Math.round((value / total) * 100)); // Calcula el porcentaje
+const baseURL = "http://127.0.0.1:8000/api";
+
+// Función para obtener estadísticas
+const getStatistics = async () => {
+  const response = await fetch(`${baseURL}/talleres/statistics/`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  return data;
 };
 
-const workshopDataPercentages = calculatePercentage([11, 12, 12]);
-const participantsDataPercentages = calculatePercentage([100, 112, 98]);
-const averageParticipantsDataPercentages = calculatePercentage([15, 16, 12]);
-const participantsByFacultyDataPercentages = calculatePercentage([12, 8, 10, 15, 12]);
-const attendanceDataPercentages = calculatePercentage([80, 85, 88]);
-const satisfactionDataPercentages = calculatePercentage([4.0, 4.2, 4.3]);
-const modalityDataPercentages = calculatePercentage([5, 6, 7, 6, 6, 5]);
-
 const WorkshopStats = () => {
-  const indicators = {
-    totalWorkshops: 12,
-    virtualWorkshops: 7,
-    inPersonWorkshops: 5,
-    averageParticipants: 15,
-  };
+  const [stats, setStats] = useState(null);
 
-  const sexData = calculatePercentage([40, 50, 10]); 
-  const genderIdentityData = calculatePercentage([35, 15, 10, 5, 20]);
+  useEffect(() => {
+    getStatistics()
+      .then((data) => {
+        setStats(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching statistics:", error);
+      });
+  }, []);
 
-  const workshopData = {
-    labels: ["2022", "2023", "2024"],
-    datasets: [{
-      label: 'Talleres por año',
-      data: workshopDataPercentages, 
-      backgroundColor: 'rgba(75, 192, 192, 0.6)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    }]
-  };
+  if (!stats) {
+    return <div>Loading...</div>;
+  }
 
-  const participantsData = {
-    labels: ["2022", "2023", "2024"],
-    datasets: [{
-      label: 'Participantes por año',
-      data: participantsDataPercentages, // Usamos los porcentajes calculados
-      backgroundColor: 'rgba(255, 206, 86, 0.6)',
-      borderColor: 'rgba(255, 206, 86, 1)',
-      borderWidth: 1,
-    }]
-  };
+  const totalWorkshops = stats.total_workshops || 0;
+  const virtualWorkshops = stats.virtual_workshops || 0;
+  const inPersonWorkshops = stats.in_person_workshops || 0;
+  const totalParticipants = stats.total_participants || 0;
+  const genderStats = stats.gender_stats || [];
+  const programStats = stats.program_stats || [];
 
-  const averageParticipantsData = {
-    labels: ["2022", "2023", "2024"],
-    datasets: [{
-      label: 'Participantes promedio',
-      data: averageParticipantsDataPercentages, // Usamos los porcentajes calculados
-      backgroundColor: 'rgba(153, 102, 255, 0.6)',
-      borderColor: 'rgba(153, 102, 255, 1)',
-      borderWidth: 1,
-    }]
-  };
+  // Calcular los porcentajes de talleres virtuales/presenciales
+  const virtualPercentage = totalWorkshops > 0 ? (virtualWorkshops / totalWorkshops) * 100 : 0;
+  const inPersonPercentage = totalWorkshops > 0 ? (inPersonWorkshops / totalWorkshops) * 100 : 0;
 
-  const participantsByFacultyData = {
-    labels: ["Psicología", "Ingeniería", "Ciencias exactas", "Derecho", "Humanidades"],
-    datasets: [{
-      label: 'Estudiantes participantes por facultad',
-      data: participantsByFacultyDataPercentages, // Usamos los porcentajes calculados
-      backgroundColor: 'rgba(54, 162, 235, 0.6)',
-      borderColor: 'rgba(54, 162, 235, 1)',
-      borderWidth: 1,
-    }]
-  };
-
-  const attendanceData = {
-    labels: ["2022", "2023", "2024"],
-    datasets: [{
-      label: 'Tasa de asistencia (%)',
-      data: attendanceDataPercentages, // Usamos los porcentajes calculados
-      backgroundColor: 'rgba(139, 0, 0, 0.6)',
-      borderColor: 'rgb(33, 2, 119)',
-      borderWidth: 1,
-    }]
-  };
-
-  const satisfactionData = {
-    labels: ["2022", "2023", "2024"],
-    datasets: [{
-      label: 'Satisfacción de los participantes',
-      data: satisfactionDataPercentages, // Usamos los porcentajes calculados
-      backgroundColor: 'rgba(189, 6, 6, 0.6)',
-      borderColor: 'rgba(189, 6, 6, 0.6)',
-      borderWidth: 1,
-    }]
-  };
-
-  const modalityData = {
-    labels: ["2022", "2023", "2024"],
+  // Gráfico de comparación de talleres
+  const workshopComparisonData = {
+    labels: ['2025'], // Solo mostrar el año 2025
     datasets: [
       {
-        label: 'Virtual',
-        data: modalityDataPercentages.slice(0, 3), // Porcentaje de modalidad virtual
+        label: `Talleres virtuales`,
+        data: [virtualWorkshops],
         backgroundColor: 'rgba(12, 0, 122, 0.6)',
+        borderColor: 'rgba(12, 0, 122, 1)',
+        borderWidth: 1,
       },
       {
-        label: 'Presencial',
-        data: modalityDataPercentages.slice(3), // Porcentaje de modalidad presencial
+        label: `Talleres presenciales`,
+        data: [inPersonWorkshops],
         backgroundColor: 'rgba(221, 23, 8, 0.6)',
-      }
-    ]
+        borderColor: 'rgba(221, 23, 8, 1)',
+        borderWidth: 1,
+      },
+    ],
   };
 
-  const sexDataChart = {
-    labels: ["Mujer", "Hombre", "Intersexual", "No responde"],
-    datasets: [{
-      label: 'Distribución de personas participantes en talleres por sexo',
-      data: sexData, 
-      backgroundColor: ['rgb(185, 124, 11)', 'rgba(0, 31, 133, 0.6)', 'rgba(233, 18, 11, 0.6)', 'rgba(100, 100, 100, 0.6)'],
-    }]
+  // Datos para el gráfico de dona
+  const genderData = {
+    labels: genderStats.map((stat) => stat.gender_identity),
+    datasets: [
+      {
+        label: 'Distribución de género',
+        data: genderStats.map((stat) => stat.count),
+        backgroundColor: [
+          'rgba(241, 29, 75, 0.6)',
+          'rgba(12, 132, 212, 0.44)',
+          'rgba(179, 31, 31, 0.49)',
+          'rgba(93, 24, 231, 0.35)',
+          'rgba(70, 233, 6, 0.56)',
+        ],
+      },
+    ],
   };
 
-  const genderIdentityChart = {
-    labels: ["Cisgénero", "Transgénero", "Género fluido", "No binario y/o queer", "No responde"],
-    datasets: [{
-      label: 'Distribución de personas participantes en talleres por identidad de género',
-      data: genderIdentityData, 
-      backgroundColor: ['rgba(241, 29, 75, 0.6)', 'rgba(54, 163, 235, 0.44)', 'rgba(179, 31, 31, 0.49)', 'rgba(153, 102, 255, 0.6)', 'rgba(70, 233, 6, 0.56)'],
-    }]
+  // Datos para el gráfico de barras (participantes por programa)
+  const programData = {
+    labels: programStats.map((stat) => stat.program),
+    datasets: [
+      {
+        label: 'Participantes por departamento',
+        data: programStats.map((stat) => stat.count),
+        backgroundColor: 'rgba(33, 31, 199, 0.6)',
+        borderColor: 'rgb(35, 25, 172)',
+        borderWidth: 1,
+      },
+    ],
   };
 
-  const audienceData = {
-    labels: ["Estudiantes", "Docentes", "Administrativos"],
-    datasets: [{
-      label: 'Participación por tipo de público',
-      data: calculatePercentage([70, 20, 10]), // Calculamos el porcentaje
-      backgroundColor: ['rgb(211, 105, 6)', 'rgba(0, 31, 133, 0.6)', 'rgba(233, 18, 11, 0.6)'],
-    }]
-  };
-
-  const options = {
+  // Opciones para el gráfico de barras
+  const getBarOptions = (title) => ({
     responsive: true,
     plugins: {
-      legend: {
-        position: 'top',
-      },
       title: {
         display: true,
-        font: {
-          size: 20,
-          style: 'bold',
-          family: 'Arial',
-        },
+        text: title, // Dynamically set title based on the graph
+      },
+      legend: {
+        position: 'top',
       },
       datalabels: {
         color: 'white',
         font: {
           weight: 'bold',
-          size: 24, // Tamaño de la fuente más grande
+          size: 20,
         },
-        formatter: (value) => `${value}%`, // Convertir a porcentaje
-        anchor: 'center',
-        align: 'center',
+        // Mostrar el valor absoluto dentro de las barras
+        formatter: (value) => {
+          return value; // Mostrar el valor absoluto dentro de la barra
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  });
+
+  // Opciones para el gráfico de dona (porcentajes en etiquetas)
+  const doughnutOptions = {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Distribución de género',
+      },
+      legend: {
+        position: 'top',
+      },
+      datalabels: {
+        color: 'white',
+        font: {
+          weight: 'bold',
+          size: 20,
+        },
+        // Mostrar el porcentaje en las etiquetas
+        formatter: (value, ctx) => {
+          const total = ctx.dataset.data.reduce((acc, val) => acc + val, 0); // Total de todos los valores en el dataset
+          const percentage = ((value / total) * 100).toFixed(1);
+          return `${percentage}%`; // Mostrar el porcentaje con un decimal
+        },
       },
     },
   };
@@ -169,58 +159,40 @@ const WorkshopStats = () => {
     <div className="w-full p-6 bg-white min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Estadísticas de talleres</h1>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-        <div className="bg-blue-200 p-4 rounded shadow text-center">
-          <h2 className="text-xl font-semibold">Talleres realizados en el último año</h2>
-          <p className="text-3xl font-bold">{indicators.totalWorkshops}</p>
-        </div>
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          <div className="bg-blue-100 p-4 rounded shadow text-center">
-            <h2 className="text-lg font-semibold">Talleres virtuales</h2>
-            <p className="text-2xl font-bold">{indicators.virtualWorkshops}</p>
-          </div>
-          <div className="bg-blue-100 p-4 rounded shadow text-center">
-            <h2 className="text-lg font-semibold">Talleres presenciales</h2>
-            <p className="text-2xl font-bold">{indicators.inPersonWorkshops}</p>
-          </div>
-          <div className="bg-blue-100 p-4 rounded shadow text-center">
-            <h2 className="text-lg font-semibold">Participantes promedio</h2>
-            <p className="text-2xl font-bold">{indicators.averageParticipants}</p>
-          </div>
+      {/* Primera fila de indicadores */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="col-span-2 bg-blue-200 p-4 rounded shadow text-center">
+          <h2 className="text-xl font-semibold">Talleres realizados en el 2025</h2>
+          <p className="text-3xl font-bold">{totalWorkshops}</p>
         </div>
       </div>
 
+      {/* Segunda fila de indicadores */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-blue-100 p-4 rounded shadow text-center">
+          <h2 className="text-lg font-semibold">Talleres virtuales en el último año</h2>
+          <p className="text-2xl font-bold">{virtualWorkshops}</p>
+        </div>
+        <div className="bg-blue-100 p-4 rounded shadow text-center">
+          <h2 className="text-lg font-semibold">Talleres presenciales en el último año</h2>
+          <p className="text-2xl font-bold">{inPersonWorkshops}</p>
+        </div>
+        <div className="bg-blue-100 p-4 rounded shadow text-center">
+          <h2 className="text-lg font-semibold">Participantes totales en el último año</h2>
+          <p className="text-2xl font-bold">{stats.total_participants}</p>
+        </div>
+      </div>
+
+      {/* Gráficos en dos columnas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-4 rounded shadow">
-          <Line data={workshopData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Talleres por año' } } }} />
+          <Bar data={workshopComparisonData} options={getBarOptions('Distribución de talleres virtuales vs presenciales')} />
         </div>
         <div className="bg-white p-4 rounded shadow">
-          <Line data={participantsData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Participantes por año' } } }} />
+          <Doughnut data={genderData} options={doughnutOptions} />
         </div>
         <div className="bg-white p-4 rounded shadow">
-          <Line data={averageParticipantsData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Participantes promedio por año' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={participantsByFacultyData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Estudiantes participantes por facultad en el último año' } } }} />
-        </div>
-
-        <div className="bg-white p-4 rounded shadow">
-          <Line data={attendanceData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Tasa de asistencia por año' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Line data={satisfactionData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Satisfacción de los participantes' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={modalityData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Evolución de asistencia por modalidad' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={sexDataChart} options={options} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={genderIdentityChart} options={options} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={audienceData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Participación por tipo de público' } } }} />
+          <Bar data={programData} options={getBarOptions('Distribución de participantes por programa')} />
         </div>
       </div>
     </div>
