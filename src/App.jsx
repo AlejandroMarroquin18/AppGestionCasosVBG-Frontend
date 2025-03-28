@@ -9,13 +9,15 @@ import SignUp from './pages/signup';
 import RestorePassword from './pages/restorepassword';
 import Queja from './pages/queja/queja';
 import WorkshopRegistrationPage from "./pages/Workshops/WorkshopRegistrationPage";
+import useAuthCheck from './helpers/fetchWithAuth';
+import ProtectedRoute from './components/ProtectedRoute';
+
 
 function App() {
   const location = useLocation();
 
-  // Array con las rutas que no deben mostrar el Header ni el Sidebar
   const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword', '/reportarvbg', '/inscripcion'];
-
+  useAuthCheck()
   return (
     <div className="flex flex-col h-screen">
       {/* Mostrar Header solo si la ruta no está en la lista de noSidebarRoutes */}
@@ -27,12 +29,14 @@ function App() {
         
         <main className="flex-1 overflow-auto">
           <Routes>
-            <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
-            <Route path="/quejas/*" element={<Complaints />} />
-            <Route path="/agenda" element={<Agenda />} />
-            <Route path="/agenda/*" element={<Agenda />} />
-            <Route path="/talleres" element={<Workshop />} />
-            <Route path="/talleres/*" element={<Workshop />} />
+            <Route element={<ProtectedRoute/>}>
+              <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
+              <Route path="/quejas/*" element={<Complaints />} />
+              <Route path="/agenda" element={<Agenda />} />
+              <Route path="/agenda/*" element={<Agenda />} />
+              <Route path="/talleres" element={<Workshop />} />
+              <Route path="/talleres/*" element={<Workshop />} />
+            </Route>
 
             {/* RUTA DE INSCRIPCIÓN */}
             <Route path="/inscripcion/:workshopId" element={<WorkshopRegistrationPage />} />
@@ -41,7 +45,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registrarse" element={<SignUp />} />
             <Route path="/restorepassword" element={<RestorePassword />} />
-            {/* Añade otras rutas según sea necesario */}
+            
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
       </div>
