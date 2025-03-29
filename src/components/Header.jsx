@@ -2,14 +2,38 @@ import React, { useState } from "react";
 import { FiLogOut, FiChevronDown } from "react-icons/fi";
 import { useNavigate } from 'react-router-dom'; 
 import "./styles.css";
+import getCSRFToken from "../helpers/getCSRF";
+
+
+
+
 
 const Header = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/logout/", {
+        
+          method: "POST",
+          credentials: "include", // 🔥 Necesario para eliminar cookies de sesión
+          headers: {
+            "X-CSRFToken": getCSRFToken(), // 🔥 Envía el token CSRF
+          },
+          
+      });
+
+      if (response.ok) {
+          localStorage.clear(); // ✅ Borra los datos locales
+          navigate("/login"); // ✅ Redirige a la pantalla de login
+      } else {
+          console.error("Error al cerrar sesión");
+      }
+    } catch (error) {
+        console.error("Error en la conexión:", error);
+    }
+
   };
 
   const toggleMenu = () => {
