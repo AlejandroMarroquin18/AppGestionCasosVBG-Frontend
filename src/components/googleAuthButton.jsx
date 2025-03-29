@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
+import getCSRFToken from "../helpers/getCSRF";
 
 const GoogleLoginButton = () => {
     const navigate = useNavigate();
@@ -9,13 +10,15 @@ const GoogleLoginButton = () => {
         flow: "auth-code",  //  Usar flujo de autorización basado en código
         ux_mode: "popup",
         onSuccess: async (codeResponse) => {
-            console.log("Código recibido:", codeResponse);
     
             try {
                 const response = await fetch("http://localhost:8000/api/auth/google/", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json","X-CSRFToken": getCSRFToken()  },
                     body: JSON.stringify({ code: codeResponse.code }), // 🔥 Enviar "code", no access_token
+                    credentials: "include",
+
+
                 });
     
                 const data = await response.json();
@@ -24,13 +27,14 @@ const GoogleLoginButton = () => {
                     const expiresIn = 3500 * 1000; // 1 hora en milisegundos
                     const expirationTime = new Date().getTime() + expiresIn;
 
-                    localStorage.setItem("userToken", data.token);
-                    localStorage.setItem("refreshToken", data.refresh_token);
+                    //localStorage.setItem("userToken", data.token);
+                    //localStorage.setItem("refreshToken", data.refresh_token);
                     localStorage.setItem("accessToken", data.access_token);
                     localStorage.setItem("userName", data.user.nombre);
                     localStorage.setItem("userRole", data.user.rol);
                     localStorage.setItem("userEmail", data.user.email);
                     localStorage.setItem("tokenExpiration", expirationTime);
+
     
                     console.log("Usuario autenticado:", data);
                     navigate("/");
@@ -42,7 +46,8 @@ const GoogleLoginButton = () => {
             }
         },
         onError: (error) => console.error("Error en login:", error),
-        scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.events.readonly",
+        
+        scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
         access_type: "offline",  // Necesario para obtener refresh_token
         prompt: "consent",       // Obligará a Google a pedir permiso de nuevo
     });
