@@ -1,202 +1,363 @@
 import React, { useState, useEffect } from "react";
-import { Doughnut, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, BarElement, Title, Tooltip, Legend } from "chart.js";
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Doughnut, Bar, Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(ChartDataLabels, CategoryScale, LinearScale, BarElement, PointElement, ArcElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
 
 const baseURL = "http://127.0.0.1:8000/api";
 
-// Función para obtener estadísticas
-const getStatistics = async () => {
-  const response = await fetch(`${baseURL}/talleres/statistics/`);
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  const data = await response.json();
-  return data;
-};
-
 const WorkshopStats = () => {
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getStatistics()
-      .then((data) => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${baseURL}/talleres/statistics/`);
+        if (!response.ok) throw new Error("Error al cargar estadísticas");
+        const data = await response.json();
         setStats(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching statistics:", error);
-      });
+      } catch (err) {
+        setError(err.message);
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
 
-  if (!stats) {
-    return <div>Loading...</div>;
-  }
+  if (loading)
+    return <div className="text-center py-8">Cargando estadísticas...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (!stats)
+    return <div className="text-center py-8">No hay datos disponibles</div>;
 
-  const totalWorkshops = stats.total_workshops || 0;
-  const virtualWorkshops = stats.virtual_workshops || 0;
-  const inPersonWorkshops = stats.in_person_workshops || 0;
-  const totalParticipants = stats.total_participants || 0;
-  const genderStats = stats.gender_stats || [];
-  const programStats = stats.program_stats || [];
+  // Configuración común para gráficos
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      datalabels: {
+        color: "#fff",
+        font: { weight: "bold", size: 14 },
+        formatter: (value, ctx) => {
+          if (ctx.chart.data.datasets[0].data.length > 5) {
+            return value > 0 ? value : "";
+          }
+          const total = ctx.chart.data.datasets[0].data.reduce(
+            (a, b) => a + b,
+            0
+          );
+          const percentage = Math.round((value / total) * 100);
+          return `${percentage}%`;
+        },
+      },
+      legend: {
+        position: "right",
+        labels: {
+          boxWidth: 12,
+          padding: 20,
+          font: { size: 12 },
+        },
+      },
+      title: {
+        display: true,
+        font: { size: 16 },
+      },
+    },
+  };
 
-  // Calcular los porcentajes de talleres virtuales/presenciales
-  const virtualPercentage = totalWorkshops > 0 ? (virtualWorkshops / totalWorkshops) * 100 : 0;
-  const inPersonPercentage = totalWorkshops > 0 ? (inPersonWorkshops / totalWorkshops) * 100 : 0;
-
-  // Gráfico de comparación de talleres
-  const workshopComparisonData = {
-    labels: ['2025'], // Solo mostrar el año 2025
+  // Gráfico de modalidad de talleres
+  const modalityData = {
+    labels: ["Virtuales", "Presenciales"],
     datasets: [
       {
-        label: `Talleres virtuales`,
-        data: [virtualWorkshops],
-        backgroundColor: 'rgba(12, 0, 122, 0.6)',
-        borderColor: 'rgba(12, 0, 122, 1)',
-        borderWidth: 1,
-      },
-      {
-        label: `Talleres presenciales`,
-        data: [inPersonWorkshops],
-        backgroundColor: 'rgba(221, 23, 8, 0.6)',
-        borderColor: 'rgba(221, 23, 8, 1)',
+        data: [stats.virtual_workshops, stats.in_person_workshops],
+        backgroundColor: ["#3b82f6", "#ef4444"],
         borderWidth: 1,
       },
     ],
   };
 
-  // Datos para el gráfico de dona
+  // Gráfico de distribución por género
   const genderData = {
-    labels: genderStats.map((stat) => stat.gender_identity),
+    labels: stats.gender_stats.map(
+      (item) => item.gender_identity || "No especificado"
+    ),
     datasets: [
       {
-        label: 'Distribución de género',
-        data: genderStats.map((stat) => stat.count),
+        data: stats.gender_stats.map((item) => item.count),
         backgroundColor: [
-          'rgba(241, 29, 75, 0.6)',
-          'rgba(12, 132, 212, 0.44)',
-          'rgba(179, 31, 31, 0.49)',
-          'rgba(93, 24, 231, 0.35)',
-          'rgba(70, 233, 6, 0.56)',
+          "#3b82f6",
+          "#ef4444",
+          "#10b981",
+          "#f59e0b",
+          "#8b5cf6",
         ],
       },
     ],
   };
 
-  // Datos para el gráfico de barras (participantes por programa)
+  // Gráfico de programas académicos
   const programData = {
-    labels: programStats.map((stat) => stat.program),
+    labels: stats.program_stats.map(
+      (item) => item.program || "No especificado"
+    ),
     datasets: [
       {
-        label: 'Participantes por departamento',
-        data: programStats.map((stat) => stat.count),
-        backgroundColor: 'rgba(33, 31, 199, 0.6)',
-        borderColor: 'rgb(35, 25, 172)',
-        borderWidth: 1,
+        label: "Participantes",
+        data: stats.program_stats.map((item) => item.count),
+        backgroundColor: "#3b82f6",
       },
     ],
   };
 
-  // Opciones para el gráfico de barras
-  const getBarOptions = (title) => ({
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: title, // Dynamically set title based on the graph
+  // Gráfico de grupos de edad
+  const ageData = {
+    labels: stats.age_stats.map((item) => item.age_group),
+    datasets: [
+      {
+        label: "Participantes",
+        data: stats.age_stats.map((item) => item.count),
+        backgroundColor: "#10b981",
       },
-      legend: {
-        position: 'top',
-      },
-      datalabels: {
-        color: 'white',
-        font: {
-          weight: 'bold',
-          size: 20,
-        },
-        // Mostrar el valor absoluto dentro de las barras
-        formatter: (value) => {
-          return value; // Mostrar el valor absoluto dentro de la barra
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  });
+    ],
+  };
 
-  // Opciones para el gráfico de dona (porcentajes en etiquetas)
-  const doughnutOptions = {
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Distribución de género',
+  // Gráfico de autoreconocimiento étnico
+  const ethnicityData = {
+    labels: stats.ethnicity_stats.map(
+      (item) => item.self_recognition || "No especificado"
+    ),
+    datasets: [
+      {
+        data: stats.ethnicity_stats.map((item) => item.count),
+        backgroundColor: [
+          "#f59e0b",
+          "#3b82f6",
+          "#ef4444",
+          "#10b981",
+          "#8b5cf6",
+        ],
       },
-      legend: {
-        position: 'top',
+    ],
+  };
+
+  // Gráfico de discapacidades
+  const disabilityData = {
+    labels: stats.disability_stats.map((item) => item.disability),
+    datasets: [
+      {
+        label: "Participantes",
+        data: stats.disability_stats.map((item) => item.count),
+        backgroundColor: "#8b5cf6",
       },
-      datalabels: {
-        color: 'white',
-        font: {
-          weight: 'bold',
-          size: 20,
-        },
-        // Mostrar el porcentaje en las etiquetas
-        formatter: (value, ctx) => {
-          const total = ctx.dataset.data.reduce((acc, val) => acc + val, 0); // Total de todos los valores en el dataset
-          const percentage = ((value / total) * 100).toFixed(1);
-          return `${percentage}%`; // Mostrar el porcentaje con un decimal
-        },
-      },
-    },
+    ],
   };
 
   return (
-    <div className="w-full p-6 bg-white min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Estadísticas de talleres</h1>
+    <div className="mx-auto px-4 py-8 w-full max-w-7xl">
+      {" "}
+      {/* Añadido max-w-7xl para limitar el ancho máximo */}
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        Estadísticas de Talleres
+      </h1>
+      {/* Tarjetas resumen - Total Talleres arriba, las demás abajo en 2 columnas en pantallas grandes */}
+      <div className="grid grid-cols-1 gap-6 mb-10">
+        {/* Card superior */}
+        <StatCard
+          title="Total talleres en el último año"
+          value={stats.total_workshops}
+          icon="📊"
+          color="bg-blue-100"
+        />
 
-      {/* Primera fila de indicadores */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="col-span-2 bg-blue-200 p-4 rounded shadow text-center">
-          <h2 className="text-xl font-semibold">Talleres realizados en el 2025</h2>
-          <p className="text-3xl font-bold">{totalWorkshops}</p>
+        {/* Cards inferiores en 2 columnas en md y 3 columnas en lg */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StatCard
+            title="Virtuales"
+            value={stats.virtual_workshops}
+            icon="💻"
+            color="bg-green-100"
+          />
+          <StatCard
+            title="Presenciales"
+            value={stats.in_person_workshops}
+            icon="🏢"
+            color="bg-red-100"
+          />
+          <StatCard
+            title="Participantes"
+            value={stats.total_participants}
+            icon="👥"
+            color="bg-purple-100"
+          />
         </div>
       </div>
+      {/* Sección de gráficos - ahora con más espacio */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
+        {/* Fila 1 - Gráficos circulares */}
+        <div className="space-y-8">
+          <ChartCard title="Modalidad de Talleres" height="h-96">
+            <Doughnut
+              data={modalityData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Distribución por modalidad",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
 
-      {/* Segunda fila de indicadores */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-blue-100 p-4 rounded shadow text-center">
-          <h2 className="text-lg font-semibold">Talleres virtuales en el último año</h2>
-          <p className="text-2xl font-bold">{virtualWorkshops}</p>
+          <ChartCard title="Distribución por género" height="h-96">
+            <Pie
+              data={genderData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Distribución por género",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
         </div>
-        <div className="bg-blue-100 p-4 rounded shadow text-center">
-          <h2 className="text-lg font-semibold">Talleres presenciales en el último año</h2>
-          <p className="text-2xl font-bold">{inPersonWorkshops}</p>
+
+        {/* Fila 2 - Gráficos de barras */}
+        <div className="space-y-8">
+          <ChartCard title="Participantes por programa" height="h-96">
+            <Bar
+              data={programData}
+              options={{
+                ...chartOptions,
+                indexAxis: "y",
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Top Programas",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
+
+          <ChartCard title="Distribución por edad" height="h-96">
+            <Bar
+              data={ageData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Grupos de edad",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
         </div>
-        <div className="bg-blue-100 p-4 rounded shadow text-center">
-          <h2 className="text-lg font-semibold">Participantes totales en el último año</h2>
-          <p className="text-2xl font-bold">{stats.total_participants}</p>
+
+        {/* Fila 3 - Gráficos adicionales */}
+        <div className="space-y-8">
+          <ChartCard title="Autoreconocimiento étnico" height="h-96">
+            <Doughnut
+              data={ethnicityData}
+              options={{
+                ...chartOptions,
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Autoreconocimiento étnico",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
+        </div>
+
+        <div className="space-y-8">
+          <ChartCard title="Tipos de discapacidad" height="h-96">
+            <Bar
+              data={disabilityData}
+              options={{
+                ...chartOptions,
+                indexAxis: "y",
+                plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                    ...chartOptions.plugins.title,
+                    text: "Discapacidades registradas",
+                    display: true,
+                  },
+                },
+              }}
+            />
+          </ChartCard>
         </div>
       </div>
-
-      {/* Gráficos en dos columnas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={workshopComparisonData} options={getBarOptions('Distribución de talleres virtuales vs presenciales')} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={genderData} options={doughnutOptions} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={programData} options={getBarOptions('Distribución de participantes por programa')} />
-        </div>
+      <div className="mt-8 text-sm text-gray-500 text-center">
+        Última actualización: {new Date(stats.last_update).toLocaleString()}
       </div>
     </div>
   );
 };
+
+// Componente auxiliar para tarjetas de estadísticas mejorado
+const StatCard = ({ title, value, icon, color }) => (
+  <div className={`${color} p-6 rounded-lg shadow-lg h-full flex items-center`}>
+    <span className="text-3xl mr-4">{icon}</span>
+    <div>
+      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+      <p className="text-3xl font-bold text-gray-900">{value}</p>
+    </div>
+  </div>
+);
+
+// Componente auxiliar para contenedor de gráficos mejorado
+const ChartCard = ({ title, children, height = "h-80" }) => (
+  <div className={`bg-white p-6 rounded-xl shadow-lg ${height} flex flex-col`}>
+    <h3 className="text-xl font-semibold mb-4 text-gray-800">{title}</h3>
+    <div className="flex-grow relative">{children}</div>
+  </div>
+);
 
 export default WorkshopStats;

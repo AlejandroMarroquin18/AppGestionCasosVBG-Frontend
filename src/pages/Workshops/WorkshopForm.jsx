@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createWorkshop } from "../../api";
 import SuccessModal from "../../components/SuccessModal";
 import WarningModal from "../../components/WarningModal";
@@ -11,28 +11,63 @@ const WorkshopForm = () => {
     end_time: "",
     details: "",
     location: "",
-    modality: "presencial", // Modalidad predeterminada
+    modality: "presencial",
     slots: "",
-    facilitators: [""], // Cambié facilitators a un array con un campo inicial vacío
+    facilitators: [""],
   });
 
+  const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [workshopId, setWorkshopId] = useState(null); // Nueva variable de estado para el ID del taller
-  const [qrCodeUrl, setQrCodeUrl] = useState(""); // Nuevo estado para la URL del QR
+  const [workshopId, setWorkshopId] = useState(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
 
-  // Manejar cambios en los campos generales
+  // Validar fechas y horas cuando cambian
+  useEffect(() => {
+    const newErrors = {...errors};
+    
+    // Validar que la fecha no sea anterior a hoy
+    if (formData.date) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(formData.date);
+      
+      if (selectedDate < today) {
+        newErrors.date = "La fecha no puede ser anterior al día actual";
+      } else {
+        delete newErrors.date;
+      }
+    }
+    
+    // Validar horas
+    if (formData.start_time && formData.end_time) {
+      const [startHours, startMinutes] = formData.start_time.split(':').map(Number);
+      const [endHours, endMinutes] = formData.end_time.split(':').map(Number);
+      
+      // Calcular duración en minutos
+      const duration = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+      
+      if (duration <= 0) {
+        newErrors.time = "La hora de finalización debe ser posterior a la de inicio";
+      } else if (duration < 60) {
+        newErrors.time = "El taller debe durar al menos 1 hora";
+      } else {
+        delete newErrors.time;
+      }
+    }
+    
+    setErrors(newErrors);
+  }, [formData.date, formData.start_time, formData.end_time]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Si el campo es un facilitador, actualizamos el array de facilitadores
     if (name === "facilitators") {
       const updatedFacilitators = [...formData.facilitators];
-      updatedFacilitators[e.target.dataset.index] = value; // Usamos el índice del facilitador
+      updatedFacilitators[e.target.dataset.index] = value;
       setFormData({ ...formData, facilitators: updatedFacilitators });
     } else {
-      // Actualizamos los demás campos de forma normal
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -48,46 +83,55 @@ const WorkshopForm = () => {
     setFormData({ ...formData, facilitators: updatedFacilitators });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validar campos requeridos
+    if (!formData.name.trim()) newErrors.name = "Nombre del taller es requerido";
+    if (!formData.date) newErrors.date = "Fecha es requerida";
+    if (!formData.start_time) newErrors.start_time = "Hora de inicio es requerida";
+    if (!formData.end_time) newErrors.end_time = "Hora de fin es requerida";
+    if (!formData.details.trim()) newErrors.details = "Detalles son requeridos";
+    if (!formData.location.trim()) newErrors.location = "Ubicación es requerida";
+    if (!formData.slots || formData.slots <= 0) newErrors.slots = "Cupos válidos son requeridos";
+    
+    // Validar al menos un tallerista con nombre
+    const hasFacilitators = formData.facilitators.some(f => f.trim());
+    if (!hasFacilitators) newErrors.facilitators = "Al menos un tallerista es requerido";
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Validación de campos obligatorios
-    if (
-      !formData.name ||
-      !formData.date ||
-      !formData.start_time ||
-      !formData.end_time ||
-      !formData.details ||
-      !formData.location ||
-      !formData.slots ||
-      !formData.facilitators.every((facilitator) => facilitator.trim())
-    ) {
+    // Validación básica de campos requeridos
+    if (!validateForm()) {
+      setShowWarningModal(true);
+      return;
+    }
+    
+    // Verificar si hay errores de validación adicionales
+    if (Object.keys(errors).length > 0) {
       setShowWarningModal(true);
       return;
     }
   
     const facilitatorsArray = formData.facilitators
       .map((facilitator) => ({ name: facilitator.trim() }))
-      .filter((facilitator) => facilitator.name); // Filtramos valores vacíos
+      .filter((facilitator) => facilitator.name);
   
-    const participantsArray = []; // Enviar un arreglo vacío para los participantes si no se tienen
+    const participantsArray = [];
   
     try {
-      // Verifica que los datos que se envían al backend sean correctos
-      console.log("Datos que se envían:", {
-        ...formData,
-        facilitators: facilitatorsArray,
-        participants: participantsArray, // Asegúrate de incluir este campo vacío
-      });
-  
       const data = await createWorkshop({
         ...formData,
         facilitators: facilitatorsArray,
-        participants: participantsArray, // Incluye el arreglo vacío de participantes
+        participants: participantsArray,
       });
-      console.log("Taller creado:", data);
-      setWorkshopId(data.id); // Guardamos el ID del taller recién creado
-      setQrCodeUrl(data.qr_code_url); // Recibimos la URL del código QR del backend
+      setWorkshopId(data.id);
+      setQrCodeUrl(data.qr_code_url);
       setSubmitSuccess(true);
       setShowSuccessModal(true);
     } catch (error) {
@@ -100,8 +144,6 @@ const WorkshopForm = () => {
     setSubmitSuccess(false);
     setShowWarningModal(false);
   };
-
-  console.log("Modalidad seleccionada:", formData.modality);
 
   return (
     <div className="w-full flex items-center justify-center bg-white">
@@ -122,8 +164,9 @@ const WorkshopForm = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className={`w-full px-6 py-4 bg-white border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -134,8 +177,10 @@ const WorkshopForm = () => {
               name="date"
               value={formData.date || ""}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              min={new Date().toISOString().split('T')[0]} // Establece la fecha mínima como hoy
+              className={`w-full px-6 py-4 bg-white border ${errors.date ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
           </div>
 
           <div>
@@ -147,8 +192,9 @@ const WorkshopForm = () => {
               name="start_time"
               value={formData.start_time || ""}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className={`w-full px-6 py-4 bg-white border ${errors.start_time ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.start_time && <p className="text-red-500 text-sm mt-1">{errors.start_time}</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -159,8 +205,9 @@ const WorkshopForm = () => {
               name="end_time"
               value={formData.end_time || ""}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className={`w-full px-6 py-4 bg-white border ${errors.end_time ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time}</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -168,8 +215,8 @@ const WorkshopForm = () => {
             </label>
             <select
               name="modality"
-              value={formData.modality} // Se asegura de que el valor de modalidad esté bien sincronizado
-              onChange={handleChange} // Al seleccionar, se actualiza el estado de modalidad
+              value={formData.modality}
+              onChange={handleChange}
               className="w-full px-6 h-9 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
             >
               <option value="presencial">Presencial</option>
@@ -185,8 +232,9 @@ const WorkshopForm = () => {
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className={`w-full px-6 py-4 bg-white border ${errors.location ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -197,8 +245,10 @@ const WorkshopForm = () => {
               name="slots"
               value={formData.slots}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              min="1"
+              className={`w-full px-6 py-4 bg-white border ${errors.slots ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
             />
+            {errors.slots && <p className="text-red-500 text-sm mt-1">{errors.slots}</p>}
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -211,8 +261,8 @@ const WorkshopForm = () => {
                   name="facilitators"
                   value={facilitator}
                   onChange={handleChange}
-                  data-index={index} // Añadimos un atributo data para saber el índice
-                  className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                  data-index={index}
+                  className={`w-full px-6 py-4 bg-white border ${errors.facilitators && index === 0 ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
                 />
                 {index > 0 && (
                   <button
@@ -232,6 +282,7 @@ const WorkshopForm = () => {
             >
               + Agregar tallerista
             </button>
+            {errors.facilitators && <p className="text-red-500 text-sm mt-1">{errors.facilitators}</p>}
           </div>
           <div className="col-span-2">
             <label className="block text-gray-700 font-semibold mb-2">
@@ -241,9 +292,10 @@ const WorkshopForm = () => {
               name="details"
               value={formData.details}
               onChange={handleChange}
-              className="w-full px-6 py-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className={`w-full px-6 py-4 bg-white border ${errors.details ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring focus:ring-blue-300`}
               rows="6"
             ></textarea>
+            {errors.details && <p className="text-red-500 text-sm mt-1">{errors.details}</p>}
           </div>
         </div>
         <div className="mt-6 flex justify-center">
@@ -265,7 +317,7 @@ const WorkshopForm = () => {
           <WarningModal
             isOpen={showWarningModal}
             onClose={handleModalClose}
-            message="Por favor completa todos los campos requeridos."
+            message="Por favor completa todos los campos requeridos y corrige los errores."
           />
         )}
       </form>

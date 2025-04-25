@@ -61,10 +61,18 @@ export const updateWorkshop = async (workshopId, workshopData) => {
 };
 
 // Eliminar un taller
-export const deleteWorkshop = async (workshopId) => {
+// api.js
+export const deleteWorkshop = async (workshopId, cancellationReason = "Por motivos organizativos") => {
   const response = await fetch(`${baseURL}/talleres/${workshopId}/`, {
     method: "DELETE",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      cancellation_reason: cancellationReason 
+    })
   });
+  
   if (!response.ok) {
     throw new Error("Failed to delete the workshop");
   }

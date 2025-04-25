@@ -10,6 +10,7 @@ const DeleteModal = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [reason, setReason] = useState(""); // Nuevo estado para el motivo
 
   useEffect(() => {
     let timer;
@@ -22,11 +23,16 @@ const DeleteModal = ({
       setVisible(false);
       timer = setTimeout(() => {
         setShowModal(false);
+        setReason(""); // Resetear el motivo al cerrar
       }, 300);
     }
 
     return () => clearTimeout(timer);
   }, [isOpen]);
+
+  const handleConfirm = () => {
+    onConfirm(reason); // Pasamos el motivo a la función de confirmación
+  };
 
   if (!showModal) return null;
 
@@ -39,11 +45,27 @@ const DeleteModal = ({
           <FiTrash2 className="w-6 h-6 mr-2" />
           {title}
         </h2>
-        <p className="text-center mb-6">{message}</p>
+        <p className="text-center mb-4">{message}</p>
+        
+        {/* Nuevo campo para el motivo */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Motivo de cancelación:
+          </label>
+          <textarea
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            rows="3"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Ej: El facilitador no está disponible..."
+          />
+        </div>
+        
         <div className="flex justify-center gap-4">
           <button
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-150"
+            disabled={!reason} // Deshabilitar si no hay motivo
           >
             Confirmar
           </button>

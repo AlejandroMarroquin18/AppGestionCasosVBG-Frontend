@@ -39,9 +39,9 @@ const WorkshopList = ({ onBackToMenu }) => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (reason) => {
     try {
-      await deleteWorkshop(selectedWorkshopId);
+      await deleteWorkshop(selectedWorkshopId, reason); 
       setWorkshops(
         workshops.filter((workshop) => workshop.id !== selectedWorkshopId)
       );
@@ -201,7 +201,7 @@ const WorkshopList = ({ onBackToMenu }) => {
         <DeleteModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onConfirm={handleDelete}
+          onConfirm={handleDelete} // Pasamos la función modificada
           message={modalMessage}
         />
       </div>

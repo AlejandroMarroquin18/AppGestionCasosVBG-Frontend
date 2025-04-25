@@ -134,7 +134,7 @@ const WorkshopDetails = () => {
       type: "select",
       options: ["presencial", "virtual"],
     },
-    { key: "slots", label: "Beneficiarios", type: "number" },
+    { key: "slots", label: "Personas beneficiarias", type: "number" },
     { key: "facilitators", label: "Talleristas", type: "facilitators" },
     { key: "details", label: "Descripción del taller", type: "textarea" },
     { key: "qr_code_url", label: "Código QR", type: "text" }, // Campo para mostrar el QR
@@ -274,16 +274,41 @@ const WorkshopDetails = () => {
                         />
                       )
                     ) : key === "qr_code_url" ? (
-                      // Mostrar el código QR si está disponible
-                      workshop.qr_code_url ? (
-                        <img
-                          src={`http://localhost:8000${workshop.qr_code_url}`}
-                          alt="Código QR"
-                          className="w-48 h-48"
-                        />
-                      ) : (
-                        <span>No disponible</span>
-                      )
+                      <div className="flex flex-col items-justify">
+                        {workshop.qr_imagen ? (
+                          <>
+                            <img
+                              src={`data:image/png;base64,${workshop.qr_imagen}`}
+                              alt="Código QR del taller"
+                              className="w-48 h-48 mb-4 border border-gray-300 rounded"
+                            />
+                            <div className="text-justify">
+                              <p className="font-semibold mb-2">Enlace de inscripción:</p>
+                              <a
+                                href={workshop.qr_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 break-all"
+                              >
+                                {workshop.qr_link}
+                              </a>
+                              <div className="mt-4">
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(workshop.qr_link);
+                                    alert('Enlace copiado al portapapeles');
+                                  }}
+                                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                                >
+                                  Copiar enlace
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-gray-500">QR no generado aún</p>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-lg">
                         {key === "facilitators"
