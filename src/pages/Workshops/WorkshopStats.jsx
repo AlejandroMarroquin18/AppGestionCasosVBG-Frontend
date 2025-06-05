@@ -221,7 +221,7 @@ const WorkshopStats = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
         {/* Fila 1 - Gráficos circulares */}
         <div className="space-y-8">
-          <ChartCard title="Modalidad de Talleres" height="h-96">
+          <ChartCard title="Modalidad de talleres" height="h-96">
             <Doughnut
               data={modalityData}
               options={{
@@ -238,7 +238,7 @@ const WorkshopStats = () => {
             />
           </ChartCard>
 
-          <ChartCard title="Distribución por género" height="h-96">
+          <ChartCard title="Distribución de participantes por género" height="h-96">
             <Pie
               data={genderData}
               options={{
@@ -258,7 +258,7 @@ const WorkshopStats = () => {
 
         {/* Fila 2 - Gráficos de barras */}
         <div className="space-y-8">
-          <ChartCard title="Participantes por programa" height="h-96">
+          <ChartCard title="Participantes por programa académico" height="h-96">
             <Bar
               data={programData}
               options={{
@@ -276,7 +276,7 @@ const WorkshopStats = () => {
             />
           </ChartCard>
 
-          <ChartCard title="Distribución por edad" height="h-96">
+          <ChartCard title="Participantes de talleres por edad" height="h-96">
             <Bar
               data={ageData}
               options={{
@@ -296,7 +296,7 @@ const WorkshopStats = () => {
 
         {/* Fila 3 - Gráficos adicionales */}
         <div className="space-y-8">
-          <ChartCard title="Autoreconocimiento étnico" height="h-96">
+          <ChartCard title="Autoreconocimiento étnico de participantes" height="h-96">
             <Doughnut
               data={ethnicityData}
               options={{
@@ -315,7 +315,7 @@ const WorkshopStats = () => {
         </div>
 
         <div className="space-y-8">
-          <ChartCard title="Tipos de discapacidad" height="h-96">
+          <ChartCard title="Tipos de discapacidad de los participantes" height="h-96">
             <Bar
               data={disabilityData}
               options={{

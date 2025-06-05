@@ -10,7 +10,7 @@ import RestorePassword from './pages/restorepassword';
 import Queja from './pages/queja/queja';
 import WorkshopRegistrationPage from "./pages/Workshops/WorkshopRegistrationPage";
 import useAuthCheck from './helpers/fetchWithAuth';
-import ProtectedRoute from './components/ProtectedRoute';
+//import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -29,14 +29,14 @@ function App() {
         
         <main className="flex-1 overflow-auto">
           <Routes>
-            <Route element={<ProtectedRoute/>}>
+            {/* <Route element={<ProtectedRoute/>}> */}
               <Route path="/" element={<Navigate replace to="/quejas/lista" />} />
               <Route path="/quejas/*" element={<Complaints />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/agenda/*" element={<Agenda />} />
               <Route path="/talleres" element={<Workshop />} />
               <Route path="/talleres/*" element={<Workshop />} />
-            </Route>
+             {/* </Route> */}
 
             {/* RUTA DE INSCRIPCIÓN */}
             <Route path="/inscripcion/:workshopId" element={<WorkshopRegistrationPage />} />

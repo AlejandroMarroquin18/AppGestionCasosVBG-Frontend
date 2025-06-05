@@ -123,6 +123,8 @@ const WorkshopForm = () => {
       .filter((facilitator) => facilitator.name);
   
     const participantsArray = [];
+
+    
   
     try {
       const data = await createWorkshop({
