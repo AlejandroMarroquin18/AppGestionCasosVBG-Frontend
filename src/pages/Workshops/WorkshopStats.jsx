@@ -30,6 +30,8 @@ const WorkshopStats = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
+  /*
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -47,6 +49,33 @@ const WorkshopStats = () => {
 
     fetchStats();
   }, []);
+  */
+ useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${baseURL}/talleres/statistics/`);
+      if (!response.ok) throw new Error("Error al cargar estadísticas");
+      const data = await response.json();
+
+      // Asegura que todos los campos sean arrays, incluso vacíos
+      setStats({
+        ...data,
+        gender_stats: data.gender_stats || [],
+        program_stats: data.program_stats || [],
+        age_stats: data.age_stats || [],
+        ethnicity_stats: data.ethnicity_stats || [],
+        disability_stats: data.disability_stats || [],
+      });
+    } catch (err) {
+      setError(err.message);
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStats();
+}, []);
 
   if (loading)
     return <div className="text-center py-8">Cargando estadísticas...</div>;
@@ -104,36 +133,34 @@ const WorkshopStats = () => {
 
   // Gráfico de distribución por género
   const genderData = {
-    labels: stats.gender_stats.map(
-      (item) => item.gender_identity || "No especificado"
-    ),
-    datasets: [
-      {
-        data: stats.gender_stats.map((item) => item.count),
-        backgroundColor: [
-          "#3b82f6",
-          "#ef4444",
-          "#10b981",
-          "#f59e0b",
-          "#8b5cf6",
-        ],
-      },
-    ],
-  };
+  labels: stats.gender_stats?.map(
+    (item) => item.gender_identity || "No especificado"
+  ) || [],
+  datasets: [
+    {
+      data: stats.gender_stats?.map((item) => item.count) || [],
+      backgroundColor: [
+        "#3b82f6",
+        "#ef4444",
+        "#10b981",
+        "#f59e0b",
+        "#8b5cf6",
+      ],
+    },
+  ],
+};
 
   // Gráfico de programas académicos
   const programData = {
-    labels: stats.program_stats.map(
-      (item) => item.program || "No especificado"
-    ),
-    datasets: [
-      {
-        label: "Participantes",
-        data: stats.program_stats.map((item) => item.count),
-        backgroundColor: "#3b82f6",
-      },
-    ],
-  };
+  labels: stats.program_stats?.map((item) => item.program || "No especificado") || [],
+  datasets: [
+    {
+      label: "Participantes",
+      data: stats.program_stats?.map((item) => item.count) || [],
+      backgroundColor: "#3b82f6",
+    },
+  ],
+};
 
   // Gráfico de grupos de edad
   const ageData = {

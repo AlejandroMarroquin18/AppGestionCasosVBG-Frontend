@@ -5,11 +5,14 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
+import 'moment/locale/es'
 
+moment.locale('es')
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const AgendaList = () => {
+  
   const accessToken = localStorage.getItem("accessToken");
   const { events, fetchEvents, createEvent, updateEvent, deleteEvent,fetchEventById } = useGoogleCalendar(accessToken);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -17,6 +20,7 @@ const AgendaList = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedEventCopy,setSelectedEventCopy]=useState(null)
   const [editEventModal, setEditEventModal] = useState(false);
+  const [currentYear, setCurrentYear]=useState(new Date().getFullYear())
   
   
   const emptyEvent={
@@ -58,13 +62,27 @@ const AgendaList = () => {
     "10": "#51b749",
     "11": "#dc2127"
   };
+  const messages = {
+  today: 'Hoy',
+  previous: 'Anterior',
+  next: 'Siguiente',
+  month: 'Mes',
+  week: 'Semana',
+  day: 'Día',
+  agenda: 'Agenda',
+  date: 'Fecha',
+  time: 'Hora',
+  event: 'Evento',
+  noEventsInRange: 'No hay eventos en este rango.',
+  showMore: total => `+ Ver más (${total})`
+}
 
 
   
 
   useEffect(() => {
     if (accessToken) {
-      fetchEvents(2025);
+      fetchEvents(currentYear);
     }
   }, [accessToken]);
 
@@ -257,6 +275,7 @@ const AgendaList = () => {
           resizable
           draggableAccessor={() => true}
           resizableAccessor={() => true}
+          messages={messages}
           onSelectSlot={handleSelectedDay}
           onSelectEvent={handleSelectEvent}
           onEventResize={handleEventResize}

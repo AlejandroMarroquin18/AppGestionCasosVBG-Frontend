@@ -38,14 +38,14 @@ const ComplaintsList = () => {
   const filteredComplaints = complaints.filter((complaint) => {
     return (
       (locationFilter === "" ||
-        (complaint.sede && complaint.sede.includes(locationFilter))) &&
+        (complaint.afectado_sede && complaint.afectado_sede.includes(locationFilter))) &&
       (typeFilter === "" ||
         (complaint.tipo_de_acompanamiento &&
           complaint.tipo_de_acompanamiento.includes(typeFilter))) &&
       (facultyFilter === "" ||
-        (complaint.facultad && complaint.facultad.includes(facultyFilter))) &&
+        (complaint.afectado_facultad && complaint.afectado_facultad.includes(facultyFilter))) &&
       (searchTerm === "" ||
-        (complaint.codigo && complaint.codigo.includes(searchTerm)))
+        (complaint.afectado_codigo && complaint.afectado_codigo.includes(searchTerm)))
     );
   });
 
@@ -180,7 +180,7 @@ const ComplaintsList = () => {
                 <td className="border p-2">{complaint.id}</td>
                 <td className="border p-2">{complaint.afectado_nombre}</td>
                 <td className="border p-2">{complaint.afectado_sede}</td>
-                <td className="border p-2">{complaint.codigo}</td>
+                <td className="border p-2">{complaint.afectado_codigo}</td>
                 <td className="border p-2">{complaint.afectado_facultad}</td>
                 <td className="border p-2">
                   {complaint.afectado_programa_academico}
