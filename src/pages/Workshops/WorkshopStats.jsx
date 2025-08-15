@@ -54,8 +54,10 @@ const WorkshopStats = () => {
   const fetchStats = async () => {
     try {
       const response = await fetch(`${baseURL}/talleres/statistics/`);
+      
       if (!response.ok) throw new Error("Error al cargar estadísticas");
       const data = await response.json();
+      console.log("Workshop Statistics:", data);
 
       // Asegura que todos los campos sean arrays, incluso vacíos
       setStats({

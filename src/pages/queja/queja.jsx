@@ -39,7 +39,15 @@ const Queja = () => {
         'Caicedonia','Cartago','Norte del Cauca',
         'Pacífico','Pacífico','Palmira','Tuluá',
         'Yumbo','Zazal',]
-
+    const vicerrectorias=[
+        
+        "Vicerrectoría Académica",
+        "Vicerrectoría Administrativa",
+        "Vicerrectoría de Bienestar Universitario",
+        "Vicerrectoría de Investigaciones",
+        "Vicerrectoría de Regionalización",
+        "Vicerrectoría de Extensión y Proyección Social", 
+    ]
 
     const [persona_que_reporta, set_persona_que_reporta]=useState(
         {
@@ -118,9 +126,11 @@ const Queja = () => {
 
 
     const onchange = (func,field,value) =>{
+        const finalValue = value.trim() === '-------------------------------------------------------------------' ? '' : value;
+        
         func((prevState)=>({
             ...prevState,
-            [field]: value,
+            [field]: finalValue,
         }));
     }
 
@@ -220,7 +230,21 @@ const Queja = () => {
 
 
                 <p>Vicerrectoría a la que está adscrito(a)</p>
-                <input value={persona_que_reporta.reporta_vicerrectoria_adscrito} onChange={(e)=>onchange(set_persona_que_reporta,"reporta_vicerrectoria_adscrito",e.target.value)}></input>
+                
+                
+                <select value={persona_que_reporta.reporta_vicerrectoria_adscrito} 
+                onChange={(e)=>onchange(set_persona_que_reporta,"reporta_vicerrectoria_adscrito",e.target.value)}>
+                
+                    <option>-------------------------------------------------------------------</option>
+                    {vicerrectorias.map((option,index)=>(
+                        <option key={index} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
+
+                
+                
                 <p>Dependencia</p>
                 <input value={persona_que_reporta.reporta_dependencia} onChange={(e)=>onchange(set_persona_que_reporta,"reporta_dependencia",e.target.value)}></input>
                 </div>
@@ -347,7 +371,22 @@ const Queja = () => {
                 </select>
 
             <p>Vicerrectoria a la que está adscrito(a)</p>
-            <input value={datos_afectado.afectado_vicerrectoria_adscrito} onChange={(e)=>onchange(set_datos_afectado,"afectado_vicerrectoria_adscrito",e.target.value)}></input>
+            
+            <select value={datos_afectado.afectado_vicerrectoria_adscrito} 
+                onChange={(e)=>onchange(set_datos_afectado,"afectado_vicerrectoria_adscrito",e.target.value)}>
+                
+                    <option>-------------------------------------------------------------------</option>
+                    {vicerrectorias.map((option,index)=>(
+                        <option key={index} value={option}>
+                            {option}
+                        </option>
+                    ))}
+            </select>
+            
+            
+            
+            
+            
             <p>Dependencia</p>
             <input value={datos_afectado.afectado_dependencia} onChange={(e)=>onchange(set_datos_afectado,"afectado_dependencia",e.target.value)}></input>
             <p>Facultad</p>
@@ -471,7 +510,17 @@ const Queja = () => {
                 </select>
 
             <p>Vicerrectoria a la que está adscrito(a)</p>
-            <input value={datos_agresor.agresor_vicerrectoria_adscrito} onChange={(e)=>onchange(set_datos_agresor,"agresor_vicerrectoria_adscrito",e.target.value)}></input>
+            <select value={datos_agresor.agresor_vicerrectoria_adscrito}
+                onChange={(e)=>onchange(set_datos_agresor,"agresor_vicerrectoria_adscrito",e.target.value)}>
+                
+                    <option>-------------------------------------------------------------------</option>
+                    {vicerrectorias.map((option,index)=>(
+                        <option key={index} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
+            
             <p>Dependencia</p>
             <input value={datos_agresor.agresor_dependencia} onChange={(e)=>onchange(set_datos_agresor,"agresor_dependencia",e.target.value)}></input>
             <p>Programa Académico</p>

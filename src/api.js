@@ -141,3 +141,120 @@ export const deleteComplaint = async (id) => {
   }
   return true;
 };
+
+
+
+export const getComplaintStats = async () => {
+  const response = await fetch(`${baseURL}/quejas/statistics/`);
+  if (!response.ok) {
+    throw new Error("Error getting complaint statistics");
+  }
+  return response.json();
+}
+
+
+
+export const saveEvent = async (eventData) => {
+  
+
+  try {
+    const response = await fetch(`${baseURL}/events/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del backend:", errorData); // Log de la respuesta de error
+      throw new Error(errorData.message || "Error desconocido");
+    }
+
+    return await response.json();  // Si la respuesta es correcta, devolver los datos
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    throw error;
+  }
+
+
+}
+
+export const getRegistryList = async (complaintId) => {
+  try {
+    const response = await fetch(`${baseURL}/quejas/historial-quejas/${complaintId}`);
+    if (!response.ok) {
+      throw new Error("Error al obtener el historial de quejas");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener el historial de quejas:", error);
+    throw error;
+  }
+}
+
+export const createRegistry = async (registryData) => {
+  try {
+    const response = await fetch(`${baseURL}/quejas/historial-quejas/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(registryData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del backend:", errorData); // Log de la respuesta de error
+      throw new Error(errorData.message || "Error desconocido");
+    }
+
+    return await response.json();  // Si la respuesta es correcta, devolver los datos
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    throw error;
+  }
+}
+
+export const updateRegistry = async (registryId, registryData) => {
+  try {
+    const response = await fetch(`${baseURL}/quejas/historial-queja/${registryId}/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(registryData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del backend:", errorData); // Log de la respuesta de error
+      throw new Error(errorData.message || "Error desconocido");
+    }
+
+    return await response.json();  // Si la respuesta es correcta, devolver los datos
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    throw error;
+  }
+}
+
+export const deleteRegistry = async (registryId) => {
+  try {
+    const response = await fetch(`${baseURL}/quejas/historial-queja/${registryId}/`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error del backend:", errorData); // Log de la respuesta de error
+      throw new Error(errorData.message || "Error desconocido");
+    }
+
+    return true;  // Si la respuesta es correcta, devolver true
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    throw error;
+  }
+}

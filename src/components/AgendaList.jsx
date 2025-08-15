@@ -6,6 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
 import 'moment/locale/es'
+import { saveEvent } from "../api";
 
 moment.locale('es')
 const localizer = momentLocalizer(moment);
@@ -21,6 +22,8 @@ const AgendaList = () => {
   const [selectedEventCopy,setSelectedEventCopy]=useState(null)
   const [editEventModal, setEditEventModal] = useState(false);
   const [currentYear, setCurrentYear]=useState(new Date().getFullYear())
+  const calendarRef = React.useRef();
+  
   
   
   const emptyEvent={
@@ -30,7 +33,10 @@ const AgendaList = () => {
     location: "",
     link: "",
     createMeet:false,
-    details: { caseId: "" },
+    caseID:  "" ,
+    description: "",
+    organizer: "",
+    type: "",
     start: null,
     end: null,
     colorId: "11",
@@ -38,7 +44,7 @@ const AgendaList = () => {
   const [newEvent, setNewEvent] = useState(emptyEvent);
 
 
-  const [eventoooos, setEventoooos] = useState([
+  const [formattedEvents, setFormattedEvents] = useState([
     {
       title: "Evento de prueba",
       start: new Date(2025, 2, 4, 10, 0),
@@ -46,7 +52,7 @@ const AgendaList = () => {
       emails: ["correo@ejemplo.com"],
       location: "Sala de reuniones A",
       link: "https://zoom.us",
-      details: { caseId: "12345" },
+      caseID: "12345" ,
     },
   ]);
   const eventColors = {
@@ -89,7 +95,19 @@ const AgendaList = () => {
 
   useEffect(() => {
     if (events && events.length > 0) {
-      const formatted = events.map(event => ({
+      
+
+
+      const formatted = events.map(event =>  { 
+        const desc = event.description ?? "";
+
+        const casoId = desc.match(/Caso ID:\s*(.+)/);
+        const organizador = desc.match(/Organizador:\s*(.+)/);
+        const tipo = desc.match(/Tipo:\s*(.+)/);
+        const descripcion = desc.match(/description:\s*(.+)/);
+        
+        
+        return {
         id: event.id,
         title: event.summary ,
         start: event.start?.dateTime ? new Date(event.start.dateTime) : new Date(event.start.date), // Soporte para eventos de día completo
@@ -97,11 +115,22 @@ const AgendaList = () => {
         emails: event.attendees ? event.attendees.map(a => a.email) : [],
         location: event.location || "Sin ubicación",
         link: event.hangoutLink || "",
-        details: { caseId: event.description ? event.description.replace("Caso ID: ", "") : "" },
-        colorId : event.colorId
-      }));
+        
+        colorId : event.colorId,
+
+        caseID: casoId?.[1].trim() ?? "",
+        organizer: organizador?.[1].trim() ?? "",
+        type: tipo?.[1].trim() ?? "",
+        description: descripcion?.[1].trim() ?? "",
+        /*
+        caseID: event.description ? event.description.replace("ID caso: ", " ") : "" ,
+        description: event.description || "",
+        organizer: event.description || "",
+        type: event.description || "",
+        */}})
+      ;
   
-      setEventoooos(formatted);
+      setFormattedEvents(formatted);
     }
   }, [events]);
 
@@ -109,7 +138,15 @@ const AgendaList = () => {
 
   //  Seleccionar una fecha/hora para crear un evento
   const handleSelectedDay = ({ start, end, box }) => {
-    setPopupPosition({ top: box?.y || 200, left: box?.x || 300 });
+    const headerHeight = calendarRef.current.querySelector(".rbc-time-header")?.offsetHeight;
+    const calendarRect = calendarRef.current.getBoundingClientRect();
+    const relativeX = box?.clientX - calendarRect.left;
+    const relativeY = box?.clientY - calendarRect.top - headerHeight;
+    
+    
+    console.log("/////////////////////////////////////////////////////////");
+    console.log(box)
+    setPopupPosition({ top: box?.relativeY || 200, left: relativeX || 300 });
     setSelectedDay({ start, end });
     setNewEvent({ ...newEvent, start, end });
     setSelectedEvent(null);
@@ -117,6 +154,7 @@ const AgendaList = () => {
 
   //  Mostrar detalles del evento
   const handleSelectEvent = (event) => {
+    console.log(event)
     setSelectedEventCopy(event)
     setSelectedEvent(event);
     //setPopupPosition({ top: pageY, left: pageX });
@@ -126,7 +164,8 @@ const AgendaList = () => {
   //  Guardar cambios en inputs
   const handleChangeInput = (func,vare,field, value) => {
     if (field === "details") {
-      func({ ...vare, details: { ...vare.details, caseId: value } });
+      //func({ ...vare, caseID: { ...vare.details, caseID: value } });
+      func({ ...vare, caseID:value});
     } else {
       func({ ...vare, [field]: value });
     }
@@ -138,11 +177,31 @@ const AgendaList = () => {
       alert("El evento debe tener un título.");
       return;
     }
+
+    const resCaseID = await fetch(`http://127.0.0.1:8000/api/quejas/validarquejaid/${newEvent.caseID}/`);
+    const dataCaseID = await resCaseID.json();
+
+    if (!dataCaseID.exists) {
+      alert("El ID de la queja no existe en el sistema.");
+      return; // Detener envío
+    }
+
+
+
+
+    
+
+
+
+
   
     const eventData = {
       summary: newEvent.title,
       location: newEvent.location,
-      description: `Caso ID: ${newEvent.details.caseId}`,
+      description: `ID caso: ${newEvent.caseID} \n 
+      Organizador: ${newEvent.organizer} \n 
+      Tipo: ${newEvent.type} \n
+      description: ${newEvent.description} \n`,
       attendees: newEvent.emails ? newEvent.emails.map((email) => ({ email: email.trim() })) : [],/////////////
       start: { dateTime: newEvent.start.toISOString(), timeZone: "America/Bogota" },
       end: { dateTime: newEvent.end.toISOString(), timeZone: "America/Bogota" },
@@ -157,12 +216,33 @@ const AgendaList = () => {
       })
       
     };
+
+    const nrew = {
+        "title": newEvent.title,                // Título del evento
+        "description": newEvent.description,          // Descripción
+        "status": newEvent.status,               // Estado (ej: Cancelado, Aplazado)
+        "location": newEvent.location,             // Lugar
+        "attendes": newEvent.attendees, // Asistentes (correos electrónicos)
+        "color": newEvent.colorId,                // Código de color (ej: "11")
+        "organizer": newEvent.organizer,            // Organizador de la reunión
+        "startdatehour": newEvent.start.toISOString(), // Fecha y hora de inicio (ISO 8601)
+        "enddatehour": newEvent.end.toISOString(),   // Fecha y hora de finalización (ISO 8601)
+        "timezone": "America/Bogota",     // Zona horaria
+        "type": newEvent.type,                 // Tipo de reunión/orientación/asesoría
+        "case_id": newEvent.caseID,              // ID de la queja relacionada
+        "create_meet": false,             // (opcional) Si se crea Google Meet
+        "meet_link": "", // (opcional) Enlace Meet
+        "google_event_id": ""       // (opcional) ID del evento en Google Calendar
+      }
+    
   
     try {
+      
+
       const createdEvent = await createEvent(eventData); // Esperar a que el evento se cree en Google Calendar
   
       // Si la creación fue exitosa, actualizar el estado con el nuevo evento
-      setEventoooos(prevEvents => [
+      setFormattedEvents(prevEvents => [
         ...prevEvents,
         {
           id: createdEvent.id, // Agregar el ID devuelto por la API
@@ -174,11 +254,20 @@ const AgendaList = () => {
           link: createdEvent.hangoutLink || "",
           //alternativa a link
 
-          details: { caseId: createdEvent.description?.replace("Caso ID: ", "") || "" },
+          details: { caseID: createdEvent.description?.replace("Caso ID: ", "") || "" },
           colorId: createdEvent.colorId || "11",
           
         }
       ]);
+
+      nrew["google_event_id"] = createdEvent.id;
+      nrew["meet_link"] = createdEvent.hangoutLink || "";
+      nrew["create_meet"] = newEvent.createMeet;
+
+
+      const createdBackendEvent = await saveEvent(nrew);
+
+      
   
       setSelectedDay(null);
       setNewEvent({
@@ -186,7 +275,10 @@ const AgendaList = () => {
         emails: [],//////////////////////////////////////////////////////cambio
         location: "",
         link: "",
-        details: { caseId: "" },
+        caseID: "",
+        description: "",
+        organizer: "",
+        type: "",
         start: null,
         end: null,
       });
@@ -195,6 +287,9 @@ const AgendaList = () => {
       console.error("Error al crear el evento:", error);
       alert("No se pudo crear el evento. Inténtalo de nuevo.");
     }
+    
+    
+    
   };
 
   //  Redimensionar evento
@@ -203,7 +298,7 @@ const AgendaList = () => {
     const oldevent = { ...event }; // Hacer una copia del evento original
     
     // Actualizar el estado de los eventos antes de llamar a la API
-    setEventoooos((prevEvents) =>
+    setFormattedEvents((prevEvents) =>
       prevEvents.map((ev) => (ev.id === id ? { ...ev, start, end } : ev))
     );
   
@@ -227,7 +322,7 @@ const AgendaList = () => {
       console.error("Error actualizando el evento:", error);
   
       // Restaurar el evento original si la actualización falla
-      setEventoooos((prevEvents) =>
+      setFormattedEvents((prevEvents) =>
         prevEvents.map((ev) => (ev.id === id ? oldevent : ev))
       );
     }
@@ -241,7 +336,7 @@ const AgendaList = () => {
       await deleteEvent(eventId); // Intentar eliminar el evento en Google Calendar
     
       // Si la eliminación fue exitosa, actualizar el estado
-      setEventoooos(prevEvents => prevEvents.filter(event => event.id !== eventId));
+      setFormattedEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
       setSelectedEvent(null)
     } catch (error) {
       console.error("Error al eliminar el evento:", error);
@@ -269,8 +364,9 @@ const AgendaList = () => {
   }
   return (
     <>
-      <div style={{ height: "80vh", position: "relative" }}>
+      <div ref={calendarRef} style={{ height: "80vh", position: "relative" }}>
         <DnDCalendar
+          
           selectable
           resizable
           draggableAccessor={() => true}
@@ -281,7 +377,7 @@ const AgendaList = () => {
           onEventResize={handleEventResize}
           onEventDrop={handleEventResize}
           localizer={localizer}
-          events={eventoooos}
+          events={formattedEvents}
           startAccessor="start"
           endAccessor="end"
           defaultView="week"
@@ -291,11 +387,23 @@ const AgendaList = () => {
 
         {/* Formulario flotante para crear evento */}
         {selectedDay && (
-          <div className={`absolute 
-           bg-white border border-gray-300 rounded-lg shadow-md p-2 z-[100] justify-around flex flex-col gap-2 w-1/3 h-auto`}
+          <div 
             style={{
               top: popupPosition.top,
-              left: popupPosition.left, 
+              left: popupPosition.left,
+              position: "absolute",
+              backgroundColor: "white",
+              border: "1px solid #d1d5db",
+              borderRadius: "0.5rem",
+              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+              padding: "0.5rem",
+              zIndex: 100,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-around",
+              gap: "0.5rem",
+              width: "33.333333%",
+              height: "auto"
             }}
           >
             <h4><strong>Crear Reunión</strong></h4>
@@ -344,10 +452,13 @@ const AgendaList = () => {
 
             <input value={newEvent.location} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"location", e.target.value)} placeholder="Ubicación" />
             
-            <input value={newEvent.details.caseId} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"details", e.target.value)} placeholder="ID de caso" />
-            {/*Descripcion*/}
-            {/**Calendario (?) */}
-            {/**color */}
+            <input value={newEvent.caseID} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"caseID", e.target.value)} placeholder="ID de caso" />
+            <input value={newEvent.description} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"description", e.target.value)} placeholder="Descripción" />
+            <input value={newEvent.organizer} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"organizer", e.target.value)} placeholder="Organizador" />
+            <input value={newEvent.type} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"type", e.target.value)} placeholder="Tipo" />
+           
+            
+            
             <select
               value={newEvent.colorId}
               onChange={(e) => handleChangeInput(setNewEvent,newEvent,"colorId",e.target.value)}
@@ -360,7 +471,9 @@ const AgendaList = () => {
                 </option>
               ))}
             </select>
+            
             <div>
+            
             <button onClick={sendEvent}>Crear</button>
             <button onClick={() =>{ setSelectedDay(null);setNewEvent(emptyEvent)}}>Cerrar</button>
             </div>
@@ -373,9 +486,13 @@ const AgendaList = () => {
             <div className="bg-white p-6 rounded shadow w-1/3">
               <h3 className="text-xl font-bold mb-4">{selectedEvent.title}</h3>
               <ul>
+                
                 <li><strong> {selectedEvent.title} </strong></li>
-                <li></li>
-                <li><strong>Ubicación:</strong> {!editEventModal ? (selectedEvent.location || "N/A") : <input value={selectedEvent["location"]} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"location", e.target.value)} />}</li>
+                
+                <li><strong>Ubicación:</strong> 
+                
+                {!editEventModal ? (selectedEvent.location || "N/A") : 
+                <input value={selectedEvent["location"]} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"location", e.target.value)} />}</li>
                 <li>
                   <strong>Asistentes:</strong>{" "}
                   {selectedEvent.emails && selectedEvent.emails.length > 0 ? (
@@ -388,12 +505,40 @@ const AgendaList = () => {
                     "N/A"
                   )}
                 </li>
-                <li><strong>Enlace:</strong> {selectedEvent.link || "N/A"}</li>
-                <li><strong>Descripcion:</strong> {selectedEvent.details.caseId || "N/A"}
-                {!editEventModal ? (selectedEvent.details.caseId || "N/A") : <input value={selectedEvent.details.caseId} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"details", e.target.value)} />}
+                
+                <li><strong>Enlace:</strong> 
+                {selectedEvent.link || "N/A"}
+                </li>
+                
+                <li><strong>Descripcion:</strong> 
+                {selectedEvent.description || "N/A"}
+                </li>
+
+                <li><strong>ID Caso:</strong>
+                  {!editEventModal ? (selectedEvent.caseID || "N/A") : <input value={selectedEvent.caseID} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"caseID", e.target.value)} />}
+                </li>
+                
+                <li>
+                  <strong>Estado:</strong> 
+                    {!editEventModal ? (selectedEvent.status || "N/A") : <input value={selectedEvent.status} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"status", e.target.value)} />}
                 </li>
                 
                 
+                <li>
+                  <strong>Organizadore:</strong> 
+                    {!editEventModal ? (selectedEvent.organizer || "N/A") : <input value={selectedEvent.organizer} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"organizer", e.target.value)} />}
+                </li>
+                          
+                <li>
+                  <strong>Color:</strong> 
+                    {!editEventModal ? (eventColors[selectedEvent.colorId] || "N/A") : <input value={eventColors[selectedEvent.colorId]} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"color", e.target.value)} />}
+                </li>
+
+                <li>
+                  <strong>Tipo:</strong> 
+                    {!editEventModal ? (selectedEvent.type || "N/A") : <input value={selectedEvent.type} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"type", e.target.value)} />}
+                </li>
+
               </ul>
               <button onClick={() => {handleDeleteEvent(selectedEvent.id)}}>Eliminar</button>
               {editEventModal && <button onClick={()=>handleEditEvent(selectedEvent)}>Guardar</button>}

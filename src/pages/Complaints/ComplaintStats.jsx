@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,6 +10,9 @@ import {
   Legend,
 } from "chart.js";
 
+import { getComplaintStats } from "../../api";
+import { use } from "react";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,12 +23,69 @@ ChartJS.register(
 );
 
 const ComplaintsStats = () => {
+  const [receivedData, setReceivedData] = React.useState({});
+  const currentYear = new Date().getFullYear();
+  const [anios, setAnios]= React.useState(["2025"]);
+  const [conteosPorAnio, setConteosPorAnio] = React.useState({});
+  const [conteofacultades, setConteofacultades] = React.useState({facultades:[],valores:[]});
+  const [conteosPorGeneros, setConteosPorGenero] = React.useState({generos:[],valores:[]});
+  const [conteosPorSedes, setConteosPorSedes] = React.useState({sedes:[],valores:[]});
+
+  const [conteosPorVicerrectorias, setConteosPorVicerrectorias] = React.useState({vicerrectorias:[],valores:[]});
+  
+
+  useEffect(() => {
+    const loadComplaintStats = async () => {
+      try {
+        const data = await getComplaintStats();
+        console.log("Complaint Statistics:", data);
+        
+        setReceivedData(data);
+        setConteosPorAnio(data.conteo_por_anio);
+
+        //estos atibutos dentro de data son arrays de objetos, por lo que se pueden mapear en un orden especifico
+        //facultades
+        const facultadesList = data.conteo_por_facultad_afectado.map(item => item.afectado_facultad===''?'No especificado':item.afectado_facultad);
+        const totalesFacultad = data.conteo_por_facultad_afectado.map(item => item.total);
+        setConteofacultades({facultades:facultadesList, valores: totalesFacultad});
+        //generos
+        const generoList = data.conteo_por_genero_afectado.map(item => item.afectado_identidad_genero===''?'No especificado':item.afectado_identidad_genero);
+        const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
+        setConteosPorGenero({generos:generoList, valores: totalesGenero});
+        //sedes
+        const sedesList = data.conteo_por_sede_afectado.map(item => item.afectado_sede===''?'No especificado':item.afectado_sede);
+        const totalesSedes = data.conteo_por_sede_afectado.map(item => item.total);
+        setConteosPorSedes({sedes:sedesList, valores: totalesSedes});
+        //vicerrectorias
+        const vicesList = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.afectado_vicerrectoria_adscrito===''?'No especificado':item.afectado_vicerrectoria_adscrito);
+        const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
+        setConteosPorVicerrectorias({vicerrectorias:vicesList, valores: totalVices});
+
+        
+        
+
+        setAnios(Object.keys(data.conteo_por_anio));
+
+
+      } catch (error) {
+        console.error("Error loading complaint statistics:", error);
+      }
+    }
+    loadComplaintStats();
+    
+
+
+  }, []);
+
+
   const indicators = {
-    receivedComplaints: 32,
+    receivedComplaints: conteosPorAnio[currentYear],
     referredComplaints: 12,
-    studentComplaints: 18,
-    staffComplaints: 4,
-    professorComplaints: 10,
+
+    studentComplaints: receivedData.afectado_estudiantes,
+    staffComplaints: receivedData.afectado_funcionarios,
+    professorComplaints: receivedData.afectado_profesores,
+    
     studentReferrals: 7,
     staffReferrals: 3,
     professorReferrals: 2,
@@ -43,11 +103,11 @@ const ComplaintsStats = () => {
   };
 
   const complaintsByFacultyData = {
-    labels: ["Artes", "Ciencias", "Ingeniería", "Medicina", "Derecho"],
+    labels: conteofacultades.facultades,
     datasets: [
       {
         label: "Quejas por facultad",
-        data: [50, 70, 40, 80, 80],
+        data: conteofacultades.valores,
         backgroundColor: "rgba(40, 92, 164)",
         borderColor: "rgba(40, 92, 164)",
         borderWidth: 1,
@@ -56,22 +116,23 @@ const ComplaintsStats = () => {
   };
 
   const complaintsByGenderData = {
-    labels: ["Masculino", "Femenino", "No Binario"],
+    //labels: ["Masculino", "Femenino", "No Binario"],
+    labels: conteosPorGeneros.generos,
     datasets: [
       {
         label: "Distribución de quejas por género",
-        data: [40, 50, 10],
+        data: conteosPorGeneros.valores,
         backgroundColor: ["rgba(54, 162, 235, 0.8)", "rgba(255, 99, 132, 0.8)", "rgba(255, 206, 86, 0.8)"],
       },
     ],
   };
 
   const complaintsByLocationData = {
-    labels: ["Melendez", "San Fernando", "Buga"],
+    labels: conteosPorSedes.sedes,
     datasets: [
       {
         label: "Quejas por sede",
-        data: [120, 100, 100],
+        data: conteosPorSedes.valores,
         backgroundColor: [
           "rgba(255, 99, 132)",
           "rgba(255, 99, 132)",
@@ -88,11 +149,11 @@ const ComplaintsStats = () => {
   };
 
   const complaintsByYearData = {
-    labels: ["2022", "2023", "2024"],
+    labels: anios,
     datasets: [
       {
         label: "Quejas por año",
-        data: [30, 38, 32],
+        data:  anios.map(anio => conteosPorAnio[anio] || 0),
         backgroundColor: "rgba(153, 102, 255, 0.5)",
         borderColor: "rgba(153, 102, 255, 1)",
         borderWidth: 1,
@@ -101,11 +162,11 @@ const ComplaintsStats = () => {
   };
 
   const complaintsByDepartmentData = {
-    labels: ["Bienestar", "Académica", "Investigaciones"],
+    labels: conteosPorVicerrectorias.vicerrectorias,
     datasets: [
       {
         label: "Quejas por departamento",
-        data: [20, 13, 10],
+        data: conteosPorVicerrectorias.valores,
         backgroundColor: "rgba(255, 159, 64, 0.5)",
         borderColor: "rgba(255, 159, 64, 1)",
         borderWidth: 1,
@@ -123,7 +184,7 @@ const ComplaintsStats = () => {
         display: true,
         font: {
           size: 20, 
-          style: 'bold', 
+          //style: 'bold', 
           family: 'Arial'
         }
       },
@@ -141,7 +202,7 @@ const ComplaintsStats = () => {
         display: true,
         font: {
           size: 20, 
-          style: 'bold', 
+          //style: 'bold', 
           family: 'Arial'
         }
       },
