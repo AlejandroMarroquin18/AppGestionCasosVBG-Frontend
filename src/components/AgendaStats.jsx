@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,6 +15,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { fetchEventStats } from "../api";
 
 ChartJS.register(
   CategoryScale,
@@ -35,12 +36,63 @@ ChartJS.register(
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const AgendaStats = () => {
+  const [receivedData,setReceivedData]= useState({});
+  const [conteofacultades, setConteofacultades] = React.useState({facultades:[],valores:[]});
+  const [conteosPorGeneros, setConteosPorGenero] = React.useState({generos:[],valores:[]});
+  const [conteoPorTipo, setConteoPorTipo] = React.useState({tipos:[],valores:[]});
+  const [conteo_por_anio, setConteoPorAnio] = React.useState({anios:[],valores:[]});
+  const [conteoPorMeses, setConteoPorMeses] = React.useState({meses:[],valores:[]});
+  
+  const mesesDelAnio = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  
+  useEffect(() => {
+
+    const fetchStats = async () => {
+      try {
+        const data = await fetchEventStats();
+        setReceivedData(data);
+        //facultades
+        const facultadesList = data.conteo_por_facultad_afectado.map(item => (item.case_id__afectado_facultad==='') || (item.case_id__afectado_facultad===null) ?'No especificado':item.case_id__afectado_facultad);
+        const totalesFacultad = data.conteo_por_facultad_afectado.map(item => item.total_eventos);
+        setConteofacultades({facultades:facultadesList, valores: totalesFacultad});
+        //generos
+        const generoList = data.conteo_por_genero_afectado.map(item => (item.case_id__afectado_identidad_genero==='') || (item.case_id__afectado_identidad_genero===null)?'No especificado':item.case_id__afectado_identidad_genero);
+        const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
+        setConteosPorGenero({generos:generoList, valores: totalesGenero});
+        //tipo de evento
+        const typeList = data.conteo_por_tipo.map(item => (item.type==='') || (item.type===null)?'No especificado':item.type);
+        const totalesType = data.conteo_por_tipo.map(item => item.total);
+        setConteoPorTipo({tipos:typeList, valores: totalesType});
+        //conteo por anio
+        const aniosList = data.conteo_por_anio.map(item => (item.year==='') || (item.year===null)?'No especificado':item.year);
+        const totalesAnios = data.conteo_por_anio.map(item => item.total);
+        setConteoPorAnio({anios:aniosList, valores: totalesAnios});
+        //conteo por mes
+        const mesesList = data.conteo_por_mes.map(item => (item.month==='') || (item.month===null)?'No especificado':mesesDelAnio[item.month-1]);
+        const totalesMeses = data.conteo_por_mes.map(item => item.total);
+        setConteoPorMeses({meses:mesesList, valores: totalesMeses});
+
+
+
+
+
+        console.log("Fetched stats:", receivedData);
+        
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+    
+  }, []);
+  
   const indicators = {
-    requestedAppointments: 16,
-    attendedAppointments: 11,
-    studentRequestedAppointments: 7,
-    staffRequestedAppointments: 5,
-    professorRequestedAppointments: 4,
+    requestedAppointments: receivedData.total_eventos_creados,
+    attendedAppointments: receivedData.total_eventos_realizados,
+    studentRequestedAppointments: receivedData.total_estudiantes,
+    staffRequestedAppointments: receivedData.total_funcionarios,
+    professorRequestedAppointments: receivedData.total_profesores,
     studentAttendedAppointments: 6,
     staffAttendedAppointments: 4,
     professorAttendedAppointments: 1,
@@ -58,10 +110,10 @@ const AgendaStats = () => {
   };
 
   const appointmentsByYearData = {
-    labels: ["2022", "2023", "2024"],
+    labels: conteo_por_anio.anios,
     datasets: [{
       label: 'Citas por Año',
-      data: [400, 450, 350],
+      data: conteo_por_anio.valores,
       backgroundColor: 'rgba(255, 99, 132)',
       borderColor: 'rgba(255, 99, 132)',
       borderWidth: 1,
@@ -80,10 +132,10 @@ const AgendaStats = () => {
   };
 
   const appointmentsByFacultyData = {
-    labels: ["Artes", "Ciencias", "Ingeniería", "Medicina", "Derecho"],
+    labels: conteofacultades.facultades,
     datasets: [{
       label: 'Citas por facultad',
-      data: [100, 200, 150, 250, 100],
+      data: conteofacultades.valores,
       backgroundColor: 'rgba(248, 148, 4)',
       borderColor: 'rgba(248, 148, 4)',
       borderWidth: 1,
@@ -91,10 +143,10 @@ const AgendaStats = () => {
   };
 
   const appointmentReasonsData = {
-    labels: ["Orientación psicológica", "Atención integral"],
+    labels: conteoPorTipo.tipos,
     datasets: [{
       label: 'Motivos de citas',
-      data: [60, 40],
+      data: conteoPorTipo.valores,
       backgroundColor: ['rgba(128, 0, 128, 0.8)', 'rgba(255, 215, 0, 0.8)'],
     }]
   };
@@ -111,10 +163,10 @@ const AgendaStats = () => {
   };
 
   const appointmentsByMonthData = {
-    labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+    labels: conteoPorMeses.meses,
     datasets: [{
       label: 'Citas por mes',
-      data: [30, 25, 40, 35, 50, 45],
+      data: conteoPorMeses.valores,
       backgroundColor: 'rgba(220, 20, 60, 0.8)',
       borderColor: 'rgba(220, 20, 60, 1)',
       borderWidth: 1,
@@ -122,10 +174,10 @@ const AgendaStats = () => {
   };
 
   const appointmentsByGenderData = {
-    labels: ["Hombres", "Mujeres", "No binario"],
+    labels: conteosPorGeneros.generos,
     datasets: [{
       label: 'Distribución de citas por género',
-      data: [18, 38, 15],
+      data: conteosPorGeneros.valores,
       backgroundColor: ['rgba(30, 144, 255, 0.8)', 'rgba(255, 105, 180, 0.8)', 'rgba(8, 98, 114, 0.8)'],
     }]
   };
@@ -134,7 +186,7 @@ const AgendaStats = () => {
     responsive: true,
     plugins: {
       legend: { position: 'top' },
-      title: { display: true, font: { size: 20, style: 'bold', family: 'Arial' } }
+      title: { display: true, font: { size: 20, family: 'Arial' } }
     },
   };
 
@@ -149,7 +201,6 @@ const AgendaStats = () => {
         text: 'Evolución anual de citas',
         font: {
           size: 20,
-          style: 'bold',
           family: 'Arial'
         }
       },
@@ -167,7 +218,6 @@ const AgendaStats = () => {
         text: 'Citas por facultad',
         font: {
           size: 20,
-          style: 'bold',
           family: 'Arial'
         }
       },
@@ -185,7 +235,6 @@ const AgendaStats = () => {
         text: 'Citas por de funcionarios por departamento',
         font: {
           size: 20,
-          style: 'bold',
           family: 'Arial'
         }
       },

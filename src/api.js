@@ -258,3 +258,17 @@ export const deleteRegistry = async (registryId) => {
     throw error;
   }
 }
+
+
+export const fetchEventStats = async () => {
+  try {
+    const response = await fetch(`${baseURL}/events/stats/`);
+    if (!response.ok) {
+      throw new Error("Error al obtener las estadísticas de eventos");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener las estadísticas de eventos:", error);
+    throw error;
+  }
+}
