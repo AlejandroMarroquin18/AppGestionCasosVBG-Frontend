@@ -41,7 +41,7 @@ const ComplaintsStats = () => {
         console.log("Complaint Statistics:", data);
         
         setReceivedData(data);
-        setConteosPorAnio(data.conteo_por_anio);
+        setConteosPorAnio(data);
 
         //estos atibutos dentro de data son arrays de objetos, por lo que se pueden mapear en un orden especifico
         //facultades

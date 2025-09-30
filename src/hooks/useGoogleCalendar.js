@@ -18,6 +18,7 @@ const useGoogleCalendar = (accessToken) => {
             const response = await fetch(`http://localhost:8000/api/calendar/fetchEvents/${year}`, {
                 method: "GET",
                 headers: {
+                    "Authorization": `Token ${localStorage.getItem("userToken")}`,
                     "Content-Type": "application/json",
                 },
                 credentials: "include",
@@ -46,7 +47,7 @@ const useGoogleCalendar = (accessToken) => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-
+                    "Authorization": `Token ${localStorage.getItem("userToken")}`,
                     "X-CSRFToken": getCSRFToken(), 
 
                 },
@@ -76,6 +77,7 @@ const useGoogleCalendar = (accessToken) => {
             const response = await fetch(`http://localhost:8000/api/calendar/update/${eventId}`, {
                 method: "PUT",
                 headers: {
+                    "Authorization": `Token ${localStorage.getItem("userToken")}`,
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCSRFToken(), 
                 },
@@ -104,6 +106,8 @@ const useGoogleCalendar = (accessToken) => {
             const response = await fetch(`http://localhost:8000/api/calendar/delete/${eventId}`, {
                 method: "DELETE",
                 headers: {
+
+                    "Authorization": `Token ${localStorage.getItem("userToken")}`,
                     "X-CSRFToken": getCSRFToken(), 
                 },
                 credentials: "include",
@@ -130,6 +134,7 @@ const useGoogleCalendar = (accessToken) => {
                 method: "GET",
                 credentials: "include",
                 headers: {
+                    "Authorization": `Token ${localStorage.getItem("userToken")}`,
                     "X-CSRFToken": getCSRFToken(), 
                 }
             });

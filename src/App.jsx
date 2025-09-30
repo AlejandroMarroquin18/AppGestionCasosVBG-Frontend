@@ -17,7 +17,7 @@ function App() {
   const location = useLocation();
 
   const noSidebarRoutes = ['/login', '/registrarse', '/restorepassword', '/reportarvbg', '/inscripcion'];
-  useAuthCheck()
+  //suseAuthCheck()
   return (
     <div className="flex flex-col h-screen">
       {/* Mostrar Header solo si la ruta no está en la lista de noSidebarRoutes */}

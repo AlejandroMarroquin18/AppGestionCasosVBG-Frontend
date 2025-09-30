@@ -15,6 +15,7 @@ import {
   getRegistryList,
   deleteRegistry,
   updateRegistry,
+  updateComplaintStatus,
 } from "../../api";
 import DeleteModal from "../../components/DeleteModal";
 import { Description } from "@mui/icons-material";
@@ -38,6 +39,7 @@ const ComplaintsDetails = () => {
   const [newRegistry, setNewRegistry] = useState(emptyRegistry);
   const [editingRegistryIndex, setEditingRegistryIndex] = useState(-1);
   const [registryCopy, setRegistryCopy] = useState(null);
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
 
   const dataTitles = [
     //persona que reporta
@@ -181,6 +183,7 @@ const ComplaintsDetails = () => {
     "unidad",
   ];
 
+  const statusOptions = ["Pendiente", "Aprobado", "En Proceso", "Finalizado", "Remitido"];
   
 
   useEffect(() => {
@@ -294,10 +297,6 @@ const ComplaintsDetails = () => {
       setRegistryCopy(registros[index]);
       setEditingRegistryIndex(index);
     }
-              
-
-    
-
   }
   const handleDeleteRegistry = async (id) => {
     try{
@@ -311,6 +310,20 @@ const ComplaintsDetails = () => {
       console.error("Error al eliminar el registro:", error);
     }
     
+  }
+
+  const handleUpdateComplaintStatus = async (estado) => {
+    try {
+      
+      const data = await updateComplaintStatus(id, estado);
+      setQuejaDetails(data);
+      setQuejaCopy(data);
+      setIsChangingStatus(false);
+      console.log("Estado de la queja actualizado:", data);
+    } catch (error) {
+      setQuejaCopy(quejaDetails);
+      console.error("Error al actualizar el estado de la queja:", error);
+    }
   }
 
   const sectionTitles = {
@@ -455,6 +468,26 @@ const renderHistorial = () => (
       }}
     >
       <h1 className="text-3xl font-bold mb-6">Detalles de la queja</h1>
+      <div className="flex flex-row gap-4 mb-8">
+        <h2>Estado Actual</h2>
+        <p>{quejaCopy.estado}</p>
+        <h2>Cambiar a </h2>
+        <select
+          value={quejaCopy.estado}
+          onChange={(e) => {setQuejaCopy({ ...quejaCopy, estado: e.target.value }); setIsChangingStatus(true);} }
+          >
+          {statusOptions.map((status) => (
+            <option key={status} value={status}> {status}</option>
+          ))} 
+          </select>
+          {isChangingStatus && (
+            <>
+            <p>¿Quieres cambiar el estado de esta queja?</p>
+            <button onClick={(e)=>handleUpdateComplaintStatus(quejaCopy.estado) }>Si, guardar</button>
+            <button onClick={(e)=>{setIsChangingStatus(false);setQuejaCopy({ ...quejaCopy, estado: quejaDetails.estado })} }>No, cancelar</button>
+            </>)}
+
+      </div>
       {renderAccordionSection(
         "reporta",
         0,

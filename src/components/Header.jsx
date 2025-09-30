@@ -17,8 +17,10 @@ const Header = () => {
       const response = await fetch("http://localhost:8000/api/logout/", {
         
           method: "POST",
-          credentials: "include", // 🔥 Necesario para eliminar cookies de sesión
+
+          credentials: "include", 
           headers: {
+            "Authorization": `Token ${localStorage.getItem("userToken")}`,
             "X-CSRFToken": getCSRFToken(), // 🔥 Envía el token CSRF
           },
           

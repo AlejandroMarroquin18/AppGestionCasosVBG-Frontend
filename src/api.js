@@ -1,3 +1,5 @@
+import getCSRFToken from "./helpers/getCSRF";
+
 const baseURL = "http://127.0.0.1:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
@@ -128,6 +130,21 @@ export const updateComplaint = async (id, complaintData) => {
   });
   if (!response.ok) {
     throw new Error("Error updating complaint");
+  }
+  return response.json();
+};
+
+export const updateComplaintStatus = async (id, status) => {
+  const response = await fetch(`${baseURL}/quejas/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ estado: status }),
+  });
+  if (!response.ok) {
+    console.log(response);
+    throw new Error("Error updating complaint status");
   }
   return response.json();
 };
@@ -272,3 +289,49 @@ export const fetchEventStats = async () => {
     throw error;
   }
 }
+
+export async function checkSession() {
+
+  //console.log("Cookies antes de checkSession:", document.cookie);
+    try {
+        const response = await fetch(`${baseURL}/auth/checkSession/`, {
+            method: "GET",
+            credentials: "include", //
+            
+            headers: {
+              "X-CSRFToken": getCSRFToken(), // 
+              "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
+            }
+        });
+
+        console.log("Response headers:", [...response.headers.entries()]);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Sesión activa:", data);
+            return data;
+        } else {
+            console.log("No hay sesión activa");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error verificando sesión:", error);
+        return null;
+    }
+}
+
+
+/**
+ * las peticiones deben enviar la cookie de sesión y el token CSRF. Por ejemplo:
+ *
+await fetch("http://localhost:8000/api/protected/", {
+    authorization: `Bearer ${localStorage.getItem("userToken")}`,//solo si ess en desarrollo
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken()
+    },
+    credentials: "include",
+    body: JSON.stringify({ data: "algo" })
+});
+ */

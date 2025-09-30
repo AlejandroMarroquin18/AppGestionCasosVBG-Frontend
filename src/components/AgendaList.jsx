@@ -13,9 +13,8 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const AgendaList = () => {
-  
-  const accessToken = localStorage.getItem("accessToken");
-  const { events, fetchEvents, createEvent, updateEvent, deleteEvent,fetchEventById } = useGoogleCalendar(accessToken);
+  const userToken = localStorage.getItem("userToken");
+  const { events, fetchEvents, createEvent, updateEvent, deleteEvent,fetchEventById } = useGoogleCalendar(userToken);
   const [selectedDay, setSelectedDay] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -87,10 +86,10 @@ const AgendaList = () => {
   
 
   useEffect(() => {
-    if (accessToken) {
+    if (userToken) {
       fetchEvents(currentYear);
     }
-  }, [accessToken]);
+  }, [userToken]);
 
 
   useEffect(() => {
@@ -100,11 +99,12 @@ const AgendaList = () => {
 
       const formatted = events.map(event =>  { 
         const desc = event.description ?? "";
+        const casoId = desc.match(/ID caso: \s*(.+) \n \n/);
+        const organizador = desc.match(/Organizador: \s*(.+) \n \n/);
+        const tipo = desc.match(/Tipo: \s*(.+)/);
+        const descripcion = desc.match(/description: \s*(.+) \n \n/);
 
-        const casoId = desc.match(/Caso ID:\s*(.+)/);
-        const organizador = desc.match(/Organizador:\s*(.+)/);
-        const tipo = desc.match(/Tipo:\s*(.+)/);
-        const descripcion = desc.match(/description:\s*(.+)/);
+        
         
         
         return {
@@ -186,19 +186,11 @@ const AgendaList = () => {
       return; // Detener envío
     }
 
-
-
-
-    
-
-
-
-
-  
     const eventData = {
       summary: newEvent.title,
       location: newEvent.location,
-      description: `ID caso: ${newEvent.caseID} \n 
+      description: 
+      `ID caso: ${newEvent.caseID} \n 
       Organizador: ${newEvent.organizer} \n 
       Tipo: ${newEvent.type} \n
       description: ${newEvent.description} \n`,
@@ -287,9 +279,7 @@ const AgendaList = () => {
       console.error("Error al crear el evento:", error);
       alert("No se pudo crear el evento. Inténtalo de nuevo.");
     }
-    
-    
-    
+
   };
 
   //  Redimensionar evento
@@ -346,7 +336,40 @@ const AgendaList = () => {
 
   };
 
-  const handleEditEvent = ( event) => {
+  const handleEditSaveEvent = async ( event) => {
+    const id = event.id;
+    const oldevent = { ...event }; // Hacer una copia del evento original
+    
+    // Actualizar el estado de los eventos antes de llamar a la API
+    setFormattedEvents((prevEvents) =>
+      prevEvents.map((ev) => (ev.id === id ? { ...ev,selectedEvent } : ev))
+    );
+  
+    try {
+      const eventEquivalent = await fetchEventById(id)
+      const finalEvent={
+        ...eventEquivalent,
+        ...selectedEvent
+      }
+      console.log(finalEvent)
+      
+      // Llamar a la API para actualizar el evento en Google Calendar
+      const response = await updateEvent(id, finalEvent);
+  
+      if (!response.ok) {
+        throw new Error("Error al actualizar el evento");
+      }
+  
+    } catch (error) {
+      console.error("Error actualizando el evento:", error);
+  
+      // Restaurar el evento original si la actualización falla
+      setFormattedEvents((prevEvents) =>
+        prevEvents.map((ev) => (ev.id === id ? oldevent : ev))
+      );
+    }
+
+
     
   };
 
@@ -541,7 +564,7 @@ const AgendaList = () => {
 
               </ul>
               <button onClick={() => {handleDeleteEvent(selectedEvent.id)}}>Eliminar</button>
-              {editEventModal && <button onClick={()=>handleEditEvent(selectedEvent)}>Guardar</button>}
+              {editEventModal && <button onClick={()=>handleEditSaveEvent(selectedEvent)}>Guardar</button>}
               {editEventModal && <button onClick={()=>{setSelectedEvent(selectedEventCopy);setEditEventModal(false)}}>Cancelar</button>}
                <button onClick={()=> setEditEventModal(true)}>Editar</button>
               <button onClick={() =>{setSelectedEvent(null);setEditEventModal(false)}}>Cerrar</button>

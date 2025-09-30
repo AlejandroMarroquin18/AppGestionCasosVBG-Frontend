@@ -12,9 +12,12 @@ const GoogleLoginButton = () => {
         onSuccess: async (codeResponse) => {
     
             try {
-                const response = await fetch("http://localhost:8000/api/auth/google/", {
+                const response = await fetch("http://127.0.0.1:8000/api/auth/google/", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json","X-CSRFToken": getCSRFToken()  },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()  
+                    },
                     body: JSON.stringify({ code: codeResponse.code }), // 🔥 Enviar "code", no access_token
                     credentials: "include",
 
@@ -24,16 +27,16 @@ const GoogleLoginButton = () => {
                 const data = await response.json();
     
                 if (response.ok) {
-                    const expiresIn = 3500 * 1000; // 1 hora en milisegundos
-                    const expirationTime = new Date().getTime() + expiresIn;
-
-                    //localStorage.setItem("userToken", data.token);
+                    console.log("Datos recibidos del backend:", data);
+                    //await new Promise(resolve => setTimeout(resolve, 10000));
+                    localStorage.setItem("userToken", data.token);
                     //localStorage.setItem("refreshToken", data.refresh_token);
-                    localStorage.setItem("accessToken", data.access_token);
+                    //localStorage.setItem("accessToken", data.access_token);
+                    
+                    //localStorage.setItem("tokenExpiration", expirationTime);
                     localStorage.setItem("userName", data.user.nombre);
                     localStorage.setItem("userRole", data.user.rol);
                     localStorage.setItem("userEmail", data.user.email);
-                    localStorage.setItem("tokenExpiration", expirationTime);
 
     
                     console.log("Usuario autenticado:", data);
