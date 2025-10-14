@@ -520,7 +520,7 @@ const renderHistorial = () => (
         </AccordionSummary>
           <AccordionDetails style={{ padding: "20px", fontSize: "18px" }}>
             <div style={{ justifyContent: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-              <button onClick={(e)=>setIsCreatingRegistry(!isCreatingRegistry)} >Añadir Registro</button>
+              <button onClick={(e)=>setIsCreatingRegistry(!isCreatingRegistry)} >{!isCreatingRegistry?"Añadir Registro":"Cancelar"}</button>
               {isCreatingRegistry && (
                 <>
                 <div

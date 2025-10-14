@@ -124,6 +124,7 @@ export const updateComplaint = async (id, complaintData) => {
   const response = await fetch(`${baseURL}/quejas/${id}/`, {
     method: "PUT",
     headers: {
+      
       "Content-Type": "application/json",
     },
     body: JSON.stringify(complaintData),
@@ -200,7 +201,17 @@ export const saveEvent = async (eventData) => {
 
 export const getRegistryList = async (complaintId) => {
   try {
-    const response = await fetch(`${baseURL}/quejas/historial-quejas/${complaintId}`);
+    const response = await fetch(`${baseURL}/quejas/historial-quejas/${complaintId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(), // 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
+      },
+    }
+
+    );
     if (!response.ok) {
       throw new Error("Error al obtener el historial de quejas");
     }
@@ -217,6 +228,8 @@ export const createRegistry = async (registryData) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(), // 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
       },
       body: JSON.stringify(registryData),
     });
@@ -240,6 +253,8 @@ export const updateRegistry = async (registryId, registryData) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(), // 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
       },
       body: JSON.stringify(registryData),
     });

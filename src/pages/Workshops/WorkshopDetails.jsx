@@ -67,6 +67,7 @@ const WorkshopDetails = () => {
     const getWorkshop = async () => {
       try {
         const data = await getWorkshopDetails(workshopId);
+        console.log("Workshop data:", data);
         setWorkshop(data);
         setParticipants(data.participants || []); // Asigna los participantes desde la respuesta
       } catch (err) {
