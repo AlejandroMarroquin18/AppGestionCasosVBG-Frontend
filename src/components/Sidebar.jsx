@@ -1,24 +1,53 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FiBarChart2, FiList, FiCalendar, FiBook, FiPlusSquare, FiEye, FiFolderPlus } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  FiBarChart2, 
+  FiList, 
+  FiCalendar, 
+  FiBook, 
+  FiPlusSquare, 
+  FiEye, 
+  FiFolderPlus,
+  FiMenu,
+  FiX,
+  FiChevronDown,
+  FiChevronRight
+} from 'react-icons/fi';
 
-const Sidebar = ({ activeRoute }) => {
-  const [open, setOpen] = useState('');
+const Sidebar = () => {
+  const [openMenus, setOpenMenus] = useState({});
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const location = useLocation();
 
-  const handleToggle = (id, event) => {
-    // Prevenir redirección si hay un submenú
-    if (event) {
-      event.preventDefault(); // Evita que el enlace redirija
-    }
-    if (open === id) {
-      setOpen('');
-    } else {
-      setOpen(id);
-    }
+  // Cerrar sidebar móvil al cambiar de ruta
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  // Determinar si un menú está activo basado en la ruta actual
+  const isMenuActive = (menuPath, submenuItems = []) => {
+    const currentPath = location.pathname;
+    
+    // Verificar si la ruta actual coincide con el path del menú principal
+    if (currentPath === menuPath) return true;
+    
+    // Verificar si la ruta actual coincide con algún submenú
+    if (submenuItems.some(sub => currentPath === sub.path)) return true;
+    
+    // Verificar rutas parciales para submenús
+    if (submenuItems.some(sub => currentPath.startsWith(sub.path))) return true;
+    
+    return false;
+  };
+
+  const handleMenuToggle = (menuId) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [menuId]: !prev[menuId]
+    }));
   };
 
   const menuItems = [
-    //{ id: 'statistics', title: 'Estadísticas', icon: FiBarChart2, path: "/estadisticas" },
     { 
       id: 'complaints', 
       title: 'Quejas', 
@@ -52,42 +81,116 @@ const Sidebar = ({ activeRoute }) => {
     }
   ];
 
-  return (
-    <aside className="bg-gray-100 w-64 min-h-screen p-4 text-lg">
-      <nav>
-        <ul>
-          {menuItems.map((item) => (
-            <li key={item.id} className="mb-2">
-              <Link
-                to={item.path}
-                className={`flex items-center space-x-2 w-full p-2 rounded ${
-                  activeRoute === item.id ? 'bg-white text-red-600 shadow' : 'text-gray-600 hover:bg-white'
-                }`}
-                onClick={(e) => handleToggle(item.id, item.submenu ? e : null)}
-              >
-                <item.icon className="text-xl" />
-                <span>{item.title}</span>
-              </Link>
-              {open === item.id && item.submenu && (
-                <ul className="ml-4">
-                  {item.submenu.map((sub, index) => (
-                    <li key={index} className="mt-1">
-                      <Link
-                        to={sub.path}
-                        className="flex items-center space-x-2 w-full p-1 text-gray-600 hover:text-red-600 hover:bg-white rounded"
-                      >
-                        <sub.icon className="text-lg" />
-                        <span>{sub.title}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+  const isSubmenuActive = (submenuItems) => {
+    return submenuItems.some(sub => location.pathname === sub.path);
+  };
+
+  const SidebarContent = () => (
+    <>
+      {/* Logo/Header */}
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-xl font-bold text-gray-800">Panel de Control</h1>
+      </div>
+
+      {/* Menú de Navegación */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-1">
+          {menuItems.map((item) => {
+            const isActive = isMenuActive(item.path, item.submenu);
+            const isSubActive = isSubmenuActive(item.submenu);
+            const isOpen = openMenus[item.id];
+
+            return (
+              <li key={item.id} className="relative">
+                {/* Item del Menú Principal */}
+                <div
+                  className={`
+                    flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 cursor-pointer
+                    ${isActive ? 'bg-red-50 border-l-4 border-red-600 text-red-700' : 'text-gray-600 hover:bg-gray-50'}
+                    ${isSubActive ? 'bg-red-50 text-red-700' : ''}
+                  `}
+                  onClick={() => handleMenuToggle(item.id)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className={`text-lg ${isActive ? 'text-red-600' : 'text-gray-500'}`} />
+                    <span className="font-medium">{item.title}</span>
+                  </div>
+                  
+                  {item.submenu && (
+                    <div className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                      <FiChevronDown className={`text-sm ${isActive ? 'text-red-600' : 'text-gray-400'}`} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Submenú */}
+                {item.submenu && isOpen && (
+                  <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-3">
+                    {item.submenu.map((sub, index) => {
+                      const isSubItemActive = location.pathname === sub.path;
+                      
+                      return (
+                        <li key={index}>
+                          <Link
+                            to={sub.path}
+                            className={`
+                              flex items-center space-x-3 w-full p-2 rounded-lg transition-all duration-200
+                              ${isSubItemActive 
+                                ? 'bg-red-100 text-red-700 font-medium' 
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                              }
+                            `}
+                          >
+                            <sub.icon className={`text-sm ${isSubItemActive ? 'text-red-600' : 'text-gray-400'}`} />
+                            <span className="text-sm">{sub.title}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </nav>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Botón Hamburguesa para Móvil */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-red rounded-lg shadow-lg border border-gray-200"
+      >
+        {isMobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+      </button>
+
+      {/* Overlay para Móvil */}
+      {isMobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar para Desktop */}
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:z-40 bg-white border-r border-gray-200 shadow-sm">
+        <SidebarContent />
+      </aside>
+
+      {/* Sidebar para Móvil */}
+      <aside className={`
+        lg:hidden fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 shadow-xl transform transition-transform duration-300
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <SidebarContent />
+      </aside>
+
+      {/* Espacio para el contenido principal (para desktop) */}
+      <div className="lg:ml-64" />
+    </>
   );
 };
 

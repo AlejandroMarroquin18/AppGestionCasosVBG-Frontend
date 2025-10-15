@@ -165,7 +165,7 @@ const Queja = () => {
 
         
     try {
-        const response = await fetch('http://localhost:8000/api/quejas/', {
+        const response = await fetch('http://192.168.20.58:8000/api/quejas/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newform),

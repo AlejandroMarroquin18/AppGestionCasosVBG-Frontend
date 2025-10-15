@@ -1,6 +1,6 @@
 import getCSRFToken from "./helpers/getCSRF";
 
-const baseURL = "http://127.0.0.1:8000/api";
+const baseURL = "http://192.168.20.58:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 
@@ -339,7 +339,7 @@ export async function checkSession() {
 /**
  * las peticiones deben enviar la cookie de sesión y el token CSRF. Por ejemplo:
  *
-await fetch("http://localhost:8000/api/protected/", {
+await fetch("http://192.168.20.58:8000/api/protected/", {
     authorization: `Bearer ${localStorage.getItem("userToken")}`,//solo si ess en desarrollo
     method: "POST",
     headers: {

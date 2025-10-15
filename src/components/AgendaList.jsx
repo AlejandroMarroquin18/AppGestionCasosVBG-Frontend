@@ -178,7 +178,7 @@ const AgendaList = () => {
       return;
     }
 
-    const resCaseID = await fetch(`http://127.0.0.1:8000/api/quejas/validarquejaid/${newEvent.caseID}/`);
+    const resCaseID = await fetch(`http://192.168.20.58:8000/api/quejas/validarquejaid/${newEvent.caseID}/`);
     const dataCaseID = await resCaseID.json();
 
     if (!dataCaseID.exists) {

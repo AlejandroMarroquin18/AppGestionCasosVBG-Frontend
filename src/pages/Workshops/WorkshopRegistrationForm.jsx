@@ -61,7 +61,7 @@ const ExternalRegistrationForm = () => {
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/talleres/inscripcion/${workshopId}/`, {
+      const response = await fetch(`http://192.168.20.58:8000/api/talleres/inscripcion/${workshopId}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

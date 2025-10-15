@@ -1,189 +1,288 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './out.css';
 
 const RestorePassword = () => {
-    const navigate=useNavigate()
-    const [statusMessage,setMessage]= useState(null);
-    const [email,setEmail]=useState('')
-    const [codigo,setCodigo]=useState('')
-    const [password,setPassword]=useState('')
-    const [confirmPassword,setConfirmPasswordInput]=useState('')
-    const [content,setContent]=useState('default')//default,validacion,changepassword
+    const navigate = useNavigate();
+    const [statusMessage, setMessage] = useState(null);
+    const [email, setEmail] = useState('');
+    const [codigo, setCodigo] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPasswordInput] = useState('');
+    const [content, setContent] = useState('default'); // default, validacion, changepassword
 
-    const handleEmailChange=(e)=>setEmail(e.target.value)
-    const handleCodigoChange=(e)=>setCodigo(e.target.value)
-    
-    const handlePasswordChangeInput=(e)=>setPassword(e.target.value)
-    const handleConfirmPasswordChangeInput=(e)=>setConfirmPasswordInput(e.target.value)
+    const handleEmailChange = (e) => setEmail(e.target.value);
+    const handleCodigoChange = (e) => setCodigo(e.target.value);
+    const handlePasswordChangeInput = (e) => setPassword(e.target.value);
+    const handleConfirmPasswordChangeInput = (e) => setConfirmPasswordInput(e.target.value);
 
-
-    const handleRestorePassword= async ()=>{
+    const handleRestorePassword = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/forgottenPassword/',{
+            const response = await fetch('http://192.168.20.58:8000/api/forgottenPassword/', {
                 method: 'POST',
-                headers: { 'Content-Type':'application/json'},
-                body: JSON.stringify({ 'email' :email}), 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'email': email }),
             });
-            
-            if(!response.ok){
-                const data = await response.json()
-                console.log(data.message)
-                setMessage(data.message)
-                //throw new Error('Usuario no encontrado')
-                return
 
+            if (!response.ok) {
+                const data = await response.json();
+                console.log(data.message);
+                setMessage(data.message);
+                return;
             }
-            //const data = await response.json();
 
-            
-            if (response.status===200){ 
-            //cambia lo que hay dentro del div y }
-            setContent('validacion')
-            setMessage(null)
+            if (response.status === 200) {
+                setContent('validacion');
+                setMessage(null);
             }
-            
 
-        }catch (error){
-            setMessage (error.setMessage);
+        } catch (error) {
+            setMessage(error.message);
         }
-    }
+    };
 
-
-    const handleSendCode= async ()=>{
+    const handleSendCode = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/validateForgottenPasswordCode/',{
+            const response = await fetch('http://192.168.20.58:8000/api/validateForgottenPasswordCode/', {
                 method: 'POST',
-                headers: { 'Content-Type':'application/json'},
-                body: JSON.stringify({codigo,email}), 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo, email }),
             });
 
-            if(!response.ok){
-                setCodigo('')
-                const data = await response.json()
-                setMessage(data.message)
-                //throw new Error('Usuario no encontrado')
-                return
+            if (!response.ok) {
+                setCodigo('');
+                const data = await response.json();
+                setMessage(data.message);
+                return;
             }
-            //const data = await response.json();
 
             console.log(response.status);
-            if(response.status === 200){
-                //cambia lo que hay dentro del div y
-                setContent('changepassword')
-                setMessage(null)
+            if (response.status === 200) {
+                setContent('changepassword');
+                setMessage(null);
             }
-             
-        }catch (error){
-            setMessage (error.setMessage);
-        }
 
-    }
-    const handleChangePassword= async ()=>{
-        if(password!==confirmPassword){
-            console.log("La contraseña no coincide")
-            setMessage("Las contraseñas no coincide")
-            return null
+        } catch (error) {
+            setMessage(error.message);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (password !== confirmPassword) {
+            console.log("La contraseña no coincide");
+            setMessage("Las contraseñas no coinciden");
+            return null;
         }
         try {
-            const response = await fetch('http://localhost:8000/api/changeForgottenPassword/',{
+            const response = await fetch('http://192.168.20.58:8000/api/changeForgottenPassword/', {
                 method: 'POST',
-                headers: { 'Content-Type':'application/json'},
-                body: JSON.stringify({email,codigo,password}), 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, codigo, password }),
             });
-            if(!response.ok){
-                const data = await response.json()
-                setMessage(data.message)
-                
-                throw new Error(data.message)
-            }
-            //const data = await response.json();
-
-            //console.log(data.status); 
-            if(response.status===200){
-                navigate('/login')
-            }else{
-
+            if (!response.ok) {
+                const data = await response.json();
+                setMessage(data.message);
+                throw new Error(data.message);
             }
 
-        }catch (error){
-            setMessage (error.setMessage);
+            if (response.status === 200) {
+                navigate('/login');
+            }
+
+        } catch (error) {
+            setMessage(error.message);
         }
-    }
+    };
 
     return (
-    <div className="App">
-        <header className="App-header">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-0">
+            <div className="flex flex-col md:flex-row w-full h-screen bg-white">
+                {/* Sección de imagen - 70% en desktop */}
+                <div className="hidden md:flex md:w-[70%] relative overflow-hidden">
+                    <img 
+                        src="/login1.jpg" 
+                        alt="Recuperar contraseña" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
 
-            <div className="container">
-                {content === 'default' &&(<>
-                <h3>Recuperar Contraseña</h3>
-                <p>Correo Electronico</p>
-                
-                <input
-                    type="email" 
-                    value={email}
-                    onChange={handleEmailChange}
-                    placeholder="Ingresa tu correo"
-                ></input>
-                
-                <button className='centered-button' onClick={handleRestorePassword}>
-                    Restaurar Contraseña
-                </button>
-                
-                {statusMessage && <p style={{ color: 'red' }}>{statusMessage}</p>}</>)}
+                {/* Sección de imagen - Móvil */}
+                <div className="md:hidden w-full h-40 relative overflow-hidden">
+                    <img 
+                        src="/login2.jpg" 
+                        alt="Recuperar contraseña" 
+                        className="w-full h-full object-cover"
+                    />
+                </div>
 
+                {/* Sección del formulario - 30% en desktop */}
+                <div className="w-full md:w-[30%] p-6 md:p-8 flex flex-col justify-center bg-white">
+                    <div className="max-w-md w-full mx-auto">
+                        
+                        {/* Paso 1: Ingresar email */}
+                        {content === 'default' && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                                        Recuperar Contraseña
+                                    </h1>
+                                    <p className="text-gray-600 text-base">
+                                        Ingresa tu correo electrónico para recuperar tu contraseña
+                                    </p>
+                                </div>
 
+                                {statusMessage && (
+                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center text-sm">
+                                        {statusMessage}
+                                    </div>
+                                )}
 
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Correo Electrónico
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={handleEmailChange}
+                                        placeholder="Ingresa tu correo"
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm"
+                                    />
+                                </div>
 
+                                <div className="space-y-4">
+                                    <button 
+                                        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+                                        onClick={handleRestorePassword}
+                                    >
+                                        Enviar Código
+                                    </button>
 
-            {content === 'validacion' &&(<>
-                <p>Ingrese su código enviado al correo electrónico</p>
-                <input type="codigo" value={codigo} maxLength={6} onChange={handleCodigoChange}></input>
-                {/**<div className='pin'>
-                    {codigoInput.map((data,i)=>{
-                        return <input type="text" 
-                        value={data}
-                        maxLength={1}
-                        onChange={(e)=>handleCodigoChange(e, i)}
-                        />
-                    })}
+                                    <button 
+                                        onClick={() => navigate('/login')}
+                                        className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm border border-gray-300"
+                                    >
+                                        Volver al Inicio de Sesión
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
-                </div>*/}
-                
-                <button className="centered-button" onClick={handleSendCode}>
-                Enviar
-                </button>
-                {statusMessage && <p style={{ color: "red" }}>{statusMessage}</p>}
-            </>)}
+                        {/* Paso 2: Validar código */}
+                        {content === 'validacion' && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                                        Verificar Código
+                                    </h1>
+                                    <p className="text-gray-600 text-base">
+                                        Ingresa el código enviado a tu correo electrónico
+                                    </p>
+                                </div>
 
+                                {statusMessage && (
+                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center text-sm">
+                                        {statusMessage}
+                                    </div>
+                                )}
 
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Código de Verificación
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={codigo}
+                                        maxLength={6}
+                                        onChange={handleCodigoChange}
+                                        placeholder="Ingresa el código de 6 dígitos"
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm text-center tracking-widest"
+                                    />
+                                </div>
 
-            {content === 'changepassword' &&(<>
-            <h3>Cambiar Contraseña</h3>
-            <p>Nueva Contraseña</p>
-            <input
-            type = "password"
-            value = {password}
-            onChange={handlePasswordChangeInput}
-            placeholder="Nueva Contraseña"
-            ></input>
-            <p>Confirmar Nueva Contraseña</p>
-            <input
-            type="confirmPassword"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChangeInput}
-            placeholder="Confirmar Nueva Contraseña"
-            ></input>
-            <button className='centered-button' onClick={handleChangePassword}>Cambiar Contraseña</button>
-            {statusMessage && <p style={{ color: 'red' }}>{statusMessage}</p>}
-            </>)}
+                                <div className="space-y-4">
+                                    <button 
+                                        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+                                        onClick={handleSendCode}
+                                    >
+                                        Verificar Código
+                                    </button>
+
+                                    <button 
+                                        onClick={() => setContent('default')}
+                                        className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm border border-gray-300"
+                                    >
+                                        Volver atrás
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Paso 3: Cambiar contraseña */}
+                        {content === 'changepassword' && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                                        Nueva Contraseña
+                                    </h1>
+                                    <p className="text-gray-600 text-base">
+                                        Crea una nueva contraseña para tu cuenta
+                                    </p>
+                                </div>
+
+                                {statusMessage && (
+                                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center text-sm">
+                                        {statusMessage}
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Nueva Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={handlePasswordChangeInput}
+                                        placeholder="Ingresa tu nueva contraseña"
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Confirmar Contraseña
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={handleConfirmPasswordChangeInput}
+                                        placeholder="Confirma tu nueva contraseña"
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 text-sm"
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    <button 
+                                        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+                                        onClick={handleChangePassword}
+                                    >
+                                        Cambiar Contraseña
+                                    </button>
+
+                                    <button 
+                                        onClick={() => setContent('validacion')}
+                                        className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm border border-gray-300"
+                                    >
+                                        Volver atrás
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
-            
-        </header>
-    </div>
-
-    )
-}
+        </div>
+    );
+};
 
 export default RestorePassword;

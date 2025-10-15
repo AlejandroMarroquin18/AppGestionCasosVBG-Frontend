@@ -23,7 +23,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const baseURL = "http://127.0.0.1:8000/api";
+const baseURL = "http://192.168.20.58:8000/api";
 
 const WorkshopStats = () => {
   const [stats, setStats] = useState(null);
