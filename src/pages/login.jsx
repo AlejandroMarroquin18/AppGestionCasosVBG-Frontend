@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GoogleLoginButton from '../components/googleAuthButton';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { baseURL } from '../api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Login = () => {
     setErrorMessage(null);
     
     try {
-      const response = await fetch('http://192.168.20.58:8000/api/login/', {
+      const response = await fetch(`${baseURL}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

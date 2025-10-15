@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../out.css';
+import { baseURL } from '../../api';
 
 
 const Queja = () => {
@@ -165,7 +166,7 @@ const Queja = () => {
 
         
     try {
-        const response = await fetch('http://192.168.20.58:8000/api/quejas/', {
+        const response = await fetch(`${baseURL}/quejas/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newform),

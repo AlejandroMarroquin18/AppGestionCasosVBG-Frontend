@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { baseURL } from '../api';
 
 const RestorePassword = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const RestorePassword = () => {
 
     const handleRestorePassword = async () => {
         try {
-            const response = await fetch('http://192.168.20.58:8000/api/forgottenPassword/', {
+            const response = await fetch(`${baseURL}/forgottenPassword/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 'email': email }),
@@ -42,7 +43,7 @@ const RestorePassword = () => {
 
     const handleSendCode = async () => {
         try {
-            const response = await fetch('http://192.168.20.58:8000/api/validateForgottenPasswordCode/', {
+            const response = await fetch(`${baseURL}/validateForgottenPasswordCode/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ codigo, email }),
@@ -73,7 +74,7 @@ const RestorePassword = () => {
             return null;
         }
         try {
-            const response = await fetch('http://192.168.20.58:8000/api/changeForgottenPassword/', {
+            const response = await fetch(`${baseURL}/changeForgottenPassword/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, codigo, password }),

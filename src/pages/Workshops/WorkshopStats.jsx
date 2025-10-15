@@ -11,6 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { baseURL } from "../../api";
+
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +25,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
-const baseURL = "http://192.168.20.58:8000/api";
+
 
 const WorkshopStats = () => {
   const [stats, setStats] = useState(null);

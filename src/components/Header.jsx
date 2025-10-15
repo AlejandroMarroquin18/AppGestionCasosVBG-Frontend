@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import "./styles.css";
 import getCSRFToken from "../helpers/getCSRF";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { baseURL } from "../api";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Header = () => {
     setShowMenu(false);
     
     try {
-      const response = await fetch("http://192.168.20.58:8000/api/logout/", {
+      const response = await fetch(`${baseURL}/logout/`, {
         method: "POST",
         credentials: "include", 
         headers: {

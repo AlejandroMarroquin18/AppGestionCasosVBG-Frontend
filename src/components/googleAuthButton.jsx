@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import getCSRFToken from "../helpers/getCSRF";
+import { baseURL } from "../api";
 
 const GoogleLoginButton = ({ onLoadingChange, disabled = false }) => {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ const GoogleLoginButton = ({ onLoadingChange, disabled = false }) => {
             if (onLoadingChange) onLoadingChange(true);
             
             try {
-                const response = await fetch("http://192.168.20.58:8000/api/auth/google/", {
+                const response = await fetch(`${baseURL}/auth/google/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

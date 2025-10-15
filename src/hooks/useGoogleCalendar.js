@@ -1,5 +1,6 @@
 import { useState } from "react";
 import getCSRFToken from "../helpers/getCSRF";
+import { baseURL } from "../api";
 
 const useGoogleCalendar = (accessToken) => {
     const [events, setEvents] = useState([]);
@@ -15,7 +16,7 @@ const useGoogleCalendar = (accessToken) => {
         
         try {
 
-            const response = await fetch(`http://192.168.20.58:8000/api/calendar/fetchEvents/${year}`, {
+            const response = await fetch(`${baseURL}/calendar/fetchEvents/${year}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Token ${localStorage.getItem("userToken")}`,
@@ -43,7 +44,7 @@ const useGoogleCalendar = (accessToken) => {
     //  Crear un evento en Google Calendar
     const createEvent = async (eventData) => {
         try {
-            const response = await fetch("http://192.168.20.58:8000/api/calendar/create", {
+            const response = await fetch(`${baseURL}/calendar/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,7 +75,7 @@ const useGoogleCalendar = (accessToken) => {
     const updateEvent = async (eventId, updatedData) => {
         try {
 
-            const response = await fetch(`http://192.168.20.58:8000/api/calendar/update/${eventId}`, {
+            const response = await fetch(`${baseURL}/calendar/update/${eventId}`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Token ${localStorage.getItem("userToken")}`,
@@ -103,7 +104,7 @@ const useGoogleCalendar = (accessToken) => {
     //  Eliminar un evento
     const deleteEvent = async (eventId) => {
         try {
-            const response = await fetch(`http://192.168.20.58:8000/api/calendar/delete/${eventId}`, {
+            const response = await fetch(`${baseURL}/calendar/delete/${eventId}`, {
                 method: "DELETE",
                 headers: {
 
@@ -130,7 +131,7 @@ const useGoogleCalendar = (accessToken) => {
         if (!accessToken || !eventId) return null;
     
         try {
-            const response = await fetch(`http://192.168.20.58:8000/api/calendar/fetchById/${eventId}`, {
+            const response = await fetch(`${baseURL}/calendar/fetchById/${eventId}`, {
                 method: "GET",
                 credentials: "include",
                 headers: {

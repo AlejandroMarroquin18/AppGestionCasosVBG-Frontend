@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import SuccessModal from "../../components/SuccessModal";
-
+import { baseURL } from "../../api";
 // Mover FormField fuera del componente principal
 const FormField = ({ label, children, required = false }) => {
   return (
@@ -61,7 +61,7 @@ const ExternalRegistrationForm = () => {
     }
 
     try {
-      const response = await fetch(`http://192.168.20.58:8000/api/talleres/inscripcion/${workshopId}/`, {
+      const response = await fetch(`${baseURL}/talleres/inscripcion/${workshopId}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

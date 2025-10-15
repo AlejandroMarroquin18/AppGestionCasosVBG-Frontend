@@ -6,7 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
 import 'moment/locale/es'
-import { saveEvent } from "../api";
+import { saveEvent, baseURL } from "../api";
 
 moment.locale('es')
 const localizer = momentLocalizer(moment);
@@ -178,7 +178,7 @@ const AgendaList = () => {
       return;
     }
 
-    const resCaseID = await fetch(`http://192.168.20.58:8000/api/quejas/validarquejaid/${newEvent.caseID}/`);
+    const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`);
     const dataCaseID = await resCaseID.json();
 
     if (!dataCaseID.exists) {

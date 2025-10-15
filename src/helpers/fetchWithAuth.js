@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../api";
 
 /**
 export const fetchWithAuth = async (url, options = {}) => {
@@ -15,7 +16,7 @@ export const fetchWithAuth = async (url, options = {}) => {
     };
 
     try {
-        const response = await fetch(`${url}`, { ...options, headers });
+        const response = await fetch(`${baseURL}`, { ...options, headers });
 
         if (response.status === 401) {
             console.warn("Token vencido. Cerrando sesión...");
