@@ -197,7 +197,7 @@ const Login = () => {
                   <div className="text-gray-400 text-[14px] mt-2">
                     ¿No tienes una cuenta?{' '}
                     <a 
-                      href="/register" 
+                      href="/registrarse" 
                       className={`text-blue-400 hover:text-blue-600 underline text-[14px] ${
                         isLoading ? 'pointer-events-none opacity-50' : ''
                       }`}
