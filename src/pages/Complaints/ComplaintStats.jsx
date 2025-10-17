@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Bar, Doughnut, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -8,10 +8,13 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
+  LineElement,
+  PointElement,
 } from "chart.js";
-
+import { FiDownload, FiUsers, FiUser, FiUserCheck, FiTrendingUp } from "react-icons/fi";
 import { getComplaintStats } from "../../api";
-import { use } from "react";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 ChartJS.register(
   CategoryScale,
@@ -19,23 +22,35 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement,
+  LineElement,
+  PointElement
 );
 
 const ComplaintsStats = () => {
   const [receivedData, setReceivedData] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState(true);
   const currentYear = new Date().getFullYear();
-  const [anios, setAnios]= React.useState(["2025"]);
+  const [anios, setAnios] = React.useState(["2025"]);
   const [conteosPorAnio, setConteosPorAnio] = React.useState({});
   const [conteofacultades, setConteofacultades] = React.useState({facultades:[],valores:[]});
   const [conteosPorGeneros, setConteosPorGenero] = React.useState({generos:[],valores:[]});
   const [conteosPorSedes, setConteosPorSedes] = React.useState({sedes:[],valores:[]});
-
   const [conteosPorVicerrectorias, setConteosPorVicerrectorias] = React.useState({vicerrectorias:[],valores:[]});
-  
+
+  // Refs para los gráficos
+  const chartRefs = {
+    faculty: useRef(null),
+    location: useRef(null),
+    year: useRef(null),
+    department: useRef(null),
+    gender: useRef(null)
+  };
 
   useEffect(() => {
     const loadComplaintStats = async () => {
+      setIsLoading(true);
       try {
         const data = await getComplaintStats();
         console.log("Complaint Statistics:", data);
@@ -43,86 +58,95 @@ const ComplaintsStats = () => {
         setReceivedData(data);
         setConteosPorAnio(data);
 
-        //estos atibutos dentro de data son arrays de objetos, por lo que se pueden mapear en un orden especifico
-        //facultades
-        const facultadesList = data.conteo_por_facultad_afectado.map(item => item.afectado_facultad===''?'No especificado':item.afectado_facultad);
+        // Procesar datos de facultades
+        const facultadesList = data.conteo_por_facultad_afectado.map(item => 
+          item.afectado_facultad === '' ? 'No especificado' : item.afectado_facultad
+        );
         const totalesFacultad = data.conteo_por_facultad_afectado.map(item => item.total);
-        setConteofacultades({facultades:facultadesList, valores: totalesFacultad});
-        //generos
-        const generoList = data.conteo_por_genero_afectado.map(item => item.afectado_identidad_genero===''?'No especificado':item.afectado_identidad_genero);
-        const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
-        setConteosPorGenero({generos:generoList, valores: totalesGenero});
-        //sedes
-        const sedesList = data.conteo_por_sede_afectado.map(item => item.afectado_sede===''?'No especificado':item.afectado_sede);
-        const totalesSedes = data.conteo_por_sede_afectado.map(item => item.total);
-        setConteosPorSedes({sedes:sedesList, valores: totalesSedes});
-        //vicerrectorias
-        const vicesList = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.afectado_vicerrectoria_adscrito===''?'No especificado':item.afectado_vicerrectoria_adscrito);
-        const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
-        setConteosPorVicerrectorias({vicerrectorias:vicesList, valores: totalVices});
+        setConteofacultades({facultades: facultadesList, valores: totalesFacultad});
 
-        
-        
+        // Procesar datos de géneros
+        const generoList = data.conteo_por_genero_afectado.map(item => 
+          item.afectado_identidad_genero === '' ? 'No especificado' : item.afectado_identidad_genero
+        );
+        const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
+        setConteosPorGenero({generos: generoList, valores: totalesGenero});
+
+        // Procesar datos de sedes
+        const sedesList = data.conteo_por_sede_afectado.map(item => 
+          item.afectado_sede === '' ? 'No especificado' : item.afectado_sede
+        );
+        const totalesSedes = data.conteo_por_sede_afectado.map(item => item.total);
+        setConteosPorSedes({sedes: sedesList, valores: totalesSedes});
+
+        // Procesar datos de vicerrectorías
+        const vicesList = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => 
+          item.afectado_vicerrectoria_adscrito === '' ? 'No especificado' : item.afectado_vicerrectoria_adscrito
+        );
+        const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
+        setConteosPorVicerrectorias({vicerrectorias: vicesList, valores: totalVices});
 
         setAnios(Object.keys(data.conteo_por_anio));
 
-
       } catch (error) {
         console.error("Error loading complaint statistics:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    loadComplaintStats();
+    };
     
-
-
+    loadComplaintStats();
   }, []);
 
+  // Función para descargar gráficos
+  const downloadChart = (chartRef, filename) => {
+    if (chartRef.current) {
+      const link = document.createElement('a');
+      link.download = `${filename}.png`;
+      link.href = chartRef.current.toBase64Image();
+      link.click();
+    }
+  };
 
   const indicators = {
-    receivedComplaints: conteosPorAnio[currentYear],
-    referredComplaints: 12,
-
-    studentComplaints: receivedData.afectado_estudiantes,
-    staffComplaints: receivedData.afectado_funcionarios,
-    professorComplaints: receivedData.afectado_profesores,
-    
-    studentReferrals: 7,
-    staffReferrals: 3,
-    professorReferrals: 2,
+    receivedComplaints: conteosPorAnio[currentYear] || 0,
+    referredComplaints: 12, // Este dato debería venir del backend
+    studentComplaints: receivedData.afectado_estudiantes || 0,
+    staffComplaints: receivedData.afectado_funcionarios || 0,
+    professorComplaints: receivedData.afectado_profesores || 0,
+    studentReferrals: 7, // Este dato debería venir del backend
+    staffReferrals: 3, // Este dato debería venir del backend
+    professorReferrals: 2, // Este dato debería venir del backend
   };
 
-  const indicatorNames = {
-    receivedComplaints: "Quejas recibidas en el último año",
-    referredComplaints: "Quejas remitidas en el último año",
-    studentComplaints: "Quejas de estudiantes",
-    staffComplaints: "Quejas de funcionarios",
-    professorComplaints: "Quejas de profesores",
-    studentReferrals: "Remisiones de estudiantes",
-    staffReferrals: "Remisiones de funcionarios",
-    professorReferrals: "Remisiones de profesores",
-  };
-
+  // Datos para los gráficos
   const complaintsByFacultyData = {
     labels: conteofacultades.facultades,
     datasets: [
       {
         label: "Quejas por facultad",
         data: conteofacultades.valores,
-        backgroundColor: "rgba(40, 92, 164)",
-        borderColor: "rgba(40, 92, 164)",
-        borderWidth: 1,
+        backgroundColor: "rgba(239, 68, 68, 0.8)",
+        borderColor: "rgba(239, 68, 68, 1)",
+        borderWidth: 2,
       },
     ],
   };
 
   const complaintsByGenderData = {
-    //labels: ["Masculino", "Femenino", "No Binario"],
     labels: conteosPorGeneros.generos,
     datasets: [
       {
-        label: "Distribución de quejas por género",
+        label: "Distribución por género",
         data: conteosPorGeneros.valores,
-        backgroundColor: ["rgba(54, 162, 235, 0.8)", "rgba(255, 99, 132, 0.8)", "rgba(255, 206, 86, 0.8)"],
+        backgroundColor: [
+          "rgba(239, 68, 68, 0.8)",
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(168, 85, 247, 0.8)",
+          "rgba(245, 158, 11, 0.8)",
+        ],
+        borderWidth: 2,
       },
     ],
   };
@@ -133,17 +157,9 @@ const ComplaintsStats = () => {
       {
         label: "Quejas por sede",
         data: conteosPorSedes.valores,
-        backgroundColor: [
-          "rgba(255, 99, 132)",
-          "rgba(255, 99, 132)",
-          "rgba(255, 99, 132)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132)",
-          "rgba(255, 99, 132)",
-          "rgba(255, 99, 132)",
-        ],
-        borderWidth: 1,
+        backgroundColor: "rgba(59, 130, 246, 0.8)",
+        borderColor: "rgba(59, 130, 246, 1)",
+        borderWidth: 2,
       },
     ],
   };
@@ -153,10 +169,11 @@ const ComplaintsStats = () => {
     datasets: [
       {
         label: "Quejas por año",
-        data:  anios.map(anio => conteosPorAnio[anio] || 0),
-        backgroundColor: "rgba(153, 102, 255, 0.5)",
-        borderColor: "rgba(153, 102, 255, 1)",
-        borderWidth: 1,
+        data: anios.map(anio => conteosPorAnio[anio] || 0),
+        backgroundColor: "rgba(34, 197, 94, 0.8)",
+        borderColor: "rgba(34, 197, 94, 1)",
+        borderWidth: 2,
+        tension: 0.4,
       },
     ],
   };
@@ -165,106 +182,301 @@ const ComplaintsStats = () => {
     labels: conteosPorVicerrectorias.vicerrectorias,
     datasets: [
       {
-        label: "Quejas por departamento",
+        label: "Quejas por vicerrectoría",
         data: conteosPorVicerrectorias.valores,
-        backgroundColor: "rgba(255, 159, 64, 0.5)",
-        borderColor: "rgba(255, 159, 64, 1)",
-        borderWidth: 1,
+        backgroundColor: "rgba(168, 85, 247, 0.8)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 2,
       },
     ],
   };
 
-  const optionsGender = {
+  const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        font: {
-          size: 20, 
-          //style: 'bold', 
-          family: 'Arial'
+        position: 'top',
+        labels: {
+          font: {
+            size: 12
+          }
         }
       },
     },
-  }
-
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        font: {
-          size: 20, 
-          //style: 'bold', 
-          family: 'Arial'
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 11
+          }
         }
       },
-    },
+      y: {
+        ticks: {
+          font: {
+            size: 11
+          }
+        }
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner message="Cargando estadísticas..." size="large" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 bg-white min-h-screen">
-  <h1 className="text-3xl font-bold mb-6">Estadísticas de quejas</h1>
+    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            📊 Estadísticas de quejas
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Resumen completo de las quejas y métricas del sistema
+          </p>
+          <div className="w-20 h-1 bg-red-600 rounded-full mt-2"></div>
+        </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-    {/* Quejas Recibidas */}
-    <div>
-      <div className="bg-blue-200 p-4 rounded shadow text-center">
-        <h2 className="text-xl font-semibold">{indicatorNames.receivedComplaints}</h2>
-        <p className="text-3xl font-bold">{indicators.receivedComplaints}</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        {["studentComplaints", "professorComplaints", "staffComplaints"].map((key) => (
-          <div key={key} className="bg-blue-100 p-4 rounded shadow text-center">
-            <h2 className="text-lg font-semibold">{indicatorNames[key]}</h2>
-            <p className="text-2xl font-bold">{indicators[key]}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-    {/* Quejas Remitidas */}
-    <div>
-      <div className="bg-green-200 p-4 rounded shadow text-center">
-        <h2 className="text-xl font-semibold">{indicatorNames.referredComplaints}</h2>
-        <p className="text-3xl font-bold">{indicators.referredComplaints}</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        {["studentReferrals", "professorReferrals", "staffReferrals"].map((key) => (
-          <div key={key} className="bg-green-100 p-4 rounded shadow text-center" style={{ minWidth: '180px' }}>
-            <h2 className="text-lg font-semibold">{indicatorNames[key]}</h2>
-            <p className="text-2xl font-bold">{indicators[key]}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
+        {/* Indicadores Principales */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Quejas Recibidas */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">📨 Quejas Recibidas</h2>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <FiTrendingUp className="text-green-500" />
+                <span>Año {currentYear}</span>
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <div className="text-4xl font-bold text-red-600 mb-2">
+                {indicators.receivedComplaints}
+              </div>
+              <p className="text-sm text-gray-600">Total de quejas recibidas</p>
+            </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-red-50 rounded-lg">
+                <FiUsers className="mx-auto text-red-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.studentComplaints}</div>
+                <div className="text-xs text-gray-600">Estudiantes</div>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <FiUserCheck className="mx-auto text-blue-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.professorComplaints}</div>
+                <div className="text-xs text-gray-600">Profesores</div>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <FiUser className="mx-auto text-green-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.staffComplaints}</div>
+                <div className="text-xs text-gray-600">Funcionarios</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quejas Remitidas */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">🔄 Quejas Remitidas</h2>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <FiTrendingUp className="text-green-500" />
+                <span>Año {currentYear}</span>
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <div className="text-4xl font-bold text-green-600 mb-2">
+                {indicators.referredComplaints}
+              </div>
+              <p className="text-sm text-gray-600">Total de quejas remitidas</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-3 bg-red-50 rounded-lg">
+                <FiUsers className="mx-auto text-red-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.studentReferrals}</div>
+                <div className="text-xs text-gray-600">Estudiantes</div>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <FiUserCheck className="mx-auto text-blue-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.professorReferrals}</div>
+                <div className="text-xs text-gray-600">Profesores</div>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <FiUser className="mx-auto text-green-600 mb-2" size={20} />
+                <div className="text-lg font-bold text-gray-800">{indicators.staffReferrals}</div>
+                <div className="text-xs text-gray-600">Funcionarios</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Gráficos */}
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={complaintsByFacultyData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Quejas por facultad' } } }} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Quejas por Facultad */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por Facultad</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.faculty, 'quejas-por-facultad')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.faculty}
+                data={complaintsByFacultyData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+          {/* Quejas por Sede */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">📍 Quejas por Sede</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.location, 'quejas-por-sede')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.location}
+                data={complaintsByLocationData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+          {/* Evolución por Año */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">📈 Evolución por Año</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.year, 'evolucion-quejas')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Line 
+                ref={chartRefs.year}
+                data={complaintsByYearData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+          {/* Distribución por Género */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">⚧️ Distribución por Género</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.gender, 'distribucion-genero')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Doughnut 
+                ref={chartRefs.gender}
+                data={complaintsByGenderData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+          {/* Quejas por Vicerrectoría */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 lg:col-span-2">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">🏢 Quejas por Vicerrectoría</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.department, 'quejas-por-vicerrectoria')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.department}
+                data={complaintsByDepartmentData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
         </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Bar data={complaintsByLocationData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Quejas por sede' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Line data={complaintsByYearData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Quejas por año' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={complaintsByDepartmentData} options={{ ...options, plugins: { ...options.plugins, title: { ...options.plugins.title, text: 'Quejas por departamento' } } }} />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <Doughnut data={complaintsByGenderData} options={{ ...optionsGender, plugins: { ...optionsGender.plugins, title: { ...optionsGender.plugins.title, text: 'Distribución de quejas por género' } } }} />
+
+        {/* Resumen General */}
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Resumen General</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="p-4 bg-red-50 rounded-lg">
+              <div className="text-2xl font-bold text-red-600">{indicators.receivedComplaints}</div>
+              <div className="text-sm text-gray-600">Quejas Totales</div>
+            </div>
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{indicators.studentComplaints}</div>
+              <div className="text-sm text-gray-600">Quejas Estudiantes</div>
+            </div>
+            <div className="p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{indicators.referredComplaints}</div>
+              <div className="text-sm text-gray-600">Quejas Remitidas</div>
+            </div>
+          </div>
         </div>
       </div>
-      </div>
+    </div>
   );
 };
 
