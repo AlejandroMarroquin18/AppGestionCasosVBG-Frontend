@@ -429,7 +429,7 @@ const AgendaList = () => {
               height: "auto"
             }}
           >
-            <h4><strong>Crear Reunión</strong></h4>
+            <h4><strong>Crear reunión</strong></h4>
             <input value={newEvent.title} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"title", e.target.value)} placeholder="Título" />
             <div className="flex flex-col gap-2">
               <div className="flex flex-row gap-2">

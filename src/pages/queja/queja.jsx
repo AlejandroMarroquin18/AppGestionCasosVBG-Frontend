@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { baseURL } from '../../api';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -17,7 +17,7 @@ const Queja = () => {
     const orientacion_sexual_opt = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual', 'Queer', 'Demisexual', 'Otro'];
     const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica'];
     const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato'];
-    const facultades = [ 
+    const facultades = [
         'Artes Integradas',
         'Ciencias Naturales y Exactas',
         'Ciencias de la Administración',
@@ -37,7 +37,7 @@ const Queja = () => {
         "Vicerrectoría de Bienestar Universitario",
         "Vicerrectoría de Investigaciones",
         "Vicerrectoría de Regionalización",
-        "Vicerrectoría de Extensión y Proyección Social", 
+        "Vicerrectoría de Extensión y Proyección Social",
     ];
 
     // Estados del formulario
@@ -125,13 +125,13 @@ const Queja = () => {
         { number: 4, title: "Información adicional", icon: FiSettings }
     ];
 
-    const onchange = (func, field, value) => {
+    const onchange = useCallback((func, field, value) => {
         const finalValue = value.trim() === '-------------------------------------------------------------------' ? '' : value;
         func((prevState) => ({
             ...prevState,
             [field]: finalValue,
         }));
-    };
+    }, []);
 
     const previousPage = () => {
         if (pagina > 0) {
@@ -151,7 +151,7 @@ const Queja = () => {
         const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
 
         onchange(set_persona_que_reporta, "fecha_recepcion", fechaFormateada);
-        
+
         const newform = { ...persona_que_reporta, ...datos_afectado, ...datos_agresor, ...datos_adicionales };
         console.log(newform);
 
@@ -179,7 +179,7 @@ const Queja = () => {
     };
 
     // Componente para renderizar campos de formulario
-    const FormField = ({ label, type = "text", value, onChange, options, isTextArea = false }) => (
+    const FormField = useCallback(({ label, type = "text", value, onChange, options, isTextArea = false }) => (
         <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
                 {label}
@@ -213,12 +213,12 @@ const Queja = () => {
                 />
             )}
         </div>
-    );
-
+    ), []);
+    
     return (
         <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             {isLoading && <LoadingSpinner message="Enviando formulario..." overlay={true} />}
-            
+
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
@@ -239,15 +239,13 @@ const Queja = () => {
                             return (
                                 <div
                                     key={step.number}
-                                    className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 flex-1 min-w-0 ${
-                                        pagina === index 
-                                            ? 'bg-red-600 text-white shadow-md' 
+                                    className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 flex-1 min-w-0 ${pagina === index
+                                            ? 'bg-red-600 text-white shadow-md'
                                             : 'bg-gray-100 text-gray-600'
-                                    }`}
+                                        }`}
                                 >
-                                    <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${
-                                        pagina === index ? 'bg-white text-red-600' : 'bg-gray-300 text-gray-600'
-                                    }`}>
+                                    <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${pagina === index ? 'bg-white text-red-600' : 'bg-gray-300 text-gray-600'
+                                        }`}>
                                         {step.number}
                                     </div>
                                     <span className="hidden sm:inline text-xs font-medium truncate">
@@ -667,11 +665,10 @@ const Queja = () => {
                     <button
                         onClick={previousPage}
                         disabled={pagina === 0}
-                        className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
-                            pagina === 0 
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                        className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${pagina === 0
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
-                        }`}
+                            }`}
                     >
                         <FiArrowLeft size={16} />
                         <span>Anterior</span>
@@ -682,20 +679,18 @@ const Queja = () => {
                             <button
                                 key={index}
                                 onClick={() => setPagina(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                                    pagina === index ? 'bg-red-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
-                                }`}
+                                className={`w-2 h-2 rounded-full transition-all duration-200 ${pagina === index ? 'bg-red-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
+                                    }`}
                             />
                         ))}
                     </div>
 
                     <button
                         onClick={pagina === 3 ? sendform : nextPage}
-                        className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
-                            pagina === 3 
-                                ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow' 
+                        className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${pagina === 3
+                                ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow'
                                 : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
-                        }`}
+                            }`}
                     >
                         <span>{pagina === 3 ? 'Enviar formulario' : 'Siguiente'}</span>
                         {pagina === 3 ? <FiSend size={16} /> : <FiArrowRight size={16} />}
