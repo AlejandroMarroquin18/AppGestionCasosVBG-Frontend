@@ -27,7 +27,6 @@ const ExternalRegistrationForm = () => {
     program: "", // Nueva pregunta para el programa académico
     gender_identity: "Cisgénero", // Valor predeterminado
     self_recognition: "Ninguna", // Valor predeterminado
-    institutional_email: "",
     terms_accepted: false, // Aceptación de términos y condiciones
   })
 
@@ -230,17 +229,6 @@ const ExternalRegistrationForm = () => {
               <option value="Múltiple">Múltiple</option>
               <option value="Otro">Otro</option>
             </select>
-          </FormField>
-
-          <FormField label="Correo institucional" required>
-            <input
-              type="email"
-              name="institutional_email"
-              value={formData.institutional_email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
           </FormField>
 
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-l-[#d32f2f]/70">

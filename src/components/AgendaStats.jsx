@@ -76,7 +76,7 @@ const AgendaStats = () => {
 
 
 
-        console.log("Fetched stats:", receivedData);
+        console.log("Fetched stats:", data);
         
       } catch (error) {
         console.error("Error fetching stats:", error);

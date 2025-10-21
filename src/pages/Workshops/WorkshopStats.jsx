@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { baseURL } from "../../api";
+import getCSRFToken from "../../helpers/getCSRF";
 
 
 ChartJS.register(
@@ -55,7 +56,14 @@ const WorkshopStats = () => {
  useEffect(() => {
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${baseURL}/talleres/statistics/`);
+      const response = await fetch(`${baseURL}/talleres/statistics/`,{
+  method: "GET",
+  headers: {
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
       
       if (!response.ok) throw new Error("Error al cargar estadísticas");
       const data = await response.json();

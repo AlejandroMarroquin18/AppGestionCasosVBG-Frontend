@@ -1,12 +1,19 @@
 import getCSRFToken from "./helpers/getCSRF";
 
-export const baseURL = "http://192.168.20.58:8000/api";
+export const baseURL = "http://localhost:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 
 // Obtener TODOS los talleres
 export const getWorkshops = async () => {
-  const response = await fetch(`${baseURL}/talleres/`);
+  const response = await fetch(`${baseURL}/talleres/`,{
+  method: "GET",
+  headers: {
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -15,7 +22,14 @@ export const getWorkshops = async () => {
 
 // Obtener los detalles de un taller específico (ID)
 export const getWorkshopDetails = async (workshopId) => {
-  const response = await fetch(`${baseURL}/talleres/${workshopId}/`);
+  const response = await fetch(`${baseURL}/talleres/${workshopId}/`,{
+  method: "GET",
+  headers: {
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
   if (!response.ok) {
     throw new Error(`Failed to get with status: ${response.status}`);
   }
@@ -29,8 +43,11 @@ export const createWorkshop = async (workshopData) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+        "X-CSRFToken": getCSRFToken(),
       },
       body: JSON.stringify(workshopData),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -52,8 +69,11 @@ export const updateWorkshop = async (workshopId, workshopData) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify(workshopData),
+    credentials: "include",
   });
   if (!response.ok) {
     const errorData = await response.json();
@@ -68,11 +88,14 @@ export const deleteWorkshop = async (workshopId, cancellationReason = "Por motiv
   const response = await fetch(`${baseURL}/talleres/${workshopId}/`, {
     method: "DELETE",
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify({
       cancellation_reason: cancellationReason 
-    })
+    }),
+    credentials: "include",
   });
   
   if (!response.ok) {
@@ -87,8 +110,11 @@ export const registerExternalParticipant = async (workshopId, participantData) =
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify(participantData),
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -103,7 +129,14 @@ export const registerExternalParticipant = async (workshopId, participantData) =
 
 // Obtener TODAS las quejas
 export const getComplaints = async () => {
-  const response = await fetch(`${baseURL}/quejas/`);
+  const response = await fetch(`${baseURL}/quejas/`, {
+  method: "GET",
+  headers: {
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
   if (!response.ok) {
     throw new Error("Error getting complaints");
   }
@@ -112,7 +145,15 @@ export const getComplaints = async () => {
 
 // Obtener los detalles de una queja específica (ID)
 export const getComplaintDetails = async (id) => {
-  const response = await fetch(`${baseURL}/quejas/${id}`);
+  const response = await fetch(`${baseURL}/quejas/${id}`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
   if (!response.ok) {
     throw new Error("Error getting complaint details");
   }
@@ -124,9 +165,11 @@ export const updateComplaint = async (id, complaintData) => {
   const response = await fetch(`${baseURL}/quejas/${id}/`, {
     method: "PUT",
     headers: {
-      
-      "Content-Type": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+    "X-CSRFToken": getCSRFToken(),
     },
+    credentials: "include",
     body: JSON.stringify(complaintData),
   });
   if (!response.ok) {
@@ -140,7 +183,10 @@ export const updateComplaintStatus = async (id, status) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "X-CSRFToken": getCSRFToken(),
     },
+    credentials: "include",
     body: JSON.stringify({ estado: status }),
   });
   if (!response.ok) {
@@ -153,6 +199,11 @@ export const updateComplaintStatus = async (id, status) => {
 export const deleteComplaint = async (id) => {
   const response = await fetch(`${baseURL}/quejas/${id}/`, {
     method: "DELETE",
+    headers: {
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
   });
   if (!response.ok) {
     throw new Error("Error deleting complaint");
@@ -163,7 +214,14 @@ export const deleteComplaint = async (id) => {
 
 
 export const getComplaintStats = async () => {
-  const response = await fetch(`${baseURL}/quejas/statistics/`);
+  const response = await fetch(`${baseURL}/quejas/statistics/`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
+  });
   if (!response.ok) {
     throw new Error("Error getting complaint statistics");
   }
@@ -294,7 +352,14 @@ export const deleteRegistry = async (registryId) => {
 
 export const fetchEventStats = async () => {
   try {
-    const response = await fetch(`${baseURL}/events/stats/`);
+    const response = await fetch(`${baseURL}/events/stats/`,{
+  method: "GET",
+  headers: {
+    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+    "X-CSRFToken": getCSRFToken(),
+  },
+  credentials: "include",
+  });
     if (!response.ok) {
       throw new Error("Error al obtener las estadísticas de eventos");
     }
@@ -340,7 +405,7 @@ export async function checkSession() {
  * las peticiones deben enviar la cookie de sesión y el token CSRF. Por ejemplo:
  *
 await fetch(`${baseURL}/protected/`, {
-    authorization: `Bearer ${localStorage.getItem("userToken")}`,//solo si ess en desarrollo
+    authorization: `Token ${localStorage.getItem("userToken")}`,//solo si ess en desarrollo
     method: "POST",
     headers: {
         "Content-Type": "application/json",
