@@ -13,7 +13,10 @@ import {
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { FiDownload, FiUsers, FiMonitor, FiHome, FiBarChart2 } from "react-icons/fi";
 import { baseURL } from "../../api";
+<<<<<<< HEAD
 import getCSRFToken from "../../helpers/getCSRF";
+=======
+>>>>>>> 6de34b4437f1d9d53c029343591264108c605d4f
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 ChartJS.register(
