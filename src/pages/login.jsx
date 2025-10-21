@@ -97,7 +97,7 @@ const Login = () => {
               {/* Títulos */}
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  Iniciar Sesión
+                  Iniciar sesión
                 </h1>
                 <p className="text-gray-600 text-base">
                   Accede a tu cuenta para continuar
@@ -115,7 +115,7 @@ const Login = () => {
                 {/* Campo Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Correo Electrónico
+                    Correo electrónico
                   </label>
                   <input
                     type="email"
