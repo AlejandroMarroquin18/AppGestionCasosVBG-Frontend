@@ -20,10 +20,10 @@ const SignUp = () => {
     if (errorMessage) setErrorMessage(null);
   };
 
-  const validateEmail = (email) => {
+  /*const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@correounivalle\.edu\.co$/;
     return emailRegex.test(email);
-  };
+  };*/
 
   const handleSubmit = async () => {
     // Validaciones
@@ -31,12 +31,12 @@ const SignUp = () => {
       setErrorMessage("Por favor completa todos los campos");
       return;
     }
-
+    /*
     if (!validateEmail(userCredentials.email)) {
       setErrorMessage("Debes usar un correo institucional de la Universidad del Valle (@correounivalle.edu.co)");
       return;
     }
-
+    */
     if (userCredentials.password !== userCredentials.confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden");
       return;
