@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getWorkshopDetails, updateWorkshop, deleteWorkshop } from "../../api";
 import DeleteModal from "../../components/DeleteModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import DownloadParticipantsButton from "../../components/DownloadParticipantsButton";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { FiEdit, FiSave, FiX, FiTrash2, FiCopy, FiUser, FiMail, FiFileText, FiCalendar } from "react-icons/fi";
 
@@ -144,7 +145,8 @@ const WorkshopDetails = () => {
     { key: "slots", label: "Cupos Disponibles", type: "number" },
     { key: "facilitators", label: "Talleristas", type: "facilitators" },
     { key: "details", label: "Descripción", type: "textarea" },
-    { key: "qr_code_url", label: "Código QR", type: "text" },
+    // CAMBIA ESTA LÍNEA: usa "qr_imagen" en lugar de "qr_code_url"
+    { key: "qr_imagen", label: "Código QR", type: "qr" },
   ];
 
   const openDeleteModal = () => {
@@ -248,9 +250,8 @@ const WorkshopDetails = () => {
                   ) : (
                     <div className="text-gray-900">
                       {key === "modality" ? (
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          workshop[key] === 'presencial' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${workshop[key] === 'presencial' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
                           {workshop[key] === 'presencial' ? '🏢 Presencial' : '💻 Virtual'}
                         </span>
                       ) : (
@@ -286,6 +287,7 @@ const WorkshopDetails = () => {
                               placeholder="Nombre del tallerista"
                             />
                             <button
+                              type="button"
                               className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
                               onClick={() => {
                                 const updatedFacilitators = workshop.facilitators.filter((_, i) => i !== index);
@@ -297,6 +299,7 @@ const WorkshopDetails = () => {
                           </div>
                         ))}
                         <button
+                          type="button"
                           className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 text-sm"
                           onClick={() => {
                             handleInputChange("facilitators", [
@@ -312,7 +315,7 @@ const WorkshopDetails = () => {
                     ) : type === "textarea" ? (
                       <textarea
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                        value={workshop[key]}
+                        value={workshop[key] || ""}
                         onChange={(e) => handleInputChange(key, e.target.value)}
                         rows="4"
                       />
@@ -320,41 +323,78 @@ const WorkshopDetails = () => {
                       <input
                         type={type}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                        value={workshop[key]}
+                        value={workshop[key] || ""}
                         onChange={(e) => handleInputChange(key, e.target.value)}
                       />
                     )
                   ) : key === "facilitators" ? (
                     <div className="space-y-1">
-                      {workshop.facilitators.map((facilitator, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-gray-900">
-                          <FiUser size={14} className="text-gray-500" />
-                          {facilitator.name}
-                        </div>
-                      ))}
+                      {workshop.facilitators && workshop.facilitators.length > 0 ? (
+                        workshop.facilitators.map((facilitator, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-gray-900">
+                            <FiUser size={14} className="text-gray-500" />
+                            {facilitator.name}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-sm">No hay talleristas asignados</p>
+                      )}
                     </div>
-                  ) : key === "qr_code_url" ? (
-                    <div className="flex flex-col items-center space-y-3">
+                  ) : key === "qr_imagen" ? (
+                    <div className="flex flex-col items-center space-y-4 p-4 bg-white rounded-lg border border-gray-200">
                       {workshop.qr_imagen ? (
                         <>
+                          <div className="text-center mb-2">
+                            <h4 className="font-medium text-gray-900 mb-1">Código QR de Inscripción</h4>
+                            <p className="text-sm text-gray-600">Escanea para compartir la inscripción</p>
+                          </div>
                           <img
                             src={`data:image/png;base64,${workshop.qr_imagen}`}
                             alt="Código QR del taller"
-                            className="w-32 h-32 border border-gray-300 rounded-lg"
+                            className="w-40 h-40 border-2 border-gray-300 rounded-lg shadow-sm"
                           />
-                          <div className="text-center">
-                            <button
-                              onClick={() => copyToClipboard(workshop.qr_link)}
-                              className="flex items-center gap-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm"
-                            >
-                              <FiCopy size={12} />
-                              Copiar enlace
-                            </button>
+                          <div className="text-center w-full">
+                            <p className="text-sm text-gray-600 mb-2">Enlace de inscripción:</p>
+                            <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded border border-gray-300">
+                              <input
+                                type="text"
+                                value={workshop.qr_link || "Enlace no disponible"}
+                                readOnly
+                                className="flex-1 text-xs bg-transparent border-none outline-none text-gray-700"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (workshop.qr_link) {
+                                    navigator.clipboard.writeText(workshop.qr_link);
+                                    alert('Enlace copiado al portapapeles');
+                                  }
+                                }}
+                                className="flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!workshop.qr_link}
+                              >
+                                <FiCopy size={14} />
+                                Copiar
+                              </button>
+                            </div>
                           </div>
                         </>
                       ) : (
-                        <p className="text-gray-500 text-sm">QR no generado aún</p>
+                        <div className="text-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
+                          <p className="text-gray-500 text-sm">Generando código QR...</p>
+                        </div>
                       )}
+                    </div>
+                  ) : key === "available_slots" ? (
+                    <div className="flex items-center gap-2">
+                      <span className={`text-lg font-semibold ${workshop.available_slots > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                        {workshop.available_slots || workshop.slots}
+                      </span>
+                      <span className="text-gray-600">de</span>
+                      <span className="text-gray-900 font-medium">{workshop.slots}</span>
+                      <span className="text-gray-600">cupos disponibles</span>
                     </div>
                   ) : (
                     <div className="text-gray-900">
@@ -369,6 +409,25 @@ const WorkshopDetails = () => {
 
         {/* Personas Inscritas */}
         <Accordion title={`👥 Personas inscritas (${participants.length})`}>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Lista de participantes inscritos
+              </h3>
+              <p className="text-sm text-gray-600">
+                {participants.length} persona(s) registrada(s)
+              </p>
+            </div>
+
+            {/* Botón de descarga - solo visible si hay participantes */}
+            {participants.length > 0 && (
+              <DownloadParticipantsButton
+                participants={participants}
+                workshop={workshop}
+              />
+            )}
+          </div>
+
           {participants.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
