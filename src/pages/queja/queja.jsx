@@ -30,7 +30,7 @@ const Queja = () => {
         'Psicología',
         'Derecho y Ciencia Política',
     ];
-    const tipos_documentos=['C.C','Tarjeta de identida', 'Pasaporte']
+    const tipos_documentos=['C.C','Tarjeta de identidad', 'Pasaporte']
     const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
         'Pacífico', 'Palmira', 'Tuluá', 'Yumbo', 'Zarzal'];
     const vicerrectorias = [
@@ -191,47 +191,60 @@ const Queja = () => {
 
         onchange(set_persona_que_reporta, "fecha_recepcion", fechaFormateada);
 
-        // Combinar los camposs de otros en uno solo
-        if (datos_afectado.afectado_identidad_genero_otro==='Otro')  {
-            datos_afectado.afectado_identidad_genero=datos_afectado.afectado_identidad_genero_otro
-        }
-        delete datos_afectado.afectado_identidad_genero_otro
+        const newform = { ...persona_que_reporta, ...datos_afectado, ...datos_agresor, ...datos_adicionales };
+        console.log(newform);
 
-        if (datos_afectado.afectado_orientacion_sexual_otro==='Otro')  {
-            datos_afectado.afectado_orientacion_sexual=datos_afectado.afectado_orientacion_sexual_otro
+        // Combinar los camposs de otros en uno solo
+        if (newform.afectado_identidad_genero==='Otro')  {
+            newform.afectado_identidad_genero=newform.afectado_identidad_genero_otro
         }
-        delete datos_afectado.afectado_orientacion_sexual_otro
+        delete newform.afectado_identidad_genero_otro
+
+        if (newform.afectado_orientacion_sexual==='Otro')  {
+            newform.afectado_orientacion_sexual=newform.afectado_orientacion_sexual_otro
+        }
+        delete newform.afectado_orientacion_sexual_otro
 
 
         //tipo de vbg
 
-        if (datos_afectado.afectado_tipo_vbg_os_otro==='Otro')  {
-            datos_afectado.afectado_tipo_vbg_os = [
-                datos_afectado.afectado_tipo_vbg_os,
-                datos_afectado.afectado_tipo_vbg_os_otro
+        if (newform.afectado_tipo_vbg_os_otro!== '')  {
+            newform.afectado_tipo_vbg_os = [
+                newform.afectado_tipo_vbg_os,
+                newform.afectado_tipo_vbg_os_otro
             ]
                 .filter(Boolean) // elimina vacíos o undefined
                 .join(", "); // une todo con coma y espacio
 
-            delete datos_afectado.afectado_tipo_vbg_os_otro;
+            delete newform.afectado_tipo_vbg_os_otro;
+        }
+
+        if (newform.agresor_factores_riesgo_otro !== '')  {
+            newform.agresor_factores_riesgo = [
+                newform.agresor_factores_riesgo,
+                newform.agresor_factores_riesgo_otro
+            ]
+                .filter(Boolean) // elimina vacíos o undefined
+                .join(", "); // une todo con coma y espacio
+            console.log(newform.agresor_factores_riesgo)
+            delete newform.agresor_factores_riesgo_otro;
         }
         
 
-        if (datos_agresor.agresor_identidad_genero_otro==='Otro')  {
-            datos_agresor.agresor_identidad_genero=datos_agresor.agresor_identidad_genero_otro
+        if (newform.agresor_identidad_genero==='Otro')  {
+            newform.agresor_identidad_genero=newform.agresor_identidad_genero_otro
         }
-        delete datos_agresor.agresor_identidad_genero_otro
+        delete newform.agresor_identidad_genero_otro
 
-        if (datos_agresor.agresor_orientacion_sexual_otro==='Otro')  {
-            datos_agresor.agresor_orientacion_sexual=datos_agresor.agresor_orientacion_sexual_otro
+        if (newform.agresor_orientacion_sexual==='Otro')  {
+            newform.agresor_orientacion_sexual=newform.agresor_orientacion_sexual_otro
         }
-        delete datos_agresor.agresor_orientacion_sexual_otro
+        delete newform.agresor_orientacion_sexual_otro
 
 
 
 
-        const newform = { ...persona_que_reporta, ...datos_afectado, ...datos_agresor, ...datos_adicionales };
-        console.log(newform);
+        
 
         try {
             const response = await fetch(`${baseURL}/quejas/`, {

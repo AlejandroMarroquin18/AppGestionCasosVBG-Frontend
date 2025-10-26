@@ -63,7 +63,7 @@ const ComplaintsDetails = () => {
     "reporta_celular",
     "reporta_correo",
     
-    // Persona afectada (12-32)
+    // Persona afectada (12-42)
     "afectado_nombre",
     "afectado_sexo",
     "afectado_edad",
@@ -95,7 +95,7 @@ const ComplaintsDetails = () => {
     "afectado_tipo_vbg_os",
     "afectado_detalles_caso",
     
-    // Persona agresora (33-46)
+    // Persona agresora (43-63)
     "agresor_nombre",
     "agresor_sexo",
     "agresor_edad",
@@ -117,7 +117,7 @@ const ComplaintsDetails = () => {
     "agresor_tiene_denuncias",
     "agresor_detalles_denuncias",
         
-    // Detalles generales (47-54)
+    // Detalles generales (63-54)
     "desea_activar_ruta_atencion_integral",
     "recibir_asesoria_orientacion_sociopedagogica",
     "orientacion_psicologica",
@@ -740,9 +740,9 @@ const ComplaintsDetails = () => {
 
           {/* Secciones de información */}
           {renderAccordionSection("reporta", 0, 12, "👤 Persona que Reporta")}
-          {renderAccordionSection("afectado", 12, 33, "🎯 Persona Afectada")}
-          {renderAccordionSection("agresor", 33, 47, "⚠️ Persona Agresora")}
-          {renderAccordionSection("detalles", 47, 55, "📋 Información Adicional y Servicios Solicitados")}
+          {renderAccordionSection("afectado", 12, 42, "🎯 Persona Afectada")}
+          {renderAccordionSection("agresor", 42, 62, "⚠️ Persona Agresora")}
+          {renderAccordionSection("detalles", 62, 71, "📋 Información Adicional y Servicios Solicitados")}
 
           {/* Historial */}
           <Accordion className="mb-8 shadow-lg border-0 rounded-lg overflow-hidden">
