@@ -1,6 +1,6 @@
 import getCSRFToken from "./helpers/getCSRF";
 
-export const baseURL = "http://localhost:8000/api";
+export const baseURL = "http://192.168.20.58:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 
@@ -110,7 +110,6 @@ export const registerExternalParticipant = async (workshopId, participantData) =
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
       "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify(participantData),
@@ -122,7 +121,7 @@ export const registerExternalParticipant = async (workshopId, participantData) =
     throw new Error(`Error al inscribirse: ${errorData.message}`);
   }
 
-  return response.json();  // Retorna la respuesta del backend con los datos del participante
+  return response.json();
 };
 
 /*------------------ SOLICITUDES DE QUEJAS ------------------*/

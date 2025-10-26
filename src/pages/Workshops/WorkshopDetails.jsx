@@ -3,20 +3,26 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getWorkshopDetails, updateWorkshop, deleteWorkshop } from "../../api";
 import DeleteModal from "../../components/DeleteModal";
 import ConfirmationModal from "../../components/ConfirmationModal";
+import DownloadParticipantsButton from "../../components/DownloadParticipantsButton";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { FiEdit, FiSave, FiX, FiTrash2, FiCopy, FiUser, FiMail, FiFileText, FiCalendar } from "react-icons/fi";
 
 const Accordion = ({ title, children, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="mb-4 last:mb-0">
+    <div className="mb-6 last:mb-0">
       <button
-        className="w-full text-left text-lg font-semibold bg-red-500 p-4 rounded-t-lg text-white"
+        className="w-full text-left text-lg font-semibold bg-red-600 hover:bg-red-700 p-4 rounded-t-lg text-white transition-colors duration-200 flex justify-between items-center"
         onClick={() => setIsOpen(!isOpen)}
       >
-        {title}
+        <span>{title}</span>
+        <span className="transform transition-transform duration-200">
+          {isOpen ? "−" : "+"}
+        </span>
       </button>
       {isOpen && (
-        <div className="bg-white p-4 border-l-4 border-r-4 border-b-4 border-red-500 rounded-b-lg">
+        <div className="bg-white p-6 border border-gray-200 rounded-b-lg shadow-sm">
           {children}
         </div>
       )}
@@ -55,7 +61,7 @@ const WorkshopDetails = () => {
   const workshopId = useParams().workshopId;
   const navigate = useNavigate();
   const [workshop, setWorkshop] = useState(null);
-  const [participants, setParticipants] = useState([]); // Nuevo estado para los participantes
+  const [participants, setParticipants] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,7 +75,7 @@ const WorkshopDetails = () => {
         const data = await getWorkshopDetails(workshopId);
         console.log("Workshop data:", data);
         setWorkshop(data);
-        setParticipants(data.participants || []); // Asigna los participantes desde la respuesta
+        setParticipants(data.participants || []);
       } catch (err) {
         setError(`Failed to load data: ${err.message}`);
       } finally {
@@ -95,6 +101,7 @@ const WorkshopDetails = () => {
       const updatedData = await updateWorkshop(workshopId, formattedData);
       setWorkshop(updatedData);
       setIsEditing(false);
+      setShowConfirmationModal(false);
     } catch (error) {
       console.error("Error al guardar los cambios:", error);
     }
@@ -124,27 +131,28 @@ const WorkshopDetails = () => {
   };
 
   const displayFields = [
-    { key: "name", label: "Nombre", type: "text" },
-    { key: "date", label: "Fecha de inicio", type: "date" },
-    { key: "start_time", label: "Hora de inicio", type: "time" },
-    { key: "end_time", label: "Hora de finalización", type: "time" },
-    { key: "location", label: "Lugar", type: "text" },
+    { key: "name", label: "Nombre del Taller", type: "text" },
+    { key: "date", label: "Fecha", type: "date" },
+    { key: "start_time", label: "Hora de Inicio", type: "time" },
+    { key: "end_time", label: "Hora de Finalización", type: "time" },
+    { key: "location", label: "Ubicación", type: "text" },
     {
       key: "modality",
       label: "Modalidad",
       type: "select",
       options: ["presencial", "virtual"],
     },
-    { key: "slots", label: "Personas beneficiarias", type: "number" },
+    { key: "slots", label: "Cupos Disponibles", type: "number" },
     { key: "facilitators", label: "Talleristas", type: "facilitators" },
-    { key: "details", label: "Descripción del taller", type: "textarea" },
-    { key: "qr_code_url", label: "Código QR", type: "text" }, // Campo para mostrar el QR
+    { key: "details", label: "Descripción", type: "textarea" },
+    // CAMBIA ESTA LÍNEA: usa "qr_imagen" en lugar de "qr_code_url"
+    { key: "qr_imagen", label: "Código QR", type: "qr" },
   ];
 
   const openDeleteModal = () => {
     if (!workshop) return;
     setMessage(
-      `¿Estás seguro de que deseas eliminar el taller "${workshop.name}"?`
+      `¿Estás seguro de que deseas eliminar el taller "${workshop.name}"? Esta acción no se puede deshacer.`
     );
     setIsModalOpen(true);
   };
@@ -157,257 +165,381 @@ const WorkshopDetails = () => {
     setShowConfirmationModal(false);
   };
 
-  if (loading)
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Enlace copiado al portapapeles');
+  };
+
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Cargando...
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner message="Cargando detalles del taller..." size="large" />
       </div>
     );
-  if (error)
+  }
+
+  if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Error: {error}
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Error al cargar el taller</h2>
+          <p className="text-gray-600">{error}</p>
+        </div>
       </div>
     );
-  if (!workshop)
+  }
+
+  if (!workshop) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        No hay detalles disponibles para el taller.
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="text-6xl mb-4">📊</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">No hay detalles disponibles</h2>
+          <p className="text-gray-600">No se encontró información para este taller</p>
+        </div>
       </div>
     );
+  }
 
   return (
-    <div className="w-full p-5">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Detalles del taller
-      </h1>
-      <Accordion title="Información general del taller">
-        <div className="w-full overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <tbody>
-              {displayFields.map(({ key, label, type, options }) => (
-                <tr key={key}>
-                  <td className="px-6 py-4 whitespace-nowrap font-semibold text-lg">
+    <div className="w-full min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            🎯 Detalles del taller
+          </h1>
+          <p className="text-gray-600">
+            Información completa y participantes inscritos
+          </p>
+          <div className="w-20 h-1 bg-red-600 rounded-full mt-2"></div>
+        </div>
+
+        {/* Información General del Taller */}
+        <Accordion title="📋 Información general" defaultOpen={true}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Columna 1 */}
+            <div className="space-y-4">
+              {displayFields.slice(0, 5).map(({ key, label, type, options }) => (
+                <div key={key} className="bg-gray-50 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     {label}
-                  </td>
-                  <td className="px-6 py-4">
-                    {isEditing ? (
-                      key === "facilitators" ? (
-                        <div>
-                          {workshop.facilitators.map((facilitator, index) => (
-                            <div key={index} className="flex mb-2">
+                  </label>
+                  {isEditing ? (
+                    type === "select" ? (
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        value={workshop[key]}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                      >
+                        {options.map((option) => (
+                          <option key={option} value={option}>
+                            {option === 'presencial' ? '🏢 Presencial' : '💻 Virtual'}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={type}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        value={workshop[key]}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                      />
+                    )
+                  ) : (
+                    <div className="text-gray-900">
+                      {key === "modality" ? (
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${workshop[key] === 'presencial' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                          }`}>
+                          {workshop[key] === 'presencial' ? '🏢 Presencial' : '💻 Virtual'}
+                        </span>
+                      ) : (
+                        workshop[key] || "No especificado"
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Columna 2 */}
+            <div className="space-y-4">
+              {displayFields.slice(5).map(({ key, label, type, options }) => (
+                <div key={key} className="bg-gray-50 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {label}
+                  </label>
+                  {isEditing ? (
+                    key === "facilitators" ? (
+                      <div className="space-y-2">
+                        {workshop.facilitators.map((facilitator, index) => (
+                          <div key={index} className="flex gap-2">
+                            <input
+                              type="text"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                              value={facilitator.name}
+                              onChange={(e) => {
+                                const updatedFacilitators = [...workshop.facilitators];
+                                updatedFacilitators[index].name = e.target.value;
+                                handleInputChange("facilitators", updatedFacilitators);
+                              }}
+                              placeholder="Nombre del tallerista"
+                            />
+                            <button
+                              type="button"
+                              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                              onClick={() => {
+                                const updatedFacilitators = workshop.facilitators.filter((_, i) => i !== index);
+                                handleInputChange("facilitators", updatedFacilitators);
+                              }}
+                            >
+                              <FiTrash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                          onClick={() => {
+                            handleInputChange("facilitators", [
+                              ...workshop.facilitators,
+                              { name: "" },
+                            ]);
+                          }}
+                        >
+                          <FiUser size={14} />
+                          Agregar Tallerista
+                        </button>
+                      </div>
+                    ) : type === "textarea" ? (
+                      <textarea
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                        value={workshop[key] || ""}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        rows="4"
+                      />
+                    ) : (
+                      <input
+                        type={type}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        value={workshop[key] || ""}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                      />
+                    )
+                  ) : key === "facilitators" ? (
+                    <div className="space-y-1">
+                      {workshop.facilitators && workshop.facilitators.length > 0 ? (
+                        workshop.facilitators.map((facilitator, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-gray-900">
+                            <FiUser size={14} className="text-gray-500" />
+                            {facilitator.name}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-sm">No hay talleristas asignados</p>
+                      )}
+                    </div>
+                  ) : key === "qr_imagen" ? (
+                    <div className="flex flex-col items-center space-y-4 p-4 bg-white rounded-lg border border-gray-200">
+                      {workshop.qr_imagen ? (
+                        <>
+                          <div className="text-center mb-2">
+                            <h4 className="font-medium text-gray-900 mb-1">Código QR de Inscripción</h4>
+                            <p className="text-sm text-gray-600">Escanea para compartir la inscripción</p>
+                          </div>
+                          <img
+                            src={`data:image/png;base64,${workshop.qr_imagen}`}
+                            alt="Código QR del taller"
+                            className="w-40 h-40 border-2 border-gray-300 rounded-lg shadow-sm"
+                          />
+                          <div className="text-center w-full">
+                            <p className="text-sm text-gray-600 mb-2">Enlace de inscripción:</p>
+                            <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded border border-gray-300">
                               <input
                                 type="text"
-                                className="border rounded px-2 py-1 w-full"
-                                value={facilitator.name}
-                                onChange={(e) => {
-                                  const updatedFacilitators = [
-                                    ...workshop.facilitators,
-                                  ];
-                                  updatedFacilitators[index].name =
-                                    e.target.value;
-                                  handleInputChange(
-                                    "facilitators",
-                                    updatedFacilitators
-                                  );
-                                }}
+                                value={workshop.qr_link || "Enlace no disponible"}
+                                readOnly
+                                className="flex-1 text-xs bg-transparent border-none outline-none text-gray-700"
                               />
                               <button
-                                className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
+                                type="button"
                                 onClick={() => {
-                                  const updatedFacilitators =
-                                    workshop.facilitators.filter(
-                                      (_, i) => i !== index
-                                    );
-                                  handleInputChange(
-                                    "facilitators",
-                                    updatedFacilitators
-                                  );
-                                }}
-                              >
-                                Eliminar
-                              </button>
-                            </div>
-                          ))}
-                          <button
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
-                            onClick={() => {
-                              handleInputChange("facilitators", [
-                                ...workshop.facilitators,
-                                { name: "" },
-                              ]);
-                            }}
-                          >
-                            Agregar Tallerista
-                          </button>
-                        </div>
-                      ) : type === "select" ? (
-                        <select
-                          className="border rounded px-2 py-1 w-full"
-                          value={workshop[key]}
-                          onChange={(e) =>
-                            handleInputChange(key, e.target.value)
-                          }
-                        >
-                          {options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : type === "textarea" ? (
-                        <textarea
-                          className="border rounded px-2 py-1 w-full"
-                          value={workshop[key]}
-                          onChange={(e) =>
-                            handleInputChange(key, e.target.value)
-                          }
-                          rows="4"
-                        ></textarea>
-                      ) : (
-                        <input
-                          type={type}
-                          className="border rounded px-2 py-1 w-full"
-                          value={workshop[key]}
-                          onChange={(e) =>
-                            handleInputChange(key, e.target.value)
-                          }
-                        />
-                      )
-                    ) : key === "qr_code_url" ? (
-                      <div className="flex flex-col items-justify">
-                        {workshop.qr_imagen ? (
-                          <>
-                            <img
-                              src={`data:image/png;base64,${workshop.qr_imagen}`}
-                              alt="Código QR del taller"
-                              className="w-48 h-48 mb-4 border border-gray-300 rounded"
-                            />
-                            <div className="text-justify">
-                              <p className="font-semibold mb-2">Enlace de inscripción:</p>
-                              <a
-                                href={workshop.qr_link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 break-all"
-                              >
-                                {workshop.qr_link}
-                              </a>
-                              <div className="mt-4">
-                                <button
-                                  onClick={() => {
+                                  if (workshop.qr_link) {
                                     navigator.clipboard.writeText(workshop.qr_link);
                                     alert('Enlace copiado al portapapeles');
-                                  }}
-                                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
-                                >
-                                  Copiar enlace
-                                </button>
-                              </div>
+                                  }
+                                }}
+                                className="flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!workshop.qr_link}
+                              >
+                                <FiCopy size={14} />
+                                Copiar
+                              </button>
                             </div>
-                          </>
-                        ) : (
-                          <p className="text-gray-500">QR no generado aún</p>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-lg">
-                        {key === "facilitators"
-                          ? workshop.facilitators.map((facilitator, idx) => (
-                              <span key={idx}>
-                                {facilitator.name}
-                                {idx < workshop.facilitators.length - 1
-                                  ? ", "
-                                  : ""}
-                              </span>
-                            ))
-                          : workshop[key]}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
+                          <p className="text-gray-500 text-sm">Generando código QR...</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : key === "available_slots" ? (
+                    <div className="flex items-center gap-2">
+                      <span className={`text-lg font-semibold ${workshop.available_slots > 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                        {workshop.available_slots || workshop.slots}
                       </span>
-                    )}
-                  </td>
-                </tr>
+                      <span className="text-gray-600">de</span>
+                      <span className="text-gray-900 font-medium">{workshop.slots}</span>
+                      <span className="text-gray-600">cupos disponibles</span>
+                    </div>
+                  ) : (
+                    <div className="text-gray-900">
+                      {workshop[key] || "No especificado"}
+                    </div>
+                  )}
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </Accordion>
-      <Accordion title="Personas inscritas">
-        {participants.length > 0 ? (
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">Nombre</th>
-                <th className="border p-2">Correo</th>
-                <th className="border p-2">Tipo de Documento</th>
-                <th className="border p-2">Número de Documento</th>
-                <th className="border p-2">Edad</th>
-              </tr>
-            </thead>
-            <tbody>
-              {participants.map((participant, idx) => (
-                <tr key={idx}>
-                  <td className="border p-2">{participant.full_name}</td>
-                  <td className="border p-2">{participant.email}</td>
-                  <td className="border p-2">{participant.document_type}</td>
-                  <td className="border p-2">{participant.document_number}</td>
-                  <td className="border p-2">{participant.age}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-center p-4 text-lg">
-            No hay participantes inscritos.
-          </p>
-        )}
-      </Accordion>
-      <Accordion title="Personas participantes"></Accordion>
+            </div>
+          </div>
+        </Accordion>
 
-      <div className="flex justify-center space-x-4 mt-4">
-        {isEditing ? (
-          <>
-            <button
-              onClick={askForConfirmation}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Guardar Cambios
-            </button>
+        {/* Personas Inscritas */}
+        <Accordion title={`👥 Personas inscritas (${participants.length})`}>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Lista de participantes inscritos
+              </h3>
+              <p className="text-sm text-gray-600">
+                {participants.length} persona(s) registrada(s)
+              </p>
+            </div>
 
+            {/* Botón de descarga - solo visible si hay participantes */}
+            {participants.length > 0 && (
+              <DownloadParticipantsButton
+                participants={participants}
+                workshop={workshop}
+              />
+            )}
+          </div>
+
+          {participants.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      <FiUser className="inline mr-1" />
+                      Nombre
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      <FiMail className="inline mr-1" />
+                      Correo
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      <FiFileText className="inline mr-1" />
+                      Tipo Doc
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      <FiFileText className="inline mr-1" />
+                      Número Doc
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                      <FiCalendar className="inline mr-1" />
+                      Edad
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {participants.map((participant, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-900">
+                        {participant.full_name}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600">
+                        {participant.email}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600">
+                        {participant.document_type}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600 font-mono">
+                        {participant.document_number}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-600">
+                        {participant.age}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">👥</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No hay inscritos</h3>
+              <p className="text-gray-500">Aún no hay personas inscritas en este taller</p>
+            </div>
+          )}
+        </Accordion>
+
+        {/* Botones de Acción */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+          {isEditing ? (
+            <>
+              <button
+                onClick={askForConfirmation}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                <FiSave size={16} />
+                Guardar Cambios
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                <FiX size={16} />
+                Cancelar
+              </button>
+            </>
+          ) : (
             <button
-              onClick={() => setIsEditing(false)}
-              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              Cancelar
+              <FiEdit size={16} />
+              Editar Taller
             </button>
-          </>
-        ) : (
+          )}
           <button
-            onClick={() => setIsEditing(true)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={openDeleteModal}
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
           >
-            Editar Taller
+            <FiTrash2 size={16} />
+            Eliminar Taller
           </button>
-        )}
-        <button
-          onClick={openDeleteModal}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Eliminar Taller
-        </button>
+        </div>
       </div>
 
+      {/* Modales */}
       <DeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDelete}
         message={message}
+        title="Confirmar Eliminación"
       />
 
       <ConfirmationModal
         isOpen={showConfirmationModal}
         onClose={handleCloseModal}
         onConfirm={handleSaveChanges}
-        message="¿Estás seguro de que deseas guardar los cambios?"
+        message="¿Estás seguro de que deseas guardar los cambios realizados en este taller?"
+        title="Confirmar Cambios"
       />
     </div>
   );

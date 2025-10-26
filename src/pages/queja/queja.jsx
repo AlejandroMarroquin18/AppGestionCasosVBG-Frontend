@@ -246,7 +246,6 @@ const Queja = () => {
                 alert("Error al enviar el formulario");
             } else {
                 alert("¡Formulario enviado exitosamente!");
-                navigate('/quejas/lista');
             }
         } catch (error) {
             console.log('No fue posible conectarse con el servidor');

@@ -1,60 +1,118 @@
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import SuccessModal from "../../components/SuccessModal";
+import WarningModal from "../../components/WarningModal";
 import { baseURL } from "../../api";
-// Mover FormField fuera del componente principal
-const FormField = ({ label, children, required = false }) => {
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-l-[#d32f2f]/70">
-      <label className="block text-[#202124] font-medium mb-4">
-        {label}
-        {required && <span className="text-[#d32f2f] ml-1">*</span>}
-      </label>
-      {children}
-    </div>
-  )
-}
+import { FiUser, FiMail, FiFileText, FiCalendar, FiBook, FiUsers, FiFlag, FiCheck } from "react-icons/fi";
 
-const ExternalRegistrationForm = () => {
-  const { workshopId } = useParams() // Obtener el ID del taller desde la URL
+// Componente reutilizable para campos de formulario
+const FormField = ({ 
+  label, 
+  type = "text", 
+  value, 
+  onChange, 
+  options, 
+  required = false,
+  icon: Icon,
+  placeholder = "",
+  disabled = false,
+  name
+}) => (
+  <div className="mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-3">
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </label>
+    <div className="relative">
+      {Icon && (
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <Icon size={18} />
+        </div>
+      )}
+      {options ? (
+        <select
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          name={name}
+          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${
+            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+          }`}
+        >
+          <option value="">Seleccionar...</option>
+          {options.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : type === "textarea" ? (
+        <textarea
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          rows="4"
+          placeholder={placeholder}
+          name={name}
+          className={`w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 resize-none ${
+            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+          }`}
+        />
+      ) : (
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          placeholder={placeholder}
+          name={name}
+          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${
+            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+          }`}
+        />
+      )}
+    </div>
+  </div>
+);
+
+const WorkshopRegistrationForm = ({ workshop }) => {
+  const { workshopId } = useParams()
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
-    document_type: "Cédula", // Valor predeterminado
+    document_type: "Cédula",
     document_number: "",
     age: "",
-    disability: "Ninguna", // Valor predeterminado
-    program: "", // Nueva pregunta para el programa académico
-    gender_identity: "Cisgénero", // Valor predeterminado
-    self_recognition: "Ninguna", // Valor predeterminado
-    terms_accepted: false, // Aceptación de términos y condiciones
+    disability: "Ninguna",
+    program: "",
+    gender_identity: "Cisgénero",
+    self_recognition: "Ninguna",
+    terms_accepted: false,
   })
 
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // Estado para el modal de éxito
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
+  const [warningMessage, setWarningMessage] = useState("")
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value, // Para el checkbox de aceptación de términos
+      [name]: type === "checkbox" ? checked : value,
     })
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setErrorMessage("")
 
-    // Verificando lo que se está enviando antes de hacer el fetch
-    console.log("Form data antes de enviar:", formData)
-
-    // Verificar si los términos y condiciones fueron aceptados
     if (!formData.terms_accepted) {
-      setErrorMessage("Debe aceptar los términos y condiciones.")
+      setWarningMessage("Debe aceptar los términos y condiciones.")
+      setIsWarningModalOpen(true)
       setIsSubmitting(false)
       return
     }
@@ -68,208 +126,300 @@ const ExternalRegistrationForm = () => {
         body: JSON.stringify(formData),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const data = await response.json()
-        console.log("Respuesta del backend:", data) // Mostrar la respuesta del backend
-        setSuccessMessage("¡Inscripción exitosa!")
-        setIsSuccessModalOpen(true); // Abrir el modal de éxito
-        setErrorMessage("");
+        setSuccessMessage("¡Inscripción exitosa! Recibirás un correo de confirmación.")
+        setIsSuccessModalOpen(true)
+        setErrorMessage("")
+        // Limpiar formulario
+        setFormData({
+          full_name: "",
+          email: "",
+          document_type: "Cédula",
+          document_number: "",
+          age: "",
+          disability: "Ninguna",
+          program: "",
+          gender_identity: "Cisgénero",
+          self_recognition: "Ninguna",
+          terms_accepted: false,
+        })
       } else {
-        const errorData = await response.json()
-        setErrorMessage(errorData.error || "Error al inscribirse, intente nuevamente.")
-        setSuccessMessage("")
+        // Manejar diferentes tipos de errores del backend
+        let errorMsg = "Error al inscribirse, intente nuevamente."
+        
+        if (data.document_number) {
+          errorMsg = "Ya existe una inscripción con este número de documento para este taller."
+        } else if (data.error) {
+          errorMsg = data.error
+        } else if (data.message) {
+          errorMsg = data.message
+        } else if (typeof data === 'string') {
+          errorMsg = data
+        }
+        
+        setWarningMessage(errorMsg)
+        setIsWarningModalOpen(true)
       }
     } catch (error) {
-      setErrorMessage("Error al inscribirse, intente nuevamente.")
-      setSuccessMessage("")
-      console.error("Error al enviar datos:", error) // Mostrar el error en caso de falla
+      console.error("Error completo:", error)
+      setWarningMessage("Error de conexión, intente nuevamente.")
+      setIsWarningModalOpen(true)
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // Opciones para los selects
+  const documentTypes = ["Cédula", "Tarjeta de identidad", "Cédula de extranjería", "Pasaporte"]
+  const genderIdentities = ["Cisgénero", "Transgénero", "Género fluido", "No binario y/o queer", "Prefiero no responder"]
+  const selfRecognitions = [
+    "Negra/o/e y/o afrodescendiente",
+    "Raizal/palenquera/o/e", 
+    "Mestiza/o/e",
+    "Gitana/o/e y/o room",
+    "Ninguna"
+  ]
+  const disabilities = ["Ninguna", "Motriz", "Visual", "Auditiva", "Cognitiva", "Múltiple", "Otro"]
+
+  // Formatear fecha en español
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  }
+
   return (
-    <div className="min-h-screen bg-[#f5f5f5] py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Form Header with red accent */}
-        <div className="bg-gradient-to-r from-[#d32f2f] to-[#f44336] rounded-t-lg h-3"></div>
-        <div className="bg-white rounded-b-lg shadow-sm mb-6 p-8 border-t-0">
-          <h1 className="text-3xl font-normal text-[#202124] mb-3">Inscripción al taller</h1>
-          <div className="w-16 h-1 bg-[#d32f2f] mb-4"></div>
-          <p className="text-[#5f6368] border-b pb-4 mb-6">Complete el formulario para inscribirse al taller</p>
-          {successMessage && (
-            <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
-              <p className="text-green-700">{successMessage}</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        
+        {/* Header del Formulario - Simplificado */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
+          <div className="bg-gradient-to-r from-red-600 to-red-700 h-2"></div>
+          <div className="p-8">
+            <div className="text-center mb-4">
+              <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                Formulario de inscripción
+              </h1>
+              {workshop && (
+                <div className="text-gray-600 space-y-1">
+                  <p className="text-lg font-medium">{workshop.name}</p>
+                  <p className="text-sm">
+                    {formatDate(workshop.date)} - {workshop.location}
+                  </p>
+                </div>
+              )}
+              <div className="w-16 h-1 bg-red-600 rounded-full mx-auto mt-4"></div>
             </div>
-          )}
+
+            {errorMessage && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700">{errorMessage}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Form Fields */}
-        <form onSubmit={handleSubmit}>
-          {errorMessage && (
-            <div className="bg-red-50 border-l-4 border-[#d32f2f] p-4 mb-6 rounded-lg shadow-sm">
-              <p className="text-[#d32f2f]">{errorMessage}</p>
+        {/* Formulario */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <form onSubmit={handleSubmit}>
+            
+            {/* Información Personal */}
+            <div className="mb-8">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  label="Nombre completo"
+                  value={formData.full_name}
+                  onChange={handleChange}
+                  name="full_name"
+                  required={true}
+                  icon={FiUser}
+                  placeholder="Ingrese su nombre completo"
+                  disabled={isSubmitting}
+                />
+
+                <FormField
+                  label="Correo electrónico"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  name="email"
+                  required={true}
+                  icon={FiMail}
+                  placeholder="ejemplo@correo.com"
+                  disabled={isSubmitting}
+                />
+
+                <FormField
+                  label="Tipo de documento"
+                  value={formData.document_type}
+                  onChange={handleChange}
+                  name="document_type"
+                  options={documentTypes}
+                  required={true}
+                  icon={FiFileText}
+                  disabled={isSubmitting}
+                />
+
+                <FormField
+                  label="Número de documento"
+                  value={formData.document_number}
+                  onChange={handleChange}
+                  name="document_number"
+                  required={true}
+                  icon={FiFileText}
+                  placeholder="Número de identificación"
+                  disabled={isSubmitting}
+                />
+
+                <FormField
+                  label="Edad"
+                  type="number"
+                  value={formData.age}
+                  onChange={handleChange}
+                  name="age"
+                  required={true}
+                  icon={FiCalendar}
+                  placeholder="Su edad"
+                  disabled={isSubmitting}
+                />
+
+                <FormField
+                  label="Programa académico / Dependencia"
+                  value={formData.program}
+                  onChange={handleChange}
+                  name="program"
+                  required={true}
+                  icon={FiBook}
+                  placeholder="Programa o dependencia a la que pertenece"
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
-          )}
 
-          <FormField label="Nombre completo" required>
-            <input
-              type="text"
-              name="full_name"
-              value={formData.full_name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
-          </FormField>
+            {/* Información Demográfica */}
+            <div className="mb-8">
 
-          <FormField label="Correo electrónico" required>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
-          </FormField>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  label="Identidad de género"
+                  value={formData.gender_identity}
+                  onChange={handleChange}
+                  name="gender_identity"
+                  options={genderIdentities}
+                  required={true}
+                  icon={FiUsers}
+                  disabled={isSubmitting}
+                />
 
-          <FormField label="Tipo de documento" required>
-            <select
-              name="document_type"
-              value={formData.document_type}
-              onChange={handleChange}
-              className="w-full px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            >
-              <option value="Cédula">Cédula</option>
-              <option value="Tarjeta de identidad">Tarjeta de identidad</option>
-              <option value="Cédula de extranjería">Cédula de extranjería</option>
-              <option value="Pasaporte">Pasaporte</option>
-            </select>
-          </FormField>
+                <FormField
+                  label="¿Usted se autoreconoce como?"
+                  value={formData.self_recognition}
+                  onChange={handleChange}
+                  name="self_recognition"
+                  options={selfRecognitions}
+                  required={true}
+                  icon={FiFlag}
+                  disabled={isSubmitting}
+                />
 
-          <FormField label="Número de documento" required>
-            <input
-              type="text"
-              name="document_number"
-              value={formData.document_number}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
-          </FormField>
-
-          <FormField label="Edad" required>
-            <input
-              type="number"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
-          </FormField>
-
-          <FormField label="Programa académico / dependencia" required>
-            <input
-              type="text"
-              name="program"
-              value={formData.program}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            />
-          </FormField>
-
-          <FormField label="Identidad de género" required>
-            <select
-              name="gender_identity"
-              value={formData.gender_identity}
-              onChange={handleChange}
-              className="w-full px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            >
-              <option value="Cisgénero">Cisgénero</option>
-              <option value="Transgénero">Transgénero</option>
-              <option value="Género fluido">Género fluido</option>
-              <option value="No binario y/o queer">No binario y/o queer</option>
-              <option value="Prefiero no responder">Prefiero no responder</option>
-            </select>
-          </FormField>
-
-          <FormField label="¿Usted se autoreconoce como?" required>
-            <select
-              name="self_recognition"
-              value={formData.self_recognition}
-              onChange={handleChange}
-              className="w-full px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-              required
-            >
-              <option value="Negra/o/e y/o afrodescendiente">Negra/o/e y/o afrodescendiente</option>
-              <option value="Raizal/palenquera/o/e">Raizal/palenquera/o/e</option>
-              <option value="Mestiza/o/e">Mestiza/o/e</option>
-              <option value="Gitana/o/e y/o room">Gitana/o/e y/o room</option>
-              <option value="Ninguna">Ninguna</option>
-            </select>
-          </FormField>
-
-          <FormField label="Discapacidad">
-            <select
-              name="disability"
-              value={formData.disability}
-              onChange={handleChange}
-              className="w-full px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d32f2f]"
-            >
-              <option value="Ninguna">Ninguna</option>
-              <option value="Motriz">Motriz</option>
-              <option value="Visual">Visual</option>
-              <option value="Auditiva">Auditiva</option>
-              <option value="Cognitiva">Cognitiva</option>
-              <option value="Múltiple">Múltiple</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </FormField>
-
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-l-[#d32f2f]/70">
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                name="terms_accepted"
-                checked={formData.terms_accepted}
-                onChange={handleChange}
-                className="mt-1 mr-3 h-4 w-4 text-[#d32f2f] focus:ring-[#d32f2f]"
-                required
-              />
-              <span className="text-[#202124]">
-                Acepto los términos y condiciones
-                <span className="text-[#d32f2f] ml-1">*</span>
-              </span>
+                <FormField
+                  label="Discapacidad"
+                  value={formData.disability}
+                  onChange={handleChange}
+                  name="disability"
+                  options={disabilities}
+                  icon={FiUsers}
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-between items-center bg-white rounded-lg shadow-sm p-6 border-l-4 border-l-[#d32f2f]/70">
-            <div className="text-sm text-[#5f6368]">
-              <span className="text-[#d32f2f]">*</span> Indica un campo obligatorio
+            {/* Términos y Condiciones */}
+            <div className="mb-8">
+              <div className="flex items-start space-x-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-shrink-0 mt-1">
+                  <input
+                    type="checkbox"
+                    name="terms_accepted"
+                    checked={formData.terms_accepted}
+                    onChange={handleChange}
+                    className="h-5 w-5 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                    required
+                    disabled={isSubmitting}
+                    id="terms_accepted"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="terms_accepted" className="block text-sm font-medium text-gray-700 mb-2">
+                    Aceptación de términos y condiciones
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Acepto los términos y condiciones y autorizo el tratamiento de mis datos personales 
+                    de acuerdo con la política de privacidad de la institución. Los datos recopilados 
+                    serán utilizados exclusivamente para fines estadísticos y de gestión del taller.
+                  </p>
+                </div>
+              </div>
             </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-gradient-to-r from-[#d32f2f] to-[#f44336] text-white rounded-md hover:from-[#c62828] hover:to-[#e53935] focus:outline-none focus:ring-2 focus:ring-[#d32f2f] focus:ring-offset-2 transition-colors shadow-md"
-            >
-              {isSubmitting ? "Enviando..." : "Enviar"}
-            </button>
-          </div>
-        </form>
+
+            {/* Botón de Envío */}
+            <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+              <div className="text-sm text-gray-500">
+                <span className="text-red-500">*</span> Campos obligatorios
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center space-x-2 px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <FiCheck size={18} />
+                    <span>Confirmar inscripción</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      {/* Modales */}
       <SuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
         message={successMessage}
+        title="¡Inscripción exitosa!"
+      />
+      
+      <WarningModal
+        isOpen={isWarningModalOpen}
+        onClose={() => setIsWarningModalOpen(false)}
+        message={warningMessage}
       />
     </div>
   )
 }
 
-export default ExternalRegistrationForm
+export default WorkshopRegistrationForm
