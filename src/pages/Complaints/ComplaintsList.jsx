@@ -50,8 +50,8 @@ const ComplaintsList = () => {
       (locationFilter === "" ||
         (complaint.afectado_sede && complaint.afectado_sede.includes(locationFilter))) &&
       (typeFilter === "" ||
-        (complaint.tipo_de_acompanamiento &&
-          complaint.tipo_de_acompanamiento.includes(typeFilter))) &&
+        (complaint.prioridad &&
+          complaint.prioridad.includes(typeFilter))) &&
       (facultyFilter === "" ||
         (complaint.afectado_facultad && complaint.afectado_facultad.includes(facultyFilter))) &&
       (searchTerm === "" ||
@@ -100,6 +100,23 @@ const ComplaintsList = () => {
     return statusColors[status] || 'bg-gray-100 text-gray-800';
   };
 
+
+  const getPriorityBadge = (priority) => {
+    const priorityColors = {
+      'Muy Baja': 'bg-green-100 text-green-800',    // verde claro
+      'Baja': 'bg-lime-100 text-lime-800',          // verde lima
+      'Media': 'bg-yellow-100 text-yellow-800',     // amarillo
+      'Alta': 'bg-orange-100 text-orange-800',      // naranja
+      'Crítica': 'bg-red-100 text-red-800'          // rojo
+    };
+    
+    return priorityColors[priority] || 'bg-gray-100 text-gray-800';
+  };
+
+  
+
+    
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -114,7 +131,7 @@ const ComplaintsList = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            📋 Lista de quejas
+            📋 Lista de atenciones
           </h1>
           <p className="text-sm text-gray-600">
             {filteredComplaints.length} queja{filteredComplaints.length !== 1 ? 's' : ''} encontrada{filteredComplaints.length !== 1 ? 's' : ''}
@@ -181,16 +198,19 @@ const ComplaintsList = () => {
 
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Tipo
+                  Prioridad
                 </label>
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
                 >
-                  <option value="">Todos los tipos</option>
-                  <option value="Psicológico">Acompañamiento psicológico</option>
-                  <option value="Integral">Acompañamiento integral</option>
+                  <option value="">Todas las prioridades</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Baja">Baja</option>
+                  <option value="Media">Media</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Crítica">Crítica</option>
                 </select>
               </div>
 
@@ -243,7 +263,7 @@ const ComplaintsList = () => {
                     Facultad
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Acompañamiento
+                    Prioridad
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Fecha
@@ -280,8 +300,8 @@ const ComplaintsList = () => {
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600">
                       {complaint.afectado_facultad || 'No especificado'}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-600">
-                      {complaint.tipo_de_acompanamiento || 'No especificado'}
+                    <td className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityBadge(complaint.prioridad)}`}>
+                      {complaint.prioridad || 'No especificado'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600">
                       {complaint.fecha_recepcion || 'No especificado'}
@@ -348,7 +368,7 @@ const ComplaintsList = () => {
                 
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-600">
-                    {complaint.tipo_de_acompanamiento || 'No especificado'}
+                    {complaint.prioridad || 'No especificado'}
                   </span>
                   <button
                     onClick={(e) => {

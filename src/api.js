@@ -334,6 +334,10 @@ export const deleteRegistry = async (registryId) => {
   try {
     const response = await fetch(`${baseURL}/quejas/historial-queja/${registryId}/`, {
       method: "DELETE",
+      headers: {
+        "X-CSRFToken": getCSRFToken(), // 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
+      },
     });
 
     if (!response.ok) {
@@ -399,6 +403,24 @@ export async function checkSession() {
         return null;
     }
 }
+
+export const updateComplaintPriority = async (id, priority) => {
+  const response = await fetch(`${baseURL}/quejas/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
+    body: JSON.stringify({ prioridad: priority }),
+  });
+  if (!response.ok) {
+    console.log(response);
+    throw new Error("Error updating complaint priority");
+  }
+  return response.json();
+};
 
 
 /**

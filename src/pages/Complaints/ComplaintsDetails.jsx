@@ -16,6 +16,7 @@ import {
   deleteRegistry,
   updateRegistry,
   updateComplaintStatus,
+  updateComplaintPriority,
 } from "../../api";
 import DeleteModal from "../../components/DeleteModal";
 import { FaPencilAlt, FaTrash, FaPlus, FaSave, FaTimes } from "react-icons/fa";
@@ -44,6 +45,7 @@ const ComplaintsDetails = () => {
   const [editingRegistryIndex, setEditingRegistryIndex] = useState(-1);
   const [registryCopy, setRegistryCopy] = useState(null);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const [isChangingPriority, setIsChangingPriority] = useState(false);
 
   // Arrays de campos - COMPLETOS
   const dataTitles = [
@@ -65,7 +67,13 @@ const ComplaintsDetails = () => {
     "afectado_nombre",
     "afectado_sexo",
     "afectado_edad",
+    "afectado_tipo_documento_identidad", 
+    "afectado_documento_identidad",
     "afectado_codigo",
+    "afectado_semestre",
+    "afectado_direccion",
+    "afectado_barrio",
+    "afectado_ciudad_origen",
     "afectado_comuna",
     "afectado_estrato_socioeconomico",
     "afectado_condicion_etnico_racial",
@@ -81,6 +89,9 @@ const ComplaintsDetails = () => {
     "afectado_sede",
     "afectado_celular",
     "afectado_correo",
+    "afectado_ha_hecho_denuncia",
+    "afectado_denuncias_previas",
+    "afectado_redes_apoyo",
     "afectado_tipo_vbg_os",
     "afectado_detalles_caso",
     
@@ -88,6 +99,9 @@ const ComplaintsDetails = () => {
     "agresor_nombre",
     "agresor_sexo",
     "agresor_edad",
+    "agresor_semestre",
+    "agresor_barrio",
+    "agresor_ciudad_origen",
     "agresor_condicion_etnico_racial",
     "agresor_tiene_discapacidad",
     "agresor_tipo_discapacidad",
@@ -99,7 +113,10 @@ const ComplaintsDetails = () => {
     "agresor_programa_academico",
     "agresor_facultad",
     "agresor_sede",
-    
+    "agresor_factores_riesgo",
+    "agresor_tiene_denuncias",
+    "agresor_detalles_denuncias",
+        
     // Detalles generales (47-54)
     "desea_activar_ruta_atencion_integral",
     "recibir_asesoria_orientacion_sociopedagogica",
@@ -130,7 +147,13 @@ const ComplaintsDetails = () => {
     "Nombre completo",
     "Sexo",
     "Edad",
+    "Tipo de documento de identidad",
+    "Número de documento de identidad",
     "Código estudiantil o identificador",
+    "Semestre en el que se encuentra",//numero
+    "Dirección",
+    "Barrio",
+    "Ciudad de origen",
     "Comuna de residencia",
     "Estrato socioeconómico",
     "Condición étnico racial",
@@ -146,6 +169,9 @@ const ComplaintsDetails = () => {
     "Sede",
     "Número de celular",
     "Correo electrónico",
+    "¿Ha hecho denuncias previamente?", //sino
+    "Denuncias hechas previamente", 
+    "Redes de apoyo",
     "Tipo de violencia basada en género u orientación sexual",
     "Detalles específicos del caso"
   ];
@@ -154,6 +180,9 @@ const ComplaintsDetails = () => {
     "Nombre completo",
     "Sexo",
     "Edad",
+    "Semestre en el que se encuentra", //numero
+    "Barrio",
+    "Ciudad de origen",
     "Condición étnico racial",
     "¿Tiene algún tipo de discapacidad?",
     "Tipo de discapacidad",
@@ -164,7 +193,10 @@ const ComplaintsDetails = () => {
     "Dependencia",
     "Programa académico",
     "Facultad",
-    "Sede"
+    "Sede",
+    "Factores de riesgo",
+    "¿Tiene denuncias previas?", //sino
+    "Denuncias previas",
   ];
 
   const detallesTitles = [
@@ -178,7 +210,8 @@ const ComplaintsDetails = () => {
     "Observaciones adicionales"
   ];
 
-  const statusOptions = ["Pendiente", "Aprobado", "En Proceso", "Finalizado", "Remitido"];
+  const statusOptions = ["Recepción", "Identificación", "Direccionamiento", "Remisión externa", "Seguimiento", "Cerrado"];
+  const prioritysOptions = ["Pendiente","Baja", "Media", "Alta", "Crítica"];
 
   // Opciones para selects
   const opcionesSiNo = ["Sí", "No"];
@@ -199,6 +232,7 @@ const ComplaintsDetails = () => {
     "Discriminación por identidad de género",
     "Otra forma de violencia"
   ];
+  const opcionesTipoOrientacion = ["Asesoría jurídica", "Apoyo psicológico", "Otro"];
 
   useEffect(() => {
     const loadDetails = async () => {
@@ -353,6 +387,20 @@ const ComplaintsDetails = () => {
       setIsLoading(false);
     }
   };
+  const handleUpdateComplaintPriority = async (prioridad) => {
+    setIsLoading(true);
+    try {
+      const data = await updateComplaintPriority(id, prioridad);
+      setQuejaDetails(data);
+      setQuejaCopy(data);
+    } catch (error) {
+      setQuejaCopy(quejaDetails);
+      console.error("Error al actualizar la prioridad de la queja:", error);
+    } finally {
+      setIsChangingPriority(false);
+      setIsLoading(false);
+    }
+  };
 
   // Función para renderizar el campo apropiado según el tipo
   const renderField = (key, value, index, sectionKey) => {
@@ -381,6 +429,8 @@ const ComplaintsDetails = () => {
           key.includes('asistencia_') || key.includes('acompañamiento_') || key.includes('interponer_')) {
         return opcionesSiNo;
       }
+      if(key.includes("¿Ha hecho denuncias previamente?"))return opcionesSiNo;
+      if(key.includes("¿Tiene denuncias previas?"))return opcionesSiNo;
       return null;
     };
 
@@ -489,12 +539,15 @@ const ComplaintsDetails = () => {
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span className="text-sm font-semibold text-gray-700 min-w-20">Tipo:</span>
                 {editingRegistryIndex === index ? (
-                  <input
-                    value={registryCopy.tipo}
-                    onChange={(e) => onEditRegistry("tipo", e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="Tipo de registro..."
-                  />
+                  <select
+                          value={registryCopy.tipo || ''}
+                          onChange={(e) => onEditRegistry("tipo", e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          {opcionesTipoOrientacion.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                  </select>
                 ) : (
                   <span className="text-gray-900 bg-red-50 px-3 py-1 rounded-full text-sm font-medium">
                     {registro.tipo}
@@ -632,6 +685,57 @@ const ComplaintsDetails = () => {
                 )}
               </div>
             </div>
+            {/* Prioridad*/ }
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <span className="text-lg font-semibold text-gray-700">Prioridad Actual:</span>
+                <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  quejaCopy.estado === "Pendiente" ? "bg-yellow-100 text-yellow-800 border border-yellow-200" :
+                  quejaCopy.estado === "Aprobado" ? "bg-green-100 text-green-800 border border-green-200" :
+                  quejaCopy.estado === "En Proceso" ? "bg-blue-100 text-blue-800 border border-blue-200" :
+                  quejaCopy.estado === "Finalizado" ? "bg-gray-100 text-gray-800 border border-gray-200" :
+                  "bg-purple-100 text-purple-800 border border-purple-200"
+                }`}>
+                  {quejaCopy.prioridad}
+                </span>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <span className="text-sm font-medium text-gray-600 whitespace-nowrap">Cambiar prioridad:</span>
+                <select
+                  value={quejaCopy.prioridad}
+                  onChange={(e) => {
+                    setQuejaCopy({ ...quejaCopy, prioridad: e.target.value });
+                    setIsChangingPriority(true);
+                  }}
+                  className="px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
+                >
+                  {prioritysOptions.map((priority) => (
+                    <option key={priority} value={priority}>{priority}</option>
+                  ))}
+                </select>
+                
+                {isChangingPriority && (
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleUpdateComplaintPriority(quejaCopy.prioridad)}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 shadow-md"
+                    >
+                      ✅ Confirmar
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setIsChangingPriority(false);
+                        setQuejaCopy({ ...quejaCopy, prioridad: quejaDetails.prioridad });
+                      }}
+                      className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 shadow-md"
+                    >
+                      ❌ Cancelar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Secciones de información */}
@@ -682,12 +786,18 @@ const ComplaintsDetails = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           🏷️ Tipo de Registro
                         </label>
-                        <input
-                          value={newRegistry.tipo}
+                        
+                        <select
+                          value={newRegistry.tipo || ''}
                           onChange={(e) => onChangeNewRegistry("tipo", e.target.value)}
-                          placeholder="Ej: Seguimiento, Actualización, Contacto..."
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                        />
+                        >
+                          <option value="">Seleccionar...</option>
+                          {opcionesTipoOrientacion.map(option => (
+                            <option key={option} value={option}>{option}</option>
+                          ))}
+                        </select>
+
                       </div>
                     </div>
                     <div className="mb-4">

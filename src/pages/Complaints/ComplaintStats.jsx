@@ -39,13 +39,23 @@ const ComplaintsStats = () => {
   const [conteosPorSedes, setConteosPorSedes] = React.useState({sedes:[],valores:[]});
   const [conteosPorVicerrectorias, setConteosPorVicerrectorias] = React.useState({vicerrectorias:[],valores:[]});
 
+  const [conteoPorEdades, setConteoPorEdades] = React.useState({edades:[],valores:[]});
+  const [conteoPorComunas, setConteoPorComunas] = React.useState({comunas:[],valores:[]});
+  const [conteosPorTipoVBG, setConteosPorTipoVBG] = React.useState({tipos:[],valores:[]});
+  const [conteoPorFactores, setConteoPorFactores] = React.useState({factores:[],valores:[]});
+
   // Refs para los gráficos
   const chartRefs = {
     faculty: useRef(null),
     location: useRef(null),
     year: useRef(null),
     department: useRef(null),
-    gender: useRef(null)
+    gender: useRef(null),
+    edades: useRef(null),
+    comunas: useRef(null),
+    tipo_vbg: useRef(null),
+    factores_riesgo: useRef(null),
+
   };
 
   useEffect(() => {
@@ -85,6 +95,29 @@ const ComplaintsStats = () => {
         );
         const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
         setConteosPorVicerrectorias({vicerrectorias: vicesList, valores: totalVices});
+
+        // Procesar datos de edades
+        const edadesList = data.edades.map(item => 
+          item.afectado_edad === '' ? 'No especificado' : item.afectado_edad
+        );
+        const totalEdades = data.edades.map(item => item.total);
+        setConteoPorEdades({edades: edadesList, valores: totalEdades});
+        // Procesar datos de comunas
+        const comunasList = data.comuna.map(item => 
+          item.afectado_comuna === '' ? 'No especificado' : item.afectado_comuna
+        );
+        const totalComunas = data.conteo_por_comuna_afectado.map(item => item.total);
+        setConteoPorComunas({comunas: comunasList, valores: totalComunas});
+        
+        
+        console.log("Tipo VBG data:", data.tipo_vbg);
+        // Procesar datos de tipos de VBG
+        setConteosPorTipoVBG({tipos:  Object.keys(data.tipo_vbg), valores: Object.values(data.tipo_vbg)});
+        
+        console.log("Factores de riesgo data:", data.factores_riesgo);
+        // Procesar datos de factores de riesgo
+        setConteoPorFactores({factores: Object.keys(data.factores_riesgo), valores: Object.values(data.factores_riesgo)});
+
 
         setAnios(Object.keys(data.conteo_por_anio));
 
@@ -178,6 +211,55 @@ const ComplaintsStats = () => {
     ],
   };
 
+  const edadesData = {
+    labels: conteoPorEdades.edades,
+    datasets: [
+      {
+        label: "Quejas por edades",
+        data: conteoPorEdades.valores,
+        backgroundColor: "rgba(168, 85, 247, 0.8)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const comunasData = {
+    labels: conteoPorComunas.comunas,
+    datasets: [
+      {
+        label: "Quejas por comunas",
+        data: conteoPorComunas.valores,
+        backgroundColor: "rgba(168, 85, 247, 0.8)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 2,
+      },
+    ],
+  };
+  const tipoVBGData = {
+    labels: conteosPorTipoVBG.tipos,
+    datasets: [
+      {
+        label: "Quejas por Tipos de violencia",
+        data: conteosPorTipoVBG.valores,
+        backgroundColor: "rgba(168, 85, 247, 0.8)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 2,
+      },
+    ],
+  };
+  const factoresRiesgoData = {
+    labels: conteoPorFactores.factores,
+    datasets: [
+      {
+        label: "Quejas por factores de riesgo",
+        data: conteoPorFactores.valores,
+        backgroundColor: "rgba(168, 85, 247, 0.8)",
+        borderColor: "rgba(168, 85, 247, 1)",
+        borderWidth: 2,
+      },
+    ],
+  };
   const complaintsByDepartmentData = {
     labels: conteosPorVicerrectorias.vicerrectorias,
     datasets: [
@@ -455,6 +537,115 @@ const ComplaintsStats = () => {
               />
             </div>
           </div>
+
+          {/** E                                    spacio para futuros gráficos */}
+          {/* edades */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800"> Quejas por edades</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.edades, 'quejas-por-edades')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.edades}
+                data={edadesData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+          {/* Comunas */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por comuna</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.comunas, 'quejas-por-comunas')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.comunas}
+                data={comunasData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+          {/* Quejas por Tipo VBG */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por tipo de violencia</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.tipo_vbg, 'quejas-por-tipo-vbg')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.tipo_vbg}
+                data={tipoVBGData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+          {/* Quejas por Factores de riesgo */}
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por factores de riesgo</h3>
+              <button
+                onClick={() => downloadChart(chartRefs.factores_riesgo, 'quejas-por-factores-riesgo')}
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+              >
+                <FiDownload size={14} />
+                Descargar
+              </button>
+            </div>
+            <div className="h-64">
+              <Bar 
+                ref={chartRefs.factores_riesgo}
+                data={factoresRiesgoData} 
+                options={{
+                  ...chartOptions,
+                  plugins: {
+                    ...chartOptions.plugins,
+                    title: { display: false }
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+
+
         </div>
 
         {/* Resumen General */}

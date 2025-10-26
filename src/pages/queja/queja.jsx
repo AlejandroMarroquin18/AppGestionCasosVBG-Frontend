@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import { baseURL } from '../../api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { FiArrowLeft, FiArrowRight, FiSend, FiUser, FiUsers, FiUserX, FiSettings } from 'react-icons/fi';
+import FormFieldMultiple from '../../components/FormFieldMultiple';
 
 const Queja = () => {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Queja = () => {
     const sino = ['Si', 'No'];
     const identidad_genero_opt = ['Cisgénero', 'Transgénero', 'No binario', 'Género fluido', 'Otro'];
     const orientacion_sexual_opt = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual', 'Queer', 'Demisexual', 'Otro'];
-    const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica'];
+    const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica', 'Psicológica', 'Patrimonial', 'Estructural', 'Vicaria', 'Otro'];    
     const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato'];
     const facultades = [
         'Artes Integradas',
@@ -29,6 +30,7 @@ const Queja = () => {
         'Psicología',
         'Derecho y Ciencia Política',
     ];
+    const tipos_documentos=['C.C','Tarjeta de identida', 'Pasaporte']
     const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
         'Pacífico', 'Palmira', 'Tuluá', 'Yumbo', 'Zarzal'];
     const vicerrectorias = [
@@ -39,6 +41,7 @@ const Queja = () => {
         "Vicerrectoría de Regionalización",
         "Vicerrectoría de Extensión y Proyección Social",
     ];
+    const factores_riesgo_opt=["Consumo de SPA", "Consumo de alcohol", "tenencia de armas", 'Otros']
 
     // Estados del formulario
     const [persona_que_reporta, set_persona_que_reporta] = useState({
@@ -55,19 +58,28 @@ const Queja = () => {
         'reporta_celular': '',
         'reporta_correo': '',
     });
-
+    
     const [datos_afectado, set_datos_afectado] = useState({
         'afectado_nombre': '',
         'afectado_sexo': '',
         'afectado_edad': '',
         'afectado_codigo': '',
+        'afectado_tipo_documento_identidad': '',
+        'afectado_documento_identidad': '',
+        'afectado_semestre': 0,
+        'afectado_redes_apoyo':'',
         'afectado_comuna': '',
+        'afectado_direccion':'',
+        'afectado_barrio': '',
+        'afectado_ciudad_origen':'',
         'afectado_estrato_socioeconomico': '',
         'afectado_condicion_etnico_racial': '',
         'afectado_tiene_discapacidad': '',
         'afectado_tipo_discapacidad': '',
         'afectado_identidad_genero': '',
+        'afectado_identidad_genero_otro': '',//otro
         'afectado_orientacion_sexual': '',
+        'afectado_orientacion_sexual_otro': '',//otro
         'afectado_estamento': '',
         'afectado_vicerrectoria_adscrito': '',
         'afectado_dependencia': '',
@@ -77,25 +89,39 @@ const Queja = () => {
         'afectado_celular': '',
         'afectado_correo': '',
         'afectado_tipo_vbg_os': '',
+        'afectado_tipo_vbg_os_otro': '',//otro
         'afectado_detalles_caso': '',
+        'afectado_ha_hecho_denuncia':'',
+        'afectado_denuncias_previas':'',
+        
     });
 
     const [datos_agresor, set_datos_agresor] = useState({
         'agresor_nombre': '',
         'agresor_sexo': '',
         'agresor_edad': '',
+        'agresor_semestre': 0,
+        'agresor_barrio': '',
+        'agresor_ciudad_origen':'',
         'agresor_condicion_etnico_racial': '',
         'agresor_tiene_discapacidad': '',
         'agresor_tipo_discapacidad': '',
         'agresor_identidad_genero': '',
+        'agresor_identidad_genero_otro': '',//otro
         'agresor_orientacion_sexual': '',
+        'agresor_orientacion_sexual_otro': '',//otro
         'agresor_estamento': '',
         'agresor_vicerrectoria_adscrito': '',
         'agresor_dependencia': '',
         'agresor_programa_academico': '',
         'agresor_facultad': '',
         'agresor_sede': '',
+        'agresor_factores_riesgo': '',
+        'agresor_factores_riesgo_otro': '',//otro
+        'agresor_tiene_denuncias': '',
+        'agresor_detalles_denuncias':'',
     });
+
 
     const [datos_adicionales, set_datos_adicionales] = useState({
         'desea_activar_ruta_atencion_integral': '',
@@ -116,6 +142,12 @@ const Queja = () => {
         'facultad': '',
         'unidad': '',
     });
+    const [telefono, setTelefono] = useState('');
+    const [telefonos, setTelefonos] = useState(
+        datos_afectado.afectado_celular
+        ? datos_afectado.afectado_celular.split(',').map(t => t.trim())
+        : []
+    );
 
     // Navegación por pasos
     const steps = [
@@ -125,8 +157,15 @@ const Queja = () => {
         { number: 4, title: "Información adicional", icon: FiSettings }
     ];
 
-    const onchange = useCallback((func, field, value) => {
-        const finalValue = value.trim() === '-------------------------------------------------------------------' ? '' : value;
+    const onchange = useCallback((func, field, value, type = 'text') => {
+        let finalValue = value;
+
+        if (type === 'text') {
+            finalValue = value.trim() === '-------------------------------------------------------------------' ? '' : value;
+        } else if (type === 'number') {
+            finalValue = value === '' ? '' : Number(value); // o parseFloat(value)
+        }
+
         func((prevState) => ({
             ...prevState,
             [field]: finalValue,
@@ -151,6 +190,45 @@ const Queja = () => {
         const fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}`;
 
         onchange(set_persona_que_reporta, "fecha_recepcion", fechaFormateada);
+
+        // Combinar los camposs de otros en uno solo
+        if (datos_afectado.afectado_identidad_genero_otro==='Otro')  {
+            datos_afectado.afectado_identidad_genero=datos_afectado.afectado_identidad_genero_otro
+        }
+        delete datos_afectado.afectado_identidad_genero_otro
+
+        if (datos_afectado.afectado_orientacion_sexual_otro==='Otro')  {
+            datos_afectado.afectado_orientacion_sexual=datos_afectado.afectado_orientacion_sexual_otro
+        }
+        delete datos_afectado.afectado_orientacion_sexual_otro
+
+
+        //tipo de vbg
+
+        if (datos_afectado.afectado_tipo_vbg_os_otro==='Otro')  {
+            datos_afectado.afectado_tipo_vbg_os = [
+                datos_afectado.afectado_tipo_vbg_os,
+                datos_afectado.afectado_tipo_vbg_os_otro
+            ]
+                .filter(Boolean) // elimina vacíos o undefined
+                .join(", "); // une todo con coma y espacio
+
+            delete datos_afectado.afectado_tipo_vbg_os_otro;
+        }
+        
+
+        if (datos_agresor.agresor_identidad_genero_otro==='Otro')  {
+            datos_agresor.agresor_identidad_genero=datos_agresor.agresor_identidad_genero_otro
+        }
+        delete datos_agresor.agresor_identidad_genero_otro
+
+        if (datos_agresor.agresor_orientacion_sexual_otro==='Otro')  {
+            datos_agresor.agresor_orientacion_sexual=datos_agresor.agresor_orientacion_sexual_otro
+        }
+        delete datos_agresor.agresor_orientacion_sexual_otro
+
+
+
 
         const newform = { ...persona_que_reporta, ...datos_afectado, ...datos_agresor, ...datos_adicionales };
         console.log(newform);
@@ -177,6 +255,27 @@ const Queja = () => {
             setIsLoading(false);
         }
     };
+
+    const agregarTelefono = () => {
+    const numero = telefono.trim();
+    if (numero && !telefonos.includes(numero)) {
+      const nuevos = [...telefonos, numero];
+      setTelefonos(nuevos);
+      set_datos_afectado(prev => ({
+        ...prev,
+        afectado_celular: nuevos.join(', ')
+      }));
+      setTelefono('');
+    }
+  };
+  const eliminarTelefono = (num) => {
+    const nuevos = telefonos.filter(t => t !== num);
+    setTelefonos(nuevos);
+    set_datos_afectado(prev => ({
+      ...prev,
+      afectado_celular: nuevos.join(', ')
+    }));
+  };
 
     // Componente para renderizar campos de formulario
     const FormField = useCallback(({ label, type = "text", value, onChange, options, isTextArea = false }) => (
@@ -408,20 +507,77 @@ const Queja = () => {
                                         value={datos_afectado.afectado_tipo_discapacidad}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_tipo_discapacidad", e.target.value)}
                                     />
+                                    <FormField
+                                        label="Direccion de residencia"
+                                        value={datos_afectado.afectado_direccion}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_direccion", e.target.value)}
+                                    />
+                                    <FormField
+                                        label="Barrio de residencia"
+                                        value={datos_afectado.afectado_barrio}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_barrio", e.target.value)}
+                                    />
+                                    <FormField
+                                        label="Ciudad de origen"
+                                        value={datos_afectado.afectado_ciudad_origen}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_ciudad_origen", e.target.value)}
+                                    />
+                                    <FormField
+                                        label="Semestre en el que se encuentra"
+                                        type= "number"
+                                        value={datos_afectado.afectado_semestre}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_semestre", e.target.value,"number")}
+                                    />
+
+                                    <FormField
+                                        label="Redes de apoyo cercanas"
+                                        value={datos_afectado.afectado_redes_apoyo}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_redes_apoyo", e.target.value)}
+                                    />
+
+
+                                    
                                 </div>
                                 <div>
+                                    <FormField
+                                        label="Tipo de documento de identidad"
+                                        value={datos_afectado.afectado_tipo_documento_identidad}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_tipo_documento_identidad", e.target.value)}
+                                        options={tipos_documentos}
+                                    />
+                                    <FormField
+                                        label="Número de documento de identidad"
+                                        value={datos_afectado.afectado_documento_identidad}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_documento_identidad", e.target.value)}
+                                    />
+
                                     <FormField
                                         label="Identidad de género"
                                         value={datos_afectado.afectado_identidad_genero}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_identidad_genero", e.target.value)}
                                         options={identidad_genero_opt}
                                     />
+                                    {(datos_afectado.afectado_identidad_genero === 'Otro' ) && (
+                                        <FormField
+                                            label="Por favor especifique su identidad de género"
+                                            value={datos_afectado.afectado_identidad_genero_otro || ''}
+                                            onChange={(e) => onchange(set_datos_afectado, "afectado_identidad_genero_otro", e.target.value)}
+                                        />
+                                    ) }
                                     <FormField
                                         label="Orientación sexual"
                                         value={datos_afectado.afectado_orientacion_sexual}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_orientacion_sexual", e.target.value)}
                                         options={orientacion_sexual_opt}
                                     />
+                                    {(datos_afectado.afectado_orientacion_sexual === 'Otro' ) && (
+                                        <FormField
+                                            label="Por favor especifique su orientación sexual"
+                                            value={datos_afectado.afectado_orientacion_sexual_otro || ''}
+                                            onChange={(e) => onchange(set_datos_afectado, "afectado_orientacion_sexual_otro", e.target.value)}
+                                        />
+                                    ) }
+
                                     <FormField
                                         label="Estamento *"
                                         value={datos_afectado.afectado_estamento}
@@ -456,27 +612,85 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_sede", e.target.value)}
                                         options={sedes}
                                     />
-                                    <FormField
-                                        label="Celular"
-                                        type="tel"
-                                        value={datos_afectado.afectado_celular}
-                                        onChange={(e) => onchange(set_datos_afectado, "afectado_celular", e.target.value)}
-                                    />
+                                    <div
+                                        className="flex items-center gap-2"
+                                        >
+                                        <FormField
+                                            label="Celular *"
+                                            type="tel"
+                                            value={telefono}
+                                            onChange={(e) => setTelefono(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={agregarTelefono}
+                                            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
+                                        >Agregar</button>
+                                    </div>
+                                    
+                                        {telefonos.map((num, i) => (
+                                            <div
+                                                key={i}
+                                                style={{
+                                                background: '#e0e0e0',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                                }}
+                                            >
+                                                <span>{num}</span>
+                                                <button
+                                                type="button"
+                                                onClick={() => eliminarTelefono(num)}
+                                                style={{
+                                                    border: 'none',
+                                                    background: 'transparent',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold'
+                                                }}
+                                                >
+                                                ✕
+                                                </button>
+                                            </div>
+                                        ))}
+                                    
                                     <FormField
                                         label="Correo electrónico"
                                         type="email"
                                         value={datos_afectado.afectado_correo}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_correo", e.target.value)}
                                     />
+                                    <FormField
+                                        label="¿Ha hecho alguna denuncia previa sobre este caso?"
+                                        value={datos_afectado.afectado_ha_hecho_denuncia}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_ha_hecho_denuncia", e.target.value)}
+                                        options={sino}
+                                    />
+                                    {(datos_afectado.afectado_ha_hecho_denuncia === 'Si' ) && (
+                                    <FormField
+                                        label="Por favor, detalle las denuncias previas realizadas"
+                                        value={datos_afectado.afectado_denuncias_previas || ''}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_denuncias_previas", e.target.value)}
+                                    />)}
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <FormField
+                                <FormFieldMultiple
                                     label="Tipo de violencia basada en género *"
                                     value={datos_afectado.afectado_tipo_vbg_os}
-                                    onChange={(e) => onchange(set_datos_afectado, "afectado_tipo_vbg_os", e.target.value)}
-                                    options={tipoVBG_opt}
+                                    field="afectado_tipo_vbg_os"
+                                    onChange={(e) => onchange(set_datos_afectado, e.field, e.target.value)}
                                 />
+
+                                {(datos_afectado.afectado_tipo_vbg_os.includes("Otro") || (datos_afectado.afectado_tipo_vbg_os.includes("No es una violencia basada en género"))) && (
+                                    <FormField
+                                        label="Por favor especifique el tipo de violencia basada en género"
+                                        value={datos_afectado.afectado_tipo_vbg_os_otro || ''}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_tipo_vbg_os_otro", e.target.value)}
+                                    />
+                                ) }
                                 <FormField
                                     label="Detalles del caso *"
                                     value={datos_afectado.afectado_detalles_caso}
@@ -536,20 +750,51 @@ const Queja = () => {
                                         value={datos_agresor.agresor_tipo_discapacidad}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_tipo_discapacidad", e.target.value)}
                                     />
+                                    <FormField
+                                        label="Barrio de residencia"
+                                        value={datos_agresor.agresor_barrio}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_barrio", e.target.value)}
+                                    />
+                                    <FormField
+                                        label="Ciudad de origen"
+                                        value={datos_agresor.agresor_ciudad_origen}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_ciudad_origen", e.target.value)}
+                                    />
+                                    <FormField
+                                        type='number'
+                                        label="Semestre en el que se encuentra"
+                                        value={datos_agresor.agresor_semestre}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_semestre", e.target.value,"number")}
+                                    />
                                 </div>
                                 <div>
+                                    
                                     <FormField
                                         label="Identidad de género"
                                         value={datos_agresor.agresor_identidad_genero}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_identidad_genero", e.target.value)}
                                         options={identidad_genero_opt}
                                     />
+                                    {(datos_agresor.agresor_identidad_genero === 'Otro' ) && (
+                                        <FormField
+                                            label="Por favor especifique su identidad de género"
+                                            value={datos_agresor.agresor_identidad_genero_otro || ''}
+                                            onChange={(e) => onchange(set_datos_agresor, "agresor_identidad_genero_otro", e.target.value)}
+                                        />
+                                    ) }
                                     <FormField
                                         label="Orientación sexual"
                                         value={datos_agresor.agresor_orientacion_sexual}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_orientacion_sexual", e.target.value)}
                                         options={orientacion_sexual_opt}
                                     />
+                                    {(datos_agresor.agresor_orientacion_sexual === 'Otro' ) && (
+                                        <FormField
+                                            label="Por favor especifique su orientación sexual"
+                                            value={datos_agresor.agresor_orientacion_sexual_otro || ''}
+                                            onChange={(e) => onchange(set_datos_agresor, "agresor_orientacion_sexual_otro", e.target.value)}
+                                        />
+                                    ) }
                                     <FormField
                                         label="Estamento"
                                         value={datos_agresor.agresor_estamento}
@@ -584,6 +829,37 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_sede", e.target.value)}
                                         options={sedes}
                                     />
+                                    <div>
+                                        <FormFieldMultiple
+                                            label="Factores de riesgo asociados a la persona agresora"
+                                            value={datos_agresor.agresor_factores_riesgo}
+                                            field="agresor_factores_riesgo"
+                                            onChange={(e) => onchange(set_datos_agresor, e.field, e.target.value)}
+                                            options={factores_riesgo_opt}
+                                        />
+                                    </div>
+                                    {(datos_agresor.agresor_factores_riesgo.includes("Otros")) && (
+                                    <FormField
+                                        label="Por favor especifique los demás factores de riesgo"
+                                        value={datos_agresor.agresor_factores_riesgo_otro|| ''}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_factores_riesgo_otro", e.target.value)}
+                                    />
+                                    ) }
+
+                                    <FormField
+                                        label="¿Tiene antecedentes disciplinarios?"
+                                        value={datos_agresor.agresor_tiene_denuncias}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_tiene_denuncias", e.target.value)}
+                                        options={sino}
+                                    />
+                                    {(datos_agresor.agresor_tiene_denuncias === 'Si' ) && (
+                                        <FormField
+                                            label="Por favor describa los antecedentes disciplinarios"
+                                            value={datos_agresor.agresor_detalles_denuncias || ''}
+                                            onChange={(e) => onchange(set_datos_agresor, "agresor_detalles_denuncias", e.target.value)}
+                                        />
+                                    ) }
+
                                 </div>
                             </div>
                         </div>

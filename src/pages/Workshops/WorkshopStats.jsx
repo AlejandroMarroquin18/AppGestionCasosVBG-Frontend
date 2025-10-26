@@ -217,6 +217,18 @@ const WorkshopStats = () => {
     ],
   };
 
+  const sedeData = {
+    labels: stats.disability_stats?.map((item) => item.sede) || [],
+    datasets: [
+      {
+        label: "Sedes",
+        data: stats.disability_stats?.map((item) => item.count) || [],
+        backgroundColor: "#8b5cf6",
+        borderWidth: 0,
+      },
+    ],
+  };
+
   return (
     // Contenedor principal que ocupa toda la pantalla
     <div className="min-h-screen w-full bg-gray-50">
@@ -408,6 +420,30 @@ const WorkshopStats = () => {
                 />
               </div>
             </div>
+            {/* Sede */}
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800"> Talleres por sede</h3>
+                <button
+                  onClick={() => downloadChart(chartRefs.sede, 'sede')}
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+                >
+                  <FiDownload size={14} />
+                  Descargar
+                </button>
+              </div>
+              <div className="h-80 w-full">
+                <Bar
+                  ref={chartRefs.sede}
+                  data={sedeData}
+                  options={{
+                    ...chartOptions,
+                    indexAxis: "y",
+                  }}
+                />
+              </div>
+            </div>
+
           </div>
 
           {/* Información Adicional */}
