@@ -76,7 +76,7 @@ const FormField = ({
 );
 
 const WorkshopRegistrationForm = ({ workshopId }) => {
-  const { workshopId } = useParams()
+  
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
