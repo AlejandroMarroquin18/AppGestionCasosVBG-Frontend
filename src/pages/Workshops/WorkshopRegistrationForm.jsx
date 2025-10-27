@@ -6,12 +6,12 @@ import { baseURL } from "../../api";
 import { FiUser, FiMail, FiFileText, FiCalendar, FiBook, FiUsers, FiFlag, FiCheck } from "react-icons/fi";
 
 // Componente reutilizable para campos de formulario
-const FormField = ({ 
-  label, 
-  type = "text", 
-  value, 
-  onChange, 
-  options, 
+const FormField = ({
+  label,
+  type = "text",
+  value,
+  onChange,
+  options,
   required = false,
   icon: Icon,
   placeholder = "",
@@ -35,9 +35,8 @@ const FormField = ({
           onChange={onChange}
           disabled={disabled}
           name={name}
-          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${
-            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-          }`}
+          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+            }`}
         >
           <option value="">Seleccionar...</option>
           {options.map((option, index) => (
@@ -54,9 +53,8 @@ const FormField = ({
           rows="4"
           placeholder={placeholder}
           name={name}
-          className={`w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 resize-none ${
-            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-          }`}
+          className={`w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 resize-none ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+            }`}
         />
       ) : (
         <input
@@ -66,9 +64,8 @@ const FormField = ({
           disabled={disabled}
           placeholder={placeholder}
           name={name}
-          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${
-            disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-          }`}
+          className={`w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+            }`}
         />
       )}
     </div>
@@ -76,7 +73,7 @@ const FormField = ({
 );
 
 const WorkshopRegistrationForm = ({ workshopId }) => {
-  
+
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
@@ -118,6 +115,9 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
     }
 
     try {
+      console.log("📤 Enviando inscripción para taller:", workshopId)
+      console.log("📤 Datos:", formData)
+
       const response = await fetch(`${baseURL}/talleres/inscripcion/${workshopId}/`, {
         method: "POST",
         headers: {
@@ -126,7 +126,22 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
         body: JSON.stringify(formData),
       })
 
-      const data = await response.json()
+      console.log("📥 Response status:", response.status)
+      console.log("📥 Response ok:", response.ok)
+
+      // Obtener el texto de la respuesta primero
+      const responseText = await response.text()
+      console.log("📥 Response text:", responseText)
+
+      let data
+      try {
+        // Intentar parsear como JSON
+        data = responseText ? JSON.parse(responseText) : {}
+      } catch (parseError) {
+        console.error("❌ Error parseando JSON:", parseError)
+        // Si no es JSON, mostrar el texto crudo
+        throw new Error(`Error del servidor: ${responseText.substring(0, 100)}...`)
+      }
 
       if (response.ok) {
         setSuccessMessage("¡Inscripción exitosa! Recibirás un correo de confirmación.")
@@ -148,7 +163,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
       } else {
         // Manejar diferentes tipos de errores del backend
         let errorMsg = "Error al inscribirse, intente nuevamente."
-        
+
         if (data.document_number) {
           errorMsg = "Ya existe una inscripción con este número de documento para este taller."
         } else if (data.error) {
@@ -157,14 +172,16 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
           errorMsg = data.message
         } else if (typeof data === 'string') {
           errorMsg = data
+        } else if (responseText.includes('<!doctype')) {
+          errorMsg = "Error interno del servidor. Por favor, contacte al administrador."
         }
-        
+
         setWarningMessage(errorMsg)
         setIsWarningModalOpen(true)
       }
     } catch (error) {
-      console.error("Error completo:", error)
-      setWarningMessage("Error de conexión, intente nuevamente.")
+      console.error("💥 Error completo:", error)
+      setWarningMessage(error.message || "Error de conexión, intente nuevamente.")
       setIsWarningModalOpen(true)
     } finally {
       setIsSubmitting(false)
@@ -176,7 +193,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
   const genderIdentities = ["Cisgénero", "Transgénero", "Género fluido", "No binario y/o queer", "Prefiero no responder"]
   const selfRecognitions = [
     "Negra/o/e y/o afrodescendiente",
-    "Raizal/palenquera/o/e", 
+    "Raizal/palenquera/o/e",
     "Mestiza/o/e",
     "Gitana/o/e y/o room",
     "Ninguna"
@@ -196,7 +213,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        
+
         {/* Header del Formulario - Simplificado sin info del taller */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
           <div className="bg-gradient-to-r from-red-600 to-red-700 h-2"></div>
@@ -231,7 +248,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
         {/* Formulario */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <form onSubmit={handleSubmit}>
-            
+
             {/* Información Personal */}
             <div className="mb-8">
 
@@ -365,8 +382,8 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Acepto los términos y condiciones y autorizo el tratamiento de mis datos personales 
-                    de acuerdo con la política de privacidad de la institución. Los datos recopilados 
+                    Acepto los términos y condiciones y autorizo el tratamiento de mis datos personales
+                    de acuerdo con la política de privacidad de la institución. Los datos recopilados
                     serán utilizados exclusivamente para fines estadísticos y de gestión del taller.
                   </p>
                 </div>
@@ -407,7 +424,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
         message={successMessage}
         title="¡Inscripción exitosa!"
       />
-      
+
       <WarningModal
         isOpen={isWarningModalOpen}
         onClose={() => setIsWarningModalOpen(false)}
