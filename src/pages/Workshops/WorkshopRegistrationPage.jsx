@@ -10,26 +10,6 @@ const WorkshopRegistrationPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchWorkshopInfo = async () => {
-      try {
-        const response = await fetch(`${baseURL}/talleres/${workshopId}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setWorkshop(data);
-        } else {
-          setError("No se pudo cargar la información del taller");
-        }
-      } catch (error) {
-        console.error("Error fetching workshop:", error);
-        setError("Error al cargar la información del taller");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWorkshopInfo();
-  }, [workshopId]);
 
   if (loading) {
     return (

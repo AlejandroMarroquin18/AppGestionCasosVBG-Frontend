@@ -75,7 +75,7 @@ const FormField = ({
   </div>
 );
 
-const WorkshopRegistrationForm = ({ workshop }) => {
+const WorkshopRegistrationForm = ({ workshopId }) => {
   const { workshopId } = useParams()
   const [formData, setFormData] = useState({
     full_name: "",
@@ -197,22 +197,17 @@ const WorkshopRegistrationForm = ({ workshop }) => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         
-        {/* Header del Formulario - Simplificado */}
+        {/* Header del Formulario - Simplificado sin info del taller */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
           <div className="bg-gradient-to-r from-red-600 to-red-700 h-2"></div>
           <div className="p-8">
             <div className="text-center mb-4">
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
-                Formulario de inscripción
+                Formulario de inscripción a taller
               </h1>
-              {workshop && (
-                <div className="text-gray-600 space-y-1">
-                  <p className="text-lg font-medium">{workshop.name}</p>
-                  <p className="text-sm">
-                    {formatDate(workshop.date)} - {workshop.location}
-                  </p>
-                </div>
-              )}
+              <p className="text-gray-600">
+                Complete el siguiente formulario para inscribirse en el taller
+              </p>
               <div className="w-16 h-1 bg-red-600 rounded-full mx-auto mt-4"></div>
             </div>
 
