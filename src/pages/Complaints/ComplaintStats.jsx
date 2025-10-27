@@ -102,11 +102,11 @@ const ComplaintsStats = () => {
         );
         const totalEdades = data.edades.map(item => item.total);
         setConteoPorEdades({edades: edadesList, valores: totalEdades});
-        // Procesar datos de comunas
-        const comunasList = data.comuna.map(item => 
+        // Procesar datos de comunass
+        const comunasList = data.comunas.map(item => 
           item.afectado_comuna === '' ? 'No especificado' : item.afectado_comuna
         );
-        const totalComunas = data.conteo_por_comuna_afectado.map(item => item.total);
+        const totalComunas = data.comunas.map(item => item.total);
         setConteoPorComunas({comunas: comunasList, valores: totalComunas});
         
         
