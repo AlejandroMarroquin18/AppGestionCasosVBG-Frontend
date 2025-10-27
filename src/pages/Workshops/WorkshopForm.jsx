@@ -13,6 +13,7 @@ const WorkshopForm = () => {
     end_time: "",
     details: "",
     location: "",
+    sede: "",
     modality: "presencial",
     slots: "",
     facilitators: [""],
@@ -287,6 +288,24 @@ const WorkshopForm = () => {
                     }`}
                   />
                   {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FiMapPin className="inline mr-2" />
+                    Sede *
+                  </label>
+                  <input
+                    type="text"
+                    name="sede"
+                    value={formData.sede}
+                    onChange={handleChange}
+                    placeholder={formData.sede === 'Sede' ? 'Sede del taller' : 'Sede del taller'}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 ${
+                      errors.sede ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.sede && <p className="text-red-500 text-sm mt-1">{errors.sede}</p>}
                 </div>
 
                 {/* Cupos Disponibles */}
