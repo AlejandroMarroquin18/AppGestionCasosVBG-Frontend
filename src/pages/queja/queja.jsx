@@ -16,7 +16,7 @@ const Queja = () => {
     const sino = ['Si', 'No'];
     const identidad_genero_opt = ['Cisgénero', 'Transgénero', 'No binario', 'Género fluido', 'Otro'];
     const orientacion_sexual_opt = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual', 'Queer', 'Demisexual', 'Otro'];
-    const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica', 'Psicológica', 'Patrimonial', 'Estructural', 'Vicaria', 'Otro'];    
+    const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica', 'Psicológica', 'Patrimonial', 'Estructural', 'Vicaria', 'Otro'];
     const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato'];
     const facultades = [
         'Artes Integradas',
@@ -30,7 +30,7 @@ const Queja = () => {
         'Psicología',
         'Derecho y Ciencia Política',
     ];
-    const tipos_documentos=['C.C','Tarjeta de identidad', 'Pasaporte']
+    const tipos_documentos = ['C.C', 'Tarjeta de identidad', 'Pasaporte']
     const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
         'Pacífico', 'Palmira', 'Tuluá', 'Yumbo', 'Zarzal'];
     const vicerrectorias = [
@@ -41,7 +41,7 @@ const Queja = () => {
         "Vicerrectoría de Regionalización",
         "Vicerrectoría de Extensión y Proyección Social",
     ];
-    const factores_riesgo_opt=["Consumo de SPA", "Consumo de alcohol", "tenencia de armas", 'Otros']
+    const factores_riesgo_opt = ["Consumo de SPA", "Consumo de alcohol", "tenencia de armas", 'Otros']
 
     // Estados del formulario
     const [persona_que_reporta, set_persona_que_reporta] = useState({
@@ -58,7 +58,7 @@ const Queja = () => {
         'reporta_celular': '',
         'reporta_correo': '',
     });
-    
+
     const [datos_afectado, set_datos_afectado] = useState({
         'afectado_nombre': '',
         'afectado_sexo': '',
@@ -67,11 +67,11 @@ const Queja = () => {
         'afectado_tipo_documento_identidad': '',
         'afectado_documento_identidad': '',
         'afectado_semestre': 0,
-        'afectado_redes_apoyo':'',
+        'afectado_redes_apoyo': '',
         'afectado_comuna': '',
-        'afectado_direccion':'',
+        'afectado_direccion': '',
         'afectado_barrio': '',
-        'afectado_ciudad_origen':'',
+        'afectado_ciudad_origen': '',
         'afectado_estrato_socioeconomico': '',
         'afectado_condicion_etnico_racial': '',
         'afectado_tiene_discapacidad': '',
@@ -91,9 +91,9 @@ const Queja = () => {
         'afectado_tipo_vbg_os': '',
         'afectado_tipo_vbg_os_otro': '',//otro
         'afectado_detalles_caso': '',
-        'afectado_ha_hecho_denuncia':'',
-        'afectado_denuncias_previas':'',
-        
+        'afectado_ha_hecho_denuncia': '',
+        'afectado_denuncias_previas': '',
+
     });
 
     const [datos_agresor, set_datos_agresor] = useState({
@@ -102,7 +102,7 @@ const Queja = () => {
         'agresor_edad': '',
         'agresor_semestre': 0,
         'agresor_barrio': '',
-        'agresor_ciudad_origen':'',
+        'agresor_ciudad_origen': '',
         'agresor_condicion_etnico_racial': '',
         'agresor_tiene_discapacidad': '',
         'agresor_tipo_discapacidad': '',
@@ -119,7 +119,7 @@ const Queja = () => {
         'agresor_factores_riesgo': '',
         'agresor_factores_riesgo_otro': '',//otro
         'agresor_tiene_denuncias': '',
-        'agresor_detalles_denuncias':'',
+        'agresor_detalles_denuncias': '',
     });
 
 
@@ -145,8 +145,8 @@ const Queja = () => {
     const [telefono, setTelefono] = useState('');
     const [telefonos, setTelefonos] = useState(
         datos_afectado.afectado_celular
-        ? datos_afectado.afectado_celular.split(',').map(t => t.trim())
-        : []
+            ? datos_afectado.afectado_celular.split(',').map(t => t.trim())
+            : []
     );
 
     // Navegación por pasos
@@ -191,77 +191,159 @@ const Queja = () => {
 
         onchange(set_persona_que_reporta, "fecha_recepcion", fechaFormateada);
 
-        const newform = { ...persona_que_reporta, ...datos_afectado, ...datos_agresor, ...datos_adicionales };
-        console.log(newform);
-
-        // Combinar los camposs de otros en uno solo
-        if (newform.afectado_identidad_genero==='Otro')  {
-            newform.afectado_identidad_genero=newform.afectado_identidad_genero_otro
-        }
-        delete newform.afectado_identidad_genero_otro
-
-        if (newform.afectado_orientacion_sexual==='Otro')  {
-            newform.afectado_orientacion_sexual=newform.afectado_orientacion_sexual_otro
-        }
-        delete newform.afectado_orientacion_sexual_otro
-
-
-        //tipo de vbg
-
-        if (newform.afectado_tipo_vbg_os_otro!== '')  {
-            newform.afectado_tipo_vbg_os = [
-                newform.afectado_tipo_vbg_os,
-                newform.afectado_tipo_vbg_os_otro
-            ]
-                .filter(Boolean) // elimina vacíos o undefined
-                .join(", "); // une todo con coma y espacio
-
-            delete newform.afectado_tipo_vbg_os_otro;
+        // Combinar los campos de otros en uno solo
+        let afectadoIdentidadGenero = datos_afectado.afectado_identidad_genero;
+        if (afectadoIdentidadGenero === 'Otro') {
+            afectadoIdentidadGenero = datos_afectado.afectado_identidad_genero_otro || '';
         }
 
-        if (newform.agresor_factores_riesgo_otro !== '')  {
-            newform.agresor_factores_riesgo = [
-                newform.agresor_factores_riesgo,
-                newform.agresor_factores_riesgo_otro
-            ]
-                .filter(Boolean) // elimina vacíos o undefined
-                .join(", "); // une todo con coma y espacio
-            console.log(newform.agresor_factores_riesgo)
-            delete newform.agresor_factores_riesgo_otro;
+        let afectadoOrientacionSexual = datos_afectado.afectado_orientacion_sexual;
+        if (afectadoOrientacionSexual === 'Otro') {
+            afectadoOrientacionSexual = datos_afectado.afectado_orientacion_sexual_otro || '';
         }
-        
 
-        if (newform.agresor_identidad_genero==='Otro')  {
-            newform.agresor_identidad_genero=newform.agresor_identidad_genero_otro
+        let afectadoTipoVbg = datos_afectado.afectado_tipo_vbg_os;
+        if (datos_afectado.afectado_tipo_vbg_os_otro !== '') {
+            afectadoTipoVbg = [
+                datos_afectado.afectado_tipo_vbg_os,
+                datos_afectado.afectado_tipo_vbg_os_otro
+            ].filter(Boolean).join(", ");
         }
-        delete newform.agresor_identidad_genero_otro
 
-        if (newform.agresor_orientacion_sexual==='Otro')  {
-            newform.agresor_orientacion_sexual=newform.agresor_orientacion_sexual_otro
+        let agresorFactoresRiesgo = datos_agresor.agresor_factores_riesgo;
+        if (datos_agresor.agresor_factores_riesgo_otro !== '') {
+            agresorFactoresRiesgo = [
+                datos_agresor.agresor_factores_riesgo,
+                datos_agresor.agresor_factores_riesgo_otro
+            ].filter(Boolean).join(", ");
         }
-        delete newform.agresor_orientacion_sexual_otro
 
+        let agresorIdentidadGenero = datos_agresor.agresor_identidad_genero;
+        if (agresorIdentidadGenero === 'Otro') {
+            agresorIdentidadGenero = datos_agresor.agresor_identidad_genero_otro || '';
+        }
 
+        let agresorOrientacionSexual = datos_agresor.agresor_orientacion_sexual;
+        if (agresorOrientacionSexual === 'Otro') {
+            agresorOrientacionSexual = datos_agresor.agresor_orientacion_sexual_otro || '';
+        }
 
+        // Crear el objeto en el NUEVO formato que espera el backend
+        const nuevaQuejaData = {
+            tipo_de_acompanamiento: datos_adicionales.tipo_de_acompanamiento || "",
+            estado: "Pendiente",
+            unidad: datos_adicionales.unidad || "",
+            prioridad: "Pendiente",
 
-        
+            // Persona que reporta - SOLO ESTE ES OBLIGATORIO
+            persona_reporta: {
+                fecha_recepcion: fechaFormateada,
+                nombre: persona_que_reporta.reporta_nombre || "",
+                sexo: persona_que_reporta.reporta_sexo || "",
+                edad: persona_que_reporta.reporta_edad || "",
+                estamento: persona_que_reporta.reporta_estamento || "",
+                vicerrectoria_adscrito: persona_que_reporta.reporta_vicerrectoria_adscrito || "",
+                dependencia: persona_que_reporta.reporta_dependencia || "",
+                programa_academico: persona_que_reporta.reporta_programa_academico || "",
+                facultad: persona_que_reporta.reporta_facultad || "",
+                sede: persona_que_reporta.reporta_sede || "",
+                celular: persona_que_reporta.reporta_celular || "",
+                correo: persona_que_reporta.reporta_correo || ""
+            },
+
+            // Persona afectada - OPCIONAL (puede ser null para quejas anónimas)
+            persona_afectada: datos_afectado.afectado_nombre ? {
+                nombre: datos_afectado.afectado_nombre || "",
+                sexo: datos_afectado.afectado_sexo || "",
+                edad: datos_afectado.afectado_edad || "",
+                tipo_documento_identidad: datos_afectado.afectado_tipo_documento_identidad || "",
+                documento_identidad: datos_afectado.afectado_documento_identidad || "",
+                redes_apoyo: datos_afectado.afectado_redes_apoyo || "",
+                codigo: datos_afectado.afectado_codigo || "",
+                semestre: datos_afectado.afectado_semestre || null,
+                comuna: datos_afectado.afectado_comuna || "",
+                direccion: datos_afectado.afectado_direccion || "",
+                barrio: datos_afectado.afectado_barrio || "",
+                ciudad_origen: datos_afectado.afectado_ciudad_origen || "",
+                estrato_socioeconomico: datos_afectado.afectado_estrato_socioeconomico || "",
+                condicion_etnico_racial: datos_afectado.afectado_condicion_etnico_racial || "",
+                tiene_discapacidad: datos_afectado.afectado_tiene_discapacidad || "",
+                tipo_discapacidad: datos_afectado.afectado_tipo_discapacidad || "",
+                identidad_genero: afectadoIdentidadGenero || "",
+                orientacion_sexual: afectadoOrientacionSexual || "",
+                estamento: datos_afectado.afectado_estamento || "",
+                vicerrectoria_adscrito: datos_afectado.afectado_vicerrectoria_adscrito || "",
+                dependencia: datos_afectado.afectado_dependencia || "",
+                programa_academico: datos_afectado.afectado_programa_academico || "",
+                facultad: datos_afectado.afectado_facultad || "",
+                sede: datos_afectado.afectado_sede || "",
+                celular: datos_afectado.afectado_celular || "",
+                correo: datos_afectado.afectado_correo || "",
+                tipo_vbg_os: afectadoTipoVbg || "",
+                detalles_caso: datos_afectado.afectado_detalles_caso || "",
+                ha_hecho_denuncia: datos_afectado.afectado_ha_hecho_denuncia || "",
+                denuncias_previas: datos_afectado.afectado_denuncias_previas || ""
+            } : null, // Si no hay nombre de afectado, enviar null
+
+            // Persona acusada - OPCIONAL
+            persona_acusada: datos_agresor.agresor_nombre ? {
+                nombre: datos_agresor.agresor_nombre || "",
+                sexo: datos_agresor.agresor_sexo || "",
+                edad: datos_agresor.agresor_edad || "",
+                semestre: datos_agresor.agresor_semestre || null,
+                barrio: datos_agresor.agresor_barrio || "",
+                ciudad_origen: datos_agresor.agresor_ciudad_origen || "",
+                condicion_etnico_racial: datos_agresor.agresor_condicion_etnico_racial || "",
+                tiene_discapacidad: datos_agresor.agresor_tiene_discapacidad || "",
+                tipo_discapacidad: datos_agresor.agresor_tipo_discapacidad || "",
+                identidad_genero: agresorIdentidadGenero || "",
+                orientacion_sexual: agresorOrientacionSexual || "",
+                estamento: datos_agresor.agresor_estamento || "",
+                vicerrectoria_adscrito: datos_agresor.agresor_vicerrectoria_adscrito || "",
+                dependencia: datos_agresor.agresor_dependencia || "",
+                programa_academico: datos_agresor.agresor_programa_academico || "",
+                facultad: datos_agresor.agresor_facultad || "",
+                sede: datos_agresor.agresor_sede || "",
+                factores_riesgo: agresorFactoresRiesgo || "",
+                tiene_denuncias: datos_agresor.agresor_tiene_denuncias || "",
+                detalles_denuncias: datos_agresor.agresor_detalles_denuncias || ""
+            } : null, // Si no hay nombre de acusado, enviar null
+
+            // Campos adicionales
+            desea_activar_ruta_atencion_integral: datos_adicionales.desea_activar_ruta_atencion_integral || "",
+            recibir_asesoria_orientacion_sociopedagogica: datos_adicionales.recibir_asesoria_orientacion_sociopedagogica || "",
+            orientacion_psicologica: datos_adicionales.orientacion_psicologica || "",
+            asistencia_juridica: datos_adicionales.asistencia_juridica || "",
+            acompañamiento_solicitud_medidas_proteccion_inicial: datos_adicionales.acompañamiento_solicitud_medidas_proteccion_inicial || "",
+            acompañamiento_ante_instancias_gubernamentales: datos_adicionales.acompañamiento_ante_instancias_gubernamentales || "",
+            interponer_queja_al_comite_asusntos_internos_disciplinarios: datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios || "",
+            observaciones: datos_adicionales.observaciones || ""
+        };
+
+        console.log("Datos transformados para enviar:", nuevaQuejaData);
 
         try {
             const response = await fetch(`${baseURL}/quejas/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newform),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(nuevaQuejaData),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Error detallado en la respuesta:", errorData);
-                alert("Error al enviar el formulario");
+                alert("Error al enviar el formulario: " + (errorData.detail || JSON.stringify(errorData)));
             } else {
+                const result = await response.json();
+                console.log("¡Formulario enviado exitosamente!", result);
                 alert("¡Formulario enviado exitosamente!");
+                // Opcional: limpiar el formulario o redirigir
+                // navigate('/quejas/lista');
             }
         } catch (error) {
-            console.log('No fue posible conectarse con el servidor');
+            console.log('No fue posible conectarse con el servidor:', error);
             alert("Error de conexión");
         } finally {
             setIsLoading(false);
@@ -269,25 +351,25 @@ const Queja = () => {
     };
 
     const agregarTelefono = () => {
-    const numero = telefono.trim();
-    if (numero && !telefonos.includes(numero)) {
-      const nuevos = [...telefonos, numero];
-      setTelefonos(nuevos);
-      set_datos_afectado(prev => ({
-        ...prev,
-        afectado_celular: nuevos.join(', ')
-      }));
-      setTelefono('');
-    }
-  };
-  const eliminarTelefono = (num) => {
-    const nuevos = telefonos.filter(t => t !== num);
-    setTelefonos(nuevos);
-    set_datos_afectado(prev => ({
-      ...prev,
-      afectado_celular: nuevos.join(', ')
-    }));
-  };
+        const numero = telefono.trim();
+        if (numero && !telefonos.includes(numero)) {
+            const nuevos = [...telefonos, numero];
+            setTelefonos(nuevos);
+            set_datos_afectado(prev => ({
+                ...prev,
+                afectado_celular: nuevos.join(', ')
+            }));
+            setTelefono('');
+        }
+    };
+    const eliminarTelefono = (num) => {
+        const nuevos = telefonos.filter(t => t !== num);
+        setTelefonos(nuevos);
+        set_datos_afectado(prev => ({
+            ...prev,
+            afectado_celular: nuevos.join(', ')
+        }));
+    };
 
     // Componente para renderizar campos de formulario
     const FormField = useCallback(({ label, type = "text", value, onChange, options, isTextArea = false }) => (
@@ -325,7 +407,7 @@ const Queja = () => {
             )}
         </div>
     ), []);
-    
+
     return (
         <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
             {isLoading && <LoadingSpinner message="Enviando formulario..." overlay={true} />}
@@ -351,8 +433,8 @@ const Queja = () => {
                                 <div
                                     key={step.number}
                                     className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 flex-1 min-w-0 ${pagina === index
-                                            ? 'bg-red-600 text-white shadow-md'
-                                            : 'bg-gray-100 text-gray-600'
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600'
                                         }`}
                                 >
                                     <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs ${pagina === index ? 'bg-white text-red-600' : 'bg-gray-300 text-gray-600'
@@ -536,9 +618,9 @@ const Queja = () => {
                                     />
                                     <FormField
                                         label="Semestre en el que se encuentra"
-                                        type= "number"
+                                        type="number"
                                         value={datos_afectado.afectado_semestre}
-                                        onChange={(e) => onchange(set_datos_afectado, "afectado_semestre", e.target.value,"number")}
+                                        onChange={(e) => onchange(set_datos_afectado, "afectado_semestre", e.target.value, "number")}
                                     />
 
                                     <FormField
@@ -548,7 +630,7 @@ const Queja = () => {
                                     />
 
 
-                                    
+
                                 </div>
                                 <div>
                                     <FormField
@@ -569,26 +651,26 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_identidad_genero", e.target.value)}
                                         options={identidad_genero_opt}
                                     />
-                                    {(datos_afectado.afectado_identidad_genero === 'Otro' ) && (
+                                    {(datos_afectado.afectado_identidad_genero === 'Otro') && (
                                         <FormField
                                             label="Por favor especifique su identidad de género"
                                             value={datos_afectado.afectado_identidad_genero_otro || ''}
                                             onChange={(e) => onchange(set_datos_afectado, "afectado_identidad_genero_otro", e.target.value)}
                                         />
-                                    ) }
+                                    )}
                                     <FormField
                                         label="Orientación sexual"
                                         value={datos_afectado.afectado_orientacion_sexual}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_orientacion_sexual", e.target.value)}
                                         options={orientacion_sexual_opt}
                                     />
-                                    {(datos_afectado.afectado_orientacion_sexual === 'Otro' ) && (
+                                    {(datos_afectado.afectado_orientacion_sexual === 'Otro') && (
                                         <FormField
                                             label="Por favor especifique su orientación sexual"
                                             value={datos_afectado.afectado_orientacion_sexual_otro || ''}
                                             onChange={(e) => onchange(set_datos_afectado, "afectado_orientacion_sexual_otro", e.target.value)}
                                         />
-                                    ) }
+                                    )}
 
                                     <FormField
                                         label="Estamento *"
@@ -626,7 +708,7 @@ const Queja = () => {
                                     />
                                     <div
                                         className="flex items-center gap-2"
-                                        >
+                                    >
                                         <FormField
                                             label="Celular *"
                                             type="tel"
@@ -639,21 +721,21 @@ const Queja = () => {
                                             className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
                                         >Agregar</button>
                                     </div>
-                                    
-                                        {telefonos.map((num, i) => (
-                                            <div
-                                                key={i}
-                                                style={{
+
+                                    {telefonos.map((num, i) => (
+                                        <div
+                                            key={i}
+                                            style={{
                                                 background: '#e0e0e0',
                                                 padding: '4px 8px',
                                                 borderRadius: '12px',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '4px'
-                                                }}
-                                            >
-                                                <span>{num}</span>
-                                                <button
+                                            }}
+                                        >
+                                            <span>{num}</span>
+                                            <button
                                                 type="button"
                                                 onClick={() => eliminarTelefono(num)}
                                                 style={{
@@ -662,12 +744,12 @@ const Queja = () => {
                                                     cursor: 'pointer',
                                                     fontWeight: 'bold'
                                                 }}
-                                                >
+                                            >
                                                 ✕
-                                                </button>
-                                            </div>
-                                        ))}
-                                    
+                                            </button>
+                                        </div>
+                                    ))}
+
                                     <FormField
                                         label="Correo electrónico"
                                         type="email"
@@ -680,12 +762,12 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_ha_hecho_denuncia", e.target.value)}
                                         options={sino}
                                     />
-                                    {(datos_afectado.afectado_ha_hecho_denuncia === 'Si' ) && (
-                                    <FormField
-                                        label="Por favor, detalle las denuncias previas realizadas"
-                                        value={datos_afectado.afectado_denuncias_previas || ''}
-                                        onChange={(e) => onchange(set_datos_afectado, "afectado_denuncias_previas", e.target.value)}
-                                    />)}
+                                    {(datos_afectado.afectado_ha_hecho_denuncia === 'Si') && (
+                                        <FormField
+                                            label="Por favor, detalle las denuncias previas realizadas"
+                                            value={datos_afectado.afectado_denuncias_previas || ''}
+                                            onChange={(e) => onchange(set_datos_afectado, "afectado_denuncias_previas", e.target.value)}
+                                        />)}
                                 </div>
                             </div>
                             <div className="mt-4">
@@ -702,7 +784,7 @@ const Queja = () => {
                                         value={datos_afectado.afectado_tipo_vbg_os_otro || ''}
                                         onChange={(e) => onchange(set_datos_afectado, "afectado_tipo_vbg_os_otro", e.target.value)}
                                     />
-                                ) }
+                                )}
                                 <FormField
                                     label="Detalles del caso *"
                                     value={datos_afectado.afectado_detalles_caso}
@@ -776,37 +858,37 @@ const Queja = () => {
                                         type='number'
                                         label="Semestre en el que se encuentra"
                                         value={datos_agresor.agresor_semestre}
-                                        onChange={(e) => onchange(set_datos_agresor, "agresor_semestre", e.target.value,"number")}
+                                        onChange={(e) => onchange(set_datos_agresor, "agresor_semestre", e.target.value, "number")}
                                     />
                                 </div>
                                 <div>
-                                    
+
                                     <FormField
                                         label="Identidad de género"
                                         value={datos_agresor.agresor_identidad_genero}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_identidad_genero", e.target.value)}
                                         options={identidad_genero_opt}
                                     />
-                                    {(datos_agresor.agresor_identidad_genero === 'Otro' ) && (
+                                    {(datos_agresor.agresor_identidad_genero === 'Otro') && (
                                         <FormField
                                             label="Por favor especifique su identidad de género"
                                             value={datos_agresor.agresor_identidad_genero_otro || ''}
                                             onChange={(e) => onchange(set_datos_agresor, "agresor_identidad_genero_otro", e.target.value)}
                                         />
-                                    ) }
+                                    )}
                                     <FormField
                                         label="Orientación sexual"
                                         value={datos_agresor.agresor_orientacion_sexual}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_orientacion_sexual", e.target.value)}
                                         options={orientacion_sexual_opt}
                                     />
-                                    {(datos_agresor.agresor_orientacion_sexual === 'Otro' ) && (
+                                    {(datos_agresor.agresor_orientacion_sexual === 'Otro') && (
                                         <FormField
                                             label="Por favor especifique su orientación sexual"
                                             value={datos_agresor.agresor_orientacion_sexual_otro || ''}
                                             onChange={(e) => onchange(set_datos_agresor, "agresor_orientacion_sexual_otro", e.target.value)}
                                         />
-                                    ) }
+                                    )}
                                     <FormField
                                         label="Estamento"
                                         value={datos_agresor.agresor_estamento}
@@ -851,12 +933,12 @@ const Queja = () => {
                                         />
                                     </div>
                                     {(datos_agresor.agresor_factores_riesgo.includes("Otros")) && (
-                                    <FormField
-                                        label="Por favor especifique los demás factores de riesgo"
-                                        value={datos_agresor.agresor_factores_riesgo_otro|| ''}
-                                        onChange={(e) => onchange(set_datos_agresor, "agresor_factores_riesgo_otro", e.target.value)}
-                                    />
-                                    ) }
+                                        <FormField
+                                            label="Por favor especifique los demás factores de riesgo"
+                                            value={datos_agresor.agresor_factores_riesgo_otro || ''}
+                                            onChange={(e) => onchange(set_datos_agresor, "agresor_factores_riesgo_otro", e.target.value)}
+                                        />
+                                    )}
 
                                     <FormField
                                         label="¿Tiene antecedentes disciplinarios?"
@@ -864,13 +946,13 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_tiene_denuncias", e.target.value)}
                                         options={sino}
                                     />
-                                    {(datos_agresor.agresor_tiene_denuncias === 'Si' ) && (
+                                    {(datos_agresor.agresor_tiene_denuncias === 'Si') && (
                                         <FormField
                                             label="Por favor describa los antecedentes disciplinarios"
                                             value={datos_agresor.agresor_detalles_denuncias || ''}
                                             onChange={(e) => onchange(set_datos_agresor, "agresor_detalles_denuncias", e.target.value)}
                                         />
-                                    ) }
+                                    )}
 
                                 </div>
                             </div>
@@ -954,8 +1036,8 @@ const Queja = () => {
                         onClick={previousPage}
                         disabled={pagina === 0}
                         className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${pagina === 0
-                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                             }`}
                     >
                         <FiArrowLeft size={16} />
@@ -976,8 +1058,8 @@ const Queja = () => {
                     <button
                         onClick={pagina === 3 ? sendform : nextPage}
                         className={`flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-all duration-200 ${pagina === 3
-                                ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow'
-                                : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
+                            ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow'
+                            : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                             }`}
                     >
                         <span>{pagina === 3 ? 'Enviar formulario' : 'Siguiente'}</span>

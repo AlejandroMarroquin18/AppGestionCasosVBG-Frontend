@@ -50,8 +50,7 @@ const ComplaintsList = () => {
       (locationFilter === "" ||
         (complaint.afectado_sede && complaint.afectado_sede.includes(locationFilter))) &&
       (typeFilter === "" ||
-        (complaint.prioridad &&
-          complaint.prioridad.includes(typeFilter))) &&
+        (complaint.prioridad && complaint.prioridad.includes(typeFilter))) &&
       (facultyFilter === "" ||
         (complaint.afectado_facultad && complaint.afectado_facultad.includes(facultyFilter))) &&
       (searchTerm === "" ||
@@ -94,28 +93,30 @@ const ComplaintsList = () => {
       'Aprobado': 'bg-green-100 text-green-800',
       'En Proceso': 'bg-blue-100 text-blue-800',
       'Finalizado': 'bg-gray-100 text-gray-800',
-      'Remitido': 'bg-purple-100 text-purple-800'
+      'Remitido': 'bg-purple-100 text-purple-800',
+      'Recepción': 'bg-blue-100 text-blue-800',
+      'Identificación': 'bg-indigo-100 text-indigo-800',
+      'Direccionamiento': 'bg-purple-100 text-purple-800',
+      'Remisión externa': 'bg-pink-100 text-pink-800',
+      'Seguimiento': 'bg-orange-100 text-orange-800',
+      'Cerrado': 'bg-gray-100 text-gray-800'
     };
     
     return statusColors[status] || 'bg-gray-100 text-gray-800';
   };
 
-
   const getPriorityBadge = (priority) => {
     const priorityColors = {
-      'Muy Baja': 'bg-green-100 text-green-800',    // verde claro
-      'Baja': 'bg-lime-100 text-lime-800',          // verde lima
-      'Media': 'bg-yellow-100 text-yellow-800',     // amarillo
-      'Alta': 'bg-orange-100 text-orange-800',      // naranja
-      'Crítica': 'bg-red-100 text-red-800'          // rojo
+      'Pendiente': 'bg-gray-100 text-gray-800',
+      'Muy Baja': 'bg-green-100 text-green-800',
+      'Baja': 'bg-lime-100 text-lime-800',
+      'Media': 'bg-yellow-100 text-yellow-800',
+      'Alta': 'bg-orange-100 text-orange-800',
+      'Crítica': 'bg-red-100 text-red-800'
     };
     
     return priorityColors[priority] || 'bg-gray-100 text-gray-800';
   };
-
-  
-
-    
 
   if (isLoading) {
     return (
@@ -141,7 +142,7 @@ const ComplaintsList = () => {
 
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4 border border-gray-200">
-          {/* Search Bar - Más compacta */}
+          {/* Search Bar */}
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <div className="flex-1 max-w-md">
               <div className="relative">
@@ -175,7 +176,7 @@ const ComplaintsList = () => {
             </div>
           </div>
 
-          {/* Filters - Más compactos */}
+          {/* Filters */}
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
               <div>
@@ -188,6 +189,7 @@ const ComplaintsList = () => {
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="">Todas las sedes</option>
+                  <option value="Principal">Principal</option>
                   <option value="Zarzal">Zarzal</option>
                   <option value="Melendez">Melendez</option>
                   <option value="Buga">Buga</option>
@@ -224,13 +226,12 @@ const ComplaintsList = () => {
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="">Todas las facultades</option>
-                  <option value="Artes">Artes Integradas</option>
+                  <option value="Ingeniería">Ingeniería</option>
                   <option value="Ciencias Naturales">Ciencias Naturales</option>
                   <option value="Ciencias de la Administración">Administración</option>
                   <option value="Salud">Salud</option>
                   <option value="Ciencias Sociales">Ciencias Sociales</option>
                   <option value="Humanidades">Humanidades</option>
-                  <option value="Ingeniería">Ingeniería</option>
                   <option value="Educación">Educación</option>
                   <option value="Psicología">Psicología</option>
                   <option value="Derecho">Derecho</option>
@@ -289,26 +290,28 @@ const ComplaintsList = () => {
                       #{complaint.id}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-900">
-                      {complaint.afectado_nombre || 'No especificado'}
+                      {complaint.afectado_nombre}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600">
-                      {complaint.afectado_sede || 'No especificado'}
+                      {complaint.afectado_sede}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600 font-mono">
-                      {complaint.afectado_codigo || 'N/A'}
+                      {complaint.afectado_codigo}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600">
-                      {complaint.afectado_facultad || 'No especificado'}
+                      {complaint.afectado_facultad}
                     </td>
-                    <td className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityBadge(complaint.prioridad)}`}>
-                      {complaint.prioridad || 'No especificado'}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(complaint.prioridad)}`}>
+                        {complaint.prioridad}
+                      </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-600">
-                      {complaint.fecha_recepcion || 'No especificado'}
+                      {complaint.fecha_recepcion}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(complaint.estado)}`}>
-                        {complaint.estado || 'Pendiente'}
+                        {complaint.estado}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -317,7 +320,7 @@ const ComplaintsList = () => {
                           e.stopPropagation();
                           handleViewDetails(complaint.id);
                         }}
-                        className="text-white-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
+                        className="text-red-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                         title="Ver detalles"
                       >
                         <FiEye size={16} />
@@ -342,40 +345,40 @@ const ComplaintsList = () => {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-semibold text-gray-900 text-sm">
-                      {complaint.afectado_nombre || 'No especificado'}
+                      {complaint.afectado_nombre}
                     </h3>
                     <p className="text-xs text-gray-600">ID: #{complaint.id}</p>
                   </div>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(complaint.estado)}`}>
-                    {complaint.estado || 'Pendiente'}
+                    {complaint.estado}
                   </span>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-1 text-xs text-gray-600 mb-2">
                   <div>
-                    <span className="font-medium">Sede:</span> {complaint.afectado_sede || 'N/A'}
+                    <span className="font-medium">Sede:</span> {complaint.afectado_sede}
                   </div>
                   <div>
-                    <span className="font-medium">Código:</span> {complaint.afectado_codigo || 'N/A'}
+                    <span className="font-medium">Código:</span> {complaint.afectado_codigo}
                   </div>
                   <div>
-                    <span className="font-medium">Facultad:</span> {complaint.afectado_facultad || 'N/A'}
+                    <span className="font-medium">Facultad:</span> {complaint.afectado_facultad}
                   </div>
                   <div>
-                    <span className="font-medium">Fecha:</span> {complaint.fecha_recepcion || 'N/A'}
+                    <span className="font-medium">Fecha:</span> {complaint.fecha_recepcion}
                   </div>
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">
-                    {complaint.prioridad || 'No especificado'}
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityBadge(complaint.prioridad)}`}>
+                    {complaint.prioridad}
                   </span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleViewDetails(complaint.id);
                     }}
-                    className="text-white-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
+                    className="text-red-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                     title="Ver detalles"
                   >
                     <FiEye size={14} />
