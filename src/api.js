@@ -7,13 +7,13 @@ export const baseURL = "http://192.168.0.6:8000/api";
 
 // Obtener TODOS los talleres
 export const getWorkshops = async () => {
-  const response = await fetch(`${baseURL}/talleres/`,{
-  method: "GET",
-  headers: {
-    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
-    "X-CSRFToken": getCSRFToken(),
-  },
-  credentials: "include",
+  const response = await fetch(`${baseURL}/talleres/`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -23,13 +23,13 @@ export const getWorkshops = async () => {
 
 // Obtener los detalles de un taller específico (ID)
 export const getWorkshopDetails = async (workshopId) => {
-  const response = await fetch(`${baseURL}/talleres/${workshopId}/`,{
-  method: "GET",
-  headers: {
-    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
-    "X-CSRFToken": getCSRFToken(),
-  },
-  credentials: "include",
+  const response = await fetch(`${baseURL}/talleres/${workshopId}/`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
   });
   if (!response.ok) {
     throw new Error(`Failed to get with status: ${response.status}`);
@@ -44,7 +44,7 @@ export const createWorkshop = async (workshopData) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,
         "X-CSRFToken": getCSRFToken(),
       },
       body: JSON.stringify(workshopData),
@@ -70,7 +70,7 @@ export const updateWorkshop = async (workshopId, workshopData) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify(workshopData),
@@ -90,15 +90,15 @@ export const deleteWorkshop = async (workshopId, cancellationReason = "Por motiv
     method: "DELETE",
     headers: {
       'Content-Type': 'application/json',
-      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     body: JSON.stringify({
-      cancellation_reason: cancellationReason 
+      cancellation_reason: cancellationReason
     }),
     credentials: "include",
   });
-  
+
   if (!response.ok) {
     throw new Error("Failed to delete the workshop");
   }
@@ -133,7 +133,7 @@ export const getComplaints = async () => {
   const response = await fetch(`${baseURL}/quejas/`, {
     method: "GET",
     headers: {
-      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -142,7 +142,7 @@ export const getComplaints = async () => {
     throw new Error("Error getting complaints");
   }
   const data = await response.json();
-  
+
   // Transformar los datos para mantener compatibilidad con el frontend
   return data.map(queja => ({
     ...queja,
@@ -166,7 +166,7 @@ export const getComplaintDetails = async (id) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`, 
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -175,7 +175,7 @@ export const getComplaintDetails = async (id) => {
     throw new Error("Error getting complaint details");
   }
   const data = await response.json();
-  
+
   // Transformar los datos para mantener compatibilidad
   return {
     ...data,
@@ -192,7 +192,7 @@ export const getComplaintDetails = async (id) => {
     reporta_sede: data.persona_reporta?.sede || '',
     reporta_celular: data.persona_reporta?.celular || '',
     reporta_correo: data.persona_reporta?.correo || '',
-    
+
     // Persona afectada
     afectado_nombre: data.persona_afectada?.nombre || '',
     afectado_sexo: data.persona_afectada?.sexo || '',
@@ -224,7 +224,7 @@ export const getComplaintDetails = async (id) => {
     afectado_redes_apoyo: data.persona_afectada?.redes_apoyo || '',
     afectado_tipo_vbg_os: data.persona_afectada?.tipo_vbg_os || '',
     afectado_detalles_caso: data.persona_afectada?.detalles_caso || '',
-    
+
     // Persona acusada
     agresor_nombre: data.persona_acusada?.nombre || '',
     agresor_sexo: data.persona_acusada?.sexo || '',
@@ -246,7 +246,7 @@ export const getComplaintDetails = async (id) => {
     agresor_factores_riesgo: data.persona_acusada?.factores_riesgo || '',
     agresor_tiene_denuncias: data.persona_acusada?.tiene_denuncias || '',
     agresor_detalles_denuncias: data.persona_acusada?.detalles_denuncias || '',
-    
+
     // Mantener los campos originales de la queja
     id: data.id,
     estado: data.estado,
@@ -281,7 +281,7 @@ export const updateComplaint = async (id, complaintData) => {
     acompañamiento_ante_instancias_gubernamentales: complaintData.acompañamiento_ante_instancias_gubernamentales,
     interponer_queja_al_comite_asusntos_internos_disciplinarios: complaintData.interponer_queja_al_comite_asusntos_internos_disciplinarios,
     observaciones: complaintData.observaciones,
-    
+
     // Datos de las personas relacionadas (si se están editando)
     persona_reporta: {
       fecha_recepcion: complaintData.fecha_recepcion,
@@ -357,7 +357,7 @@ export const updateComplaint = async (id, complaintData) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -374,7 +374,7 @@ export const updateComplaintStatus = async (id, status) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -391,7 +391,7 @@ export const deleteComplaint = async (id) => {
   const response = await fetch(`${baseURL}/quejas/${id}/`, {
     method: "DELETE",
     headers: {
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -408,7 +408,7 @@ export const getComplaintStats = async () => {
   const response = await fetch(`${baseURL}/quejas/statistics/`, {
     method: "GET",
     headers: {
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
@@ -422,7 +422,7 @@ export const getComplaintStats = async () => {
 
 
 export const saveEvent = async (eventData) => {
-  
+
 
   try {
     const response = await fetch(`${baseURL}/events/`, {
@@ -451,14 +451,14 @@ export const saveEvent = async (eventData) => {
 export const getRegistryList = async (complaintId) => {
   try {
     const response = await fetch(`${baseURL}/quejas/historial-quejas/${complaintId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCSRFToken(), // 
-        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
-      },
-    }
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFToken(), // 
+          "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
+        },
+      }
 
     );
     if (!response.ok) {
@@ -547,14 +547,14 @@ export const deleteRegistry = async (registryId) => {
 
 export const fetchEventStats = async () => {
   try {
-    const response = await fetch(`${baseURL}/events/stats/`,{
-  method: "GET",
-  headers: {
-    "Authorization": `Token ${localStorage.getItem("userToken")}`, 
-    "X-CSRFToken": getCSRFToken(),
-  },
-  credentials: "include",
-  });
+    const response = await fetch(`${baseURL}/events/stats/`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,
+        "X-CSRFToken": getCSRFToken(),
+      },
+      credentials: "include",
+    });
     if (!response.ok) {
       throw new Error("Error al obtener las estadísticas de eventos");
     }
@@ -568,31 +568,31 @@ export const fetchEventStats = async () => {
 export async function checkSession() {
 
   //console.log("Cookies antes de checkSession:", document.cookie);
-    try {
-        const response = await fetch(`${baseURL}/auth/checkSession/`, {
-            method: "GET",
-            credentials: "include", //
-            
-            headers: {
-              "X-CSRFToken": getCSRFToken(), // 
-              "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
-            }
-        });
+  try {
+    const response = await fetch(`${baseURL}/auth/checkSession/`, {
+      method: "GET",
+      credentials: "include", //
 
-        console.log("Response headers:", [...response.headers.entries()]);
+      headers: {
+        "X-CSRFToken": getCSRFToken(), // 
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,//solo si es en desarrollo
+      }
+    });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Sesión activa:", data);
-            return data;
-        } else {
-            console.log("No hay sesión activa");
-            return null;
-        }
-    } catch (error) {
-        console.error("Error verificando sesión:", error);
-        return null;
+    console.log("Response headers:", [...response.headers.entries()]);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Sesión activa:", data);
+      return data;
+    } else {
+      console.log("No hay sesión activa");
+      return null;
     }
+  } catch (error) {
+    console.error("Error verificando sesión:", error);
+    return null;
+  }
 }
 
 export const updateComplaintPriority = async (id, priority) => {
@@ -600,7 +600,7 @@ export const updateComplaintPriority = async (id, priority) => {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,   
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
       "X-CSRFToken": getCSRFToken(),
     },
     credentials: "include",
