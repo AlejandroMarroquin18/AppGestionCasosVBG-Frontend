@@ -7,6 +7,7 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
 import 'moment/locale/es'
 import { saveEvent, baseURL } from "../api";
+import getCSRFToken from "../helpers/getCSRF";
 
 moment.locale('es')
 const localizer = momentLocalizer(moment);
@@ -178,8 +179,16 @@ const AgendaList = () => {
       return;
     }
 
-    const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`);
+    const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Token ${localStorage.getItem("userToken")}`,
+      "X-CSRFToken": getCSRFToken(),
+    },
+    credentials: "include",
+  });
     const dataCaseID = await resCaseID.json();
+    console.log(dataCaseID)
 
     if (!dataCaseID.exists) {
       alert("El ID de la atencion no existe en el sistema.");

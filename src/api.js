@@ -1,7 +1,7 @@
 import getCSRFToken from "./helpers/getCSRF";
 
 //export const baseURL = process.env.REACT_APP_API_URL;
-export const baseURL = "http://192.168.0.6:8000/api";
+export const baseURL = "http://192.168.0.13:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 
@@ -428,8 +428,11 @@ export const saveEvent = async (eventData) => {
     const response = await fetch(`${baseURL}/events/`, {
       method: "POST",
       headers: {
+        "X-CSRFToken": getCSRFToken(), //
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(eventData),
     });
 

@@ -117,20 +117,15 @@ const ComplaintsDetails = () => {
     "agresor_factores_riesgo",
     "agresor_tiene_denuncias",
     "agresor_detalles_denuncias",
-<<<<<<< HEAD
         
-    // Detalles generales (63-57)
-=======
-
-    // Detalles generales (63-54)
->>>>>>> f72496dcb0a86dc90a574432f84669b61ba53e01
+    // Detalles generales (63-56)
     "desea_activar_ruta_atencion_integral",
     "recibir_asesoria_orientacion_sociopedagogica",
     "orientacion_psicologica",
     "asistencia_juridica",
     "acompañamiento_solicitud_medidas_proteccion_inicial",
     "acompañamiento_ante_instancias_gubernamentales",
-    "interponer_queja_al_comite_asusntos_internos_disciplinarios",
+    //"interponer_queja_al_comite_asusntos_internos_disciplinarios",
     "interponer_queja_al_cade", 
     "interponer_queja_oficina_control_interno",
     "interponer_queja_a_rectoria",
@@ -215,7 +210,7 @@ const ComplaintsDetails = () => {
     "¿Requiere recibir asistencia jurídica?",
     "¿Requiere recibir acompañamiento para solicitud de medidas de protección inicial?",
     "¿Requiere recibir acompañamiento ante instancias gubernamentales?",
-    "¿Requiere interponer una queja formal al Comité de Asuntos Internos Disciplinarios?",
+    //"¿Requiere interponer una queja formal al Comité de Asuntos Internos Disciplinarios?",
     "¿Requiere interponer una queja formal al Comité de Asuntos Disciplinarios Estudiantiles (CADE)?",
     "¿Requiere interponer queja ante la oficina de control interno?",
     "¿Requiere interpones queja ante la Rectoría?",
@@ -758,17 +753,10 @@ const ComplaintsDetails = () => {
           </div>
 
           {/* Secciones de información */}
-<<<<<<< HEAD
           {renderAccordionSection("reporta", 0, 12, "👤 Persona que Reporta")}
           {renderAccordionSection("afectado", 12, 42, "🎯 Persona Afectada")}
           {renderAccordionSection("agresor", 42, 62, "⚠️ Persona Agresora")}
-          {renderAccordionSection("detalles", 62, 74, "📋 Información Adicional y Servicios Solicitados")}
-=======
-          {renderAccordionSection("reporta", 0, 12, "👤 Persona que reporta")}
-          {renderAccordionSection("afectado", 12, 42, "🎯 Persona afectada")}
-          {renderAccordionSection("agresor", 42, 62, "⚠️ Persona agresora")}
-          {renderAccordionSection("detalles", 62, 71, "📋 Información adicional y servicios solicitados")}
->>>>>>> f72496dcb0a86dc90a574432f84669b61ba53e01
+          {renderAccordionSection("detalles", 62, 73, "📋 Información Adicional y Servicios Solicitados")}
 
           {/* Historial */}
           <Accordion className="mb-8 shadow-lg border-0 rounded-lg overflow-hidden">

@@ -82,6 +82,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
     age: "",
     disability: "Ninguna",
     program: "",
+    estamento: "",
     gender_identity: "Cisgénero",
     self_recognition: "Ninguna",
     terms_accepted: false,
@@ -93,6 +94,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
   const [warningMessage, setWarningMessage] = useState("")
+  const estamentoOptions = ["Estudiante", "Profesor", "Funcionario", "Externo"]
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -156,6 +158,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
           age: "",
           disability: "Ninguna",
           program: "",
+          estamento: "",
           gender_identity: "Cisgénero",
           self_recognition: "Ninguna",
           terms_accepted: false,
@@ -308,6 +311,20 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
                   icon={FiCalendar}
                   placeholder="Su edad"
                   disabled={isSubmitting}
+                />
+                <FormField
+                  label="Estamento"
+                  value={formData.estamento}
+                  onChange={handleChange}
+                  name="estamento"
+                  required={true}
+                  icon={FiBook}
+                  placeholder="Estamento al que pertenece"
+                  disabled={isSubmitting}
+                  
+                  
+                  options={estamentoOptions}s
+
                 />
 
                 <FormField

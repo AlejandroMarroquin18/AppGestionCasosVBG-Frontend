@@ -130,7 +130,7 @@ const Queja = () => {
         'asistencia_juridica': '',
         'acompañamiento_solicitud_medidas_proteccion_inicial': '',
         'acompañamiento_ante_instancias_gubernamentales': '',
-        'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
+        //'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
         'interponer_queja_al_cade': '',
         'interponer_queja_oficina_control_interno': '',
         'interponer_queja_a_rectoria': '',
@@ -319,7 +319,10 @@ const Queja = () => {
             asistencia_juridica: datos_adicionales.asistencia_juridica || "",
             acompañamiento_solicitud_medidas_proteccion_inicial: datos_adicionales.acompañamiento_solicitud_medidas_proteccion_inicial || "",
             acompañamiento_ante_instancias_gubernamentales: datos_adicionales.acompañamiento_ante_instancias_gubernamentales || "",
-            interponer_queja_al_comite_asusntos_internos_disciplinarios: datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios || "",
+            //interponer_queja_al_comite_asusntos_internos_disciplinarios: datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios || "",
+            interponer_queja_al_cade: datos_adicionales.interponer_queja_al_cade || "",
+            interponer_queja_oficina_control_interno: datos_adicionales.interponer_queja_oficina_control_interno || "",
+            interponer_queja_a_rectoria: datos_adicionales.interponer_queja_a_rectoria || "",
             observaciones: datos_adicionales.observaciones || ""
         };
 
@@ -1015,12 +1018,12 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_adicionales, "acompañamiento_ante_instancias_gubernamentales", e.target.value)}
                                         options={sino}
                                     />
-                                    <FormField
+                                    {/**<FormField
                                         label="¿Requiere interponer queja formal?"
                                         value={datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios}
                                         onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_comite_asusntos_internos_disciplinarios", e.target.value)}
                                         options={sino}
-                                    />
+                                    />*/}
                                     <FormField
                                         label="¿Requiere interponer queja ante el comité de asuntos disciplinarios estudiantiles CADE?"
                                         value={datos_adicionales.interponer_queja_al_cade}
