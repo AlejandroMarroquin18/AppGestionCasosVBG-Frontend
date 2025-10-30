@@ -182,7 +182,7 @@ const AgendaList = () => {
     const dataCaseID = await resCaseID.json();
 
     if (!dataCaseID.exists) {
-      alert("El ID de la queja no existe en el sistema.");
+      alert("El ID de la atencion no existe en el sistema.");
       return; // Detener envío
     }
 
@@ -387,7 +387,12 @@ const AgendaList = () => {
   }
   return (
     <>
-      <div ref={calendarRef} style={{ height: "80vh", position: "relative" }}>
+      <div ref={calendarRef} style={{ height: "80vh", position: "relative" }}onContextMenu={(e) => {
+        e.preventDefault(); // evita que aparezca el menú del navegador
+        setSelectedDay(null);
+        setNewEvent(emptyEvent);
+      }}>
+        <div>
         <DnDCalendar
           
           selectable
@@ -428,6 +433,7 @@ const AgendaList = () => {
               width: "33.333333%",
               height: "auto"
             }}
+            onContextMenu={(e) => e.stopPropagation()}
           >
             <h4><strong>Crear reunión</strong></h4>
             <input value={newEvent.title} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"title", e.target.value)} placeholder="Título" />
@@ -495,13 +501,14 @@ const AgendaList = () => {
               ))}
             </select>
             
-            <div>
+            <div className="gap-3">
             
-            <button onClick={sendEvent}>Crear</button>
-            <button onClick={() =>{ setSelectedDay(null);setNewEvent(emptyEvent)}}>Cerrar</button>
+            <button className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" onClick={sendEvent}>Crear</button>
+            <button className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" onClick={() =>{ setSelectedDay(null);setNewEvent(emptyEvent)}}>Cerrar</button>
             </div>
           </div>
         )}
+        </div>
 
         {/* Detalles del evento seleccionado */}
         {selectedEvent && (

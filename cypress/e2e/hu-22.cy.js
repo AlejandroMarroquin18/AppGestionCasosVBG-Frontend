@@ -62,7 +62,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.get('aside').should('exist');
       
       // 2. Verificar menús principales que SÍ son visibles
-      cy.contains('Quejas').should('be.visible');
+      cy.contains('Atenciones').should('be.visible');
       cy.contains('Agenda').should('be.visible');
       cy.contains('Talleres').should('be.visible');
       
@@ -89,7 +89,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.url().should('include', '/talleres/crear');
       
       // Verificar que seguimos en página con sidebar
-      cy.contains('Quejas').should('be.visible');
+      cy.contains('Atenciones').should('be.visible');
       cy.contains('Agenda').should('be.visible');
       cy.contains('Talleres').should('be.visible');
     });
@@ -100,9 +100,9 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       
       // VERIFICACIONES R1 - Estados visuales
       
-      // Verificar que el menú "Quejas" muestra sus submenús (está expandido)
+      // Verificar que el menú "Atenciones" muestra sus submenús (está expandido)
       cy.contains('Estadísticas').should('be.visible');
-      cy.contains('Lista de quejas').should('be.visible');
+      cy.contains('Lista de atenciones').should('be.visible');
       
       // Navegar a otra ruta y verificar cambio
       cy.visit('http://localhost:3000/agenda/list');
@@ -114,14 +114,14 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       
       // VERIFICACIONES R1 - Interacción con menús
       
-      // 1. Verificar que el menú Quejas está expandido inicialmente (ruta activa)
+      // 1. Verificar que el menú Atenciones está expandido inicialmente (ruta activa)
       cy.contains('Estadísticas').should('be.visible');
-      cy.contains('Lista de quejas').should('be.visible');
+      cy.contains('Lista de atenciones').should('be.visible');
       
-      // 2. Contraer menú Quejas
-      cy.contains('Quejas').click();
+      // 2. Contraer menú atenciones
+      cy.contains('Atenciones').click();
       cy.contains('Estadísticas').should('not.be.visible');
-      cy.contains('Lista de quejas').should('not.be.visible');
+      cy.contains('Lista de atenciones').should('not.be.visible');
       
       // 3. Expandir menú Agenda
       cy.contains('Agenda').click();
@@ -147,7 +147,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
         cy.visit(`http://localhost:3000${ruta}`);
         
         // Verificar que la sidebar sigue visible con menús principales
-        cy.contains('Quejas').should('be.visible');
+        cy.contains('Atenciones').should('be.visible');
         cy.contains('Agenda').should('be.visible');
         cy.contains('Talleres').should('be.visible');
         
@@ -184,7 +184,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       });
       
       // 2. Verificar que NO muestra elementos de la sidebar
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.contains('Agenda').should('not.exist');
       cy.contains('Talleres').should('not.exist');
       
@@ -197,19 +197,19 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       
       // Página de login
       cy.visit('http://localhost:3000/login');
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.contains('Agenda').should('not.exist');
       cy.contains('Talleres').should('not.exist');
       cy.contains('Iniciar sesión').should('be.visible');
       
       // Página de registro
       cy.visit('http://localhost:3000/registrarse');
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.contains('Agenda').should('not.exist');
       
       // Página de restaurar contraseña
       cy.visit('http://localhost:3000/restorepassword');
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.contains('Agenda').should('not.exist');
     });
 
@@ -226,7 +226,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.contains('Iniciar Sesión').should('exist');
       
       // Verificar que NO muestra elementos de sidebar
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.get('aside').should('not.exist');
     });
   });
@@ -266,7 +266,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.visit('http://localhost:3000/login');
       
       // Verificar que NO hay sidebar
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.get('aside').should('not.exist');
       
       // 2. Hacer login
@@ -276,7 +276,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.wait('@login');
       
       // 3. Verificar que ahora SÍ hay sidebar con menús
-      cy.contains('Quejas').should('be.visible');
+      cy.contains('Atenciones').should('be.visible');
       cy.contains('Agenda').should('be.visible');
       cy.contains('Talleres').should('be.visible');
       cy.get('aside').should('exist');
@@ -299,7 +299,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.reload();
 
       // 6. Verificar que NO hay sidebar
-      cy.contains('Quejas').should('not.exist');
+      cy.contains('Atenciones').should('not.exist');
       cy.get('aside').should('not.exist');
     });
   });
@@ -342,7 +342,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
     });
 
     it('debería navegar correctamente entre todas las opciones del menú', () => {
-      // Navegar de Quejas a Agenda
+      // Navegar de Atenciones a Agenda
       cy.visit('http://localhost:3000/quejas/lista');
       cy.contains('Agenda').click();
       cy.contains('Citas').click();
@@ -353,8 +353,8 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.contains('Ver talleres').click();
       cy.url().should('include', '/talleres/ver');
       
-      // Navegar de Talleres a Quejas
-      cy.contains('Quejas').click();
+      // Navegar de Talleres a Atenciones
+      cy.contains('Atenciones').click();
       cy.contains('Estadísticas').click();
       cy.url().should('include', '/quejas/estadisticas');
     });
@@ -400,7 +400,7 @@ describe('HU-22 - Creación de la sidebar - Tabla de Decisiones', () => {
       cy.visit('http://localhost:3000/quejas/lista');
       
       // Verificar que existen iconos cerca de los menús
-      cy.contains('Quejas').siblings('svg').should('exist');
+      cy.contains('Atenciones').siblings('svg').should('exist');
       cy.contains('Agenda').siblings('svg').should('exist');
       cy.contains('Talleres').siblings('svg').should('exist');
     });

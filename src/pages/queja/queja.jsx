@@ -131,6 +131,9 @@ const Queja = () => {
         'acompañamiento_solicitud_medidas_proteccion_inicial': '',
         'acompañamiento_ante_instancias_gubernamentales': '',
         'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
+        'interponer_queja_al_cade': '',
+        'interponer_queja_oficina_control_interno': '',
+        'interponer_queja_a_rectoria': '',
         'observaciones': '',
         'nombre': '',
         'sede': '',
@@ -1018,6 +1021,25 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_comite_asusntos_internos_disciplinarios", e.target.value)}
                                         options={sino}
                                     />
+                                    <FormField
+                                        label="¿Requiere interponer queja ante el comité de asuntos disciplinarios estudiantiles CADE?"
+                                        value={datos_adicionales.interponer_queja_al_cade}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_cade", e.target.value)}
+                                        options={sino}
+                                    />
+                                    <FormField
+                                        label="¿Requiere interponer queja ante la oficina de control interno?"
+                                        value={datos_adicionales.interponer_queja_oficina_control_interno}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_oficina_control_interno", e.target.value)}
+                                        options={sino}
+                                    />
+                                    <FormField
+                                        label="¿Requiere interpones queja ante la Rectoría?"
+                                        value={datos_adicionales.interponer_queja_a_rectoria}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_a_rectoria", e.target.value)}
+                                        options={sino}
+                                    />
+
                                     <FormField
                                         label="Observaciones adicionales"
                                         value={datos_adicionales.observaciones}

@@ -50,12 +50,12 @@ const Sidebar = () => {
   const menuItems = [
     { 
       id: 'complaints', 
-      title: 'Quejas', 
+      title: 'Atenciones', 
       icon: FiFolderPlus, 
       path: "/quejas",
       submenu: [
         { title: 'Estadísticas', path: '/quejas/estadisticas', icon: FiBarChart2 },
-        { title: 'Lista de quejas', path: '/quejas/lista', icon: FiList },
+        { title: 'Lista de Atenciones', path: '/quejas/lista', icon: FiList },
       ]
     },
     {

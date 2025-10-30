@@ -158,7 +158,7 @@ useEffect(() => {
     labels: conteofacultades.facultades,
     datasets: [
       {
-        label: "Quejas por facultad",
+        label: "Atenciones por facultad",
         data: conteofacultades.valores,
         backgroundColor: "rgba(239, 68, 68, 0.8)",
         borderColor: "rgba(239, 68, 68, 1)",
@@ -189,7 +189,7 @@ useEffect(() => {
     labels: conteosPorSedes.sedes,
     datasets: [
       {
-        label: "Quejas por sede",
+        label: "Atenciones por sede",
         data: conteosPorSedes.valores,
         backgroundColor: "rgba(59, 130, 246, 0.8)",
         borderColor: "rgba(59, 130, 246, 1)",
@@ -202,7 +202,7 @@ useEffect(() => {
     labels: anios,
     datasets: [
       {
-        label: "Quejas por año",
+        label: "Atenciones por año",
         data: anios.map(anio => conteosPorAnio[anio] || 0),
         backgroundColor: "rgba(34, 197, 94, 0.8)",
         borderColor: "rgba(34, 197, 94, 1)",
@@ -216,7 +216,7 @@ useEffect(() => {
     labels: conteoPorEdades.edades,
     datasets: [
       {
-        label: "Quejas por edades",
+        label: "Atenciones por edades",
         data: conteoPorEdades.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -229,7 +229,7 @@ useEffect(() => {
     labels: conteoPorComunas.comunas,
     datasets: [
       {
-        label: "Quejas por comunas",
+        label: "Atenciones por comunas",
         data: conteoPorComunas.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -241,7 +241,7 @@ useEffect(() => {
     labels: conteosPorTipoVBG.tipos,
     datasets: [
       {
-        label: "Quejas por Tipos de violencia",
+        label: "Atenciones por Tipos de violencia",
         data: conteosPorTipoVBG.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -253,7 +253,7 @@ useEffect(() => {
     labels: conteoPorFactores.factores,
     datasets: [
       {
-        label: "Quejas por factores de riesgo",
+        label: "Atenciones por factores de riesgo",
         data: conteoPorFactores.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -265,7 +265,7 @@ useEffect(() => {
     labels: conteosPorVicerrectorias.vicerrectorias,
     datasets: [
       {
-        label: "Quejas por vicerrectoría",
+        label: "Atenciones por vicerrectoría",
         data: conteosPorVicerrectorias.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -319,20 +319,20 @@ useEffect(() => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            📊 Estadísticas de quejas
+            📊 Estadísticas de atenciones
           </h1>
           <p className="text-gray-600 text-sm">
-            Resumen completo de las quejas y métricas del sistema
+            Resumen completo de las atenciones y métricas del sistema
           </p>
           <div className="w-20 h-1 bg-red-600 rounded-full mt-2"></div>
         </div>
 
         {/* Indicadores Principales */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Quejas Recibidas */}
+          {/* Atenciones Recibidas */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">📨 Quejas Recibidas</h2>
+              <h2 className="text-lg font-semibold text-gray-800">📨 Atenciones Recibidas</h2>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <FiTrendingUp className="text-green-500" />
                 <span>Año {currentYear}</span>
@@ -343,7 +343,7 @@ useEffect(() => {
               <div className="text-4xl font-bold text-red-600 mb-2">
                 {indicators.receivedComplaints}
               </div>
-              <p className="text-sm text-gray-600">Total de quejas recibidas</p>
+              <p className="text-sm text-gray-600">Total de atenciones recibidas</p>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -365,10 +365,10 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Quejas Remitidas */}
+          {/* Atenciones Remitidas */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">🔄 Quejas Remitidas</h2>
+              <h2 className="text-lg font-semibold text-gray-800">🔄 Atenciones Remitidas</h2>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <FiTrendingUp className="text-green-500" />
                 <span>Año {currentYear}</span>
@@ -379,7 +379,7 @@ useEffect(() => {
               <div className="text-4xl font-bold text-green-600 mb-2">
                 {indicators.referredComplaints}
               </div>
-              <p className="text-sm text-gray-600">Total de quejas remitidas</p>
+              <p className="text-sm text-gray-600">Total de atenciones remitidas</p>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -404,10 +404,10 @@ useEffect(() => {
 
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Quejas por Facultad */}
+          {/* Atenciones por Facultad */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por Facultad</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Atenciones por Facultad</h3>
               <button
                 onClick={() => downloadChart(chartRefs.faculty, 'quejas-por-facultad')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -431,10 +431,10 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Quejas por Sede */}
+          {/* Atenciones por Sede */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">📍 Quejas por Sede</h3>
+              <h3 className="text-lg font-semibold text-gray-800">📍 Atenciones por Sede</h3>
               <button
                 onClick={() => downloadChart(chartRefs.location, 'quejas-por-sede')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -512,10 +512,10 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Quejas por Vicerrectoría */}
+          {/* Atenciones por Vicerrectoría */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 lg:col-span-2">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏢 Quejas por Vicerrectoría</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏢 Atenciones por Vicerrectoría</h3>
               <button
                 onClick={() => downloadChart(chartRefs.department, 'quejas-por-vicerrectoria')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -543,7 +543,7 @@ useEffect(() => {
           {/* edades */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800"> Quejas por edades</h3>
+              <h3 className="text-lg font-semibold text-gray-800"> Atenciones por edades</h3>
               <button
                 onClick={() => downloadChart(chartRefs.edades, 'quejas-por-edades')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -569,7 +569,7 @@ useEffect(() => {
           {/* Comunas */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por comuna</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Atenciones por comuna</h3>
               <button
                 onClick={() => downloadChart(chartRefs.comunas, 'quejas-por-comunas')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -592,10 +592,10 @@ useEffect(() => {
               />
             </div>
           </div>
-          {/* Quejas por Tipo VBG */}
+          {/* Atenciones por Tipo VBG */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por tipo de violencia</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Atenciones por tipo de violencia</h3>
               <button
                 onClick={() => downloadChart(chartRefs.tipo_vbg, 'quejas-por-tipo-vbg')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -618,10 +618,10 @@ useEffect(() => {
               />
             </div>
           </div>
-          {/* Quejas por Factores de riesgo */}
+          {/* Atenciones por Factores de riesgo */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por factores de riesgo</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Atenciones por factores de riesgo</h3>
               <button
                 onClick={() => downloadChart(chartRefs.factores_riesgo, 'quejas-por-factores-riesgo')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -655,15 +655,15 @@ useEffect(() => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="p-4 bg-red-50 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{indicators.receivedComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Totales</div>
+              <div className="text-sm text-gray-600">Atenciones Totales</div>
             </div>
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{indicators.studentComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Estudiantes</div>
+              <div className="text-sm text-gray-600">Atenciones Estudiantes</div>
             </div>
             <div className="p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{indicators.referredComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Remitidas</div>
+              <div className="text-sm text-gray-600">Atenciones Remitidas</div>
             </div>
           </div>
         </div>

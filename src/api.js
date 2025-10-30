@@ -1,7 +1,7 @@
 import getCSRFToken from "./helpers/getCSRF";
 
 //export const baseURL = process.env.REACT_APP_API_URL;
-export const baseURL = "http://192.168.20.58:8000/api";
+export const baseURL = "http://192.168.0.6:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 
@@ -127,7 +127,7 @@ export const registerExternalParticipant = async (workshopId, participantData) =
 
 /*------------------ SOLICITUDES DE QUEJAS ------------------*/
 
-// Obtener TODAS las quejas
+// Obtener TODAS las atenciones
 // api.js - ACTUALIZAR LA FUNCIÓN getComplaints
 export const getComplaints = async () => {
   const response = await fetch(`${baseURL}/quejas/`, {
@@ -462,11 +462,11 @@ export const getRegistryList = async (complaintId) => {
 
     );
     if (!response.ok) {
-      throw new Error("Error al obtener el historial de quejas");
+      throw new Error("Error al obtener el historial de atenciones");
     }
     return await response.json();
   } catch (error) {
-    console.error("Error al obtener el historial de quejas:", error);
+    console.error("Error al obtener el historial de atenciones:", error);
     throw error;
   }
 }

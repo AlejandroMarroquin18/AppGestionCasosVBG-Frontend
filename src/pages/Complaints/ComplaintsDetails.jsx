@@ -117,7 +117,7 @@ const ComplaintsDetails = () => {
     "agresor_tiene_denuncias",
     "agresor_detalles_denuncias",
         
-    // Detalles generales (63-54)
+    // Detalles generales (63-57)
     "desea_activar_ruta_atencion_integral",
     "recibir_asesoria_orientacion_sociopedagogica",
     "orientacion_psicologica",
@@ -125,6 +125,9 @@ const ComplaintsDetails = () => {
     "acompañamiento_solicitud_medidas_proteccion_inicial",
     "acompañamiento_ante_instancias_gubernamentales",
     "interponer_queja_al_comite_asusntos_internos_disciplinarios",
+    "interponer_queja_al_cade", 
+    "interponer_queja_oficina_control_interno",
+    "interponer_queja_a_rectoria",
     "observaciones"
   ];
 
@@ -207,6 +210,9 @@ const ComplaintsDetails = () => {
     "¿Requiere recibir acompañamiento para solicitud de medidas de protección inicial?",
     "¿Requiere recibir acompañamiento ante instancias gubernamentales?",
     "¿Requiere interponer una queja formal al Comité de Asuntos Internos Disciplinarios?",
+    "¿Requiere interponer una queja formal al Comité de Asuntos Disciplinarios Estudiantiles (CADE)?",
+    "¿Requiere interponer queja ante la oficina de control interno?",
+    "¿Requiere interpones queja ante la Rectoría?",
     "Observaciones adicionales"
   ];
 
@@ -742,7 +748,7 @@ const ComplaintsDetails = () => {
           {renderAccordionSection("reporta", 0, 12, "👤 Persona que Reporta")}
           {renderAccordionSection("afectado", 12, 42, "🎯 Persona Afectada")}
           {renderAccordionSection("agresor", 42, 62, "⚠️ Persona Agresora")}
-          {renderAccordionSection("detalles", 62, 71, "📋 Información Adicional y Servicios Solicitados")}
+          {renderAccordionSection("detalles", 62, 74, "📋 Información Adicional y Servicios Solicitados")}
 
           {/* Historial */}
           <Accordion className="mb-8 shadow-lg border-0 rounded-lg overflow-hidden">
@@ -751,7 +757,7 @@ const ComplaintsDetails = () => {
               className="bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200"
             >
               <Typography className="text-xl font-bold text-gray-800">
-                📝 Historial de Registros ({registros.length})
+                📝 Historial de atenciones ({registros.length})
               </Typography>
             </AccordionSummary>
             <AccordionDetails className="p-6 bg-white">
@@ -836,7 +842,7 @@ const ComplaintsDetails = () => {
                 ) : (
                   <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                     <div className="text-6xl mb-4">📝</div>
-                    <p className="text-lg font-medium text-gray-600">No hay registros en el historial</p>
+                    <p className="text-lg font-medium text-gray-600">No hay registros de la atención</p>
                     <p className="text-sm text-gray-500 mt-2">Agrega el primer registro usando el botón superior</p>
                   </div>
                 )}

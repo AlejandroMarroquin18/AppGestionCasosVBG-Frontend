@@ -21,8 +21,10 @@ const ComplaintsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [complaintsPerPage] = useState(8);
   const [facultyFilter, setFacultyFilter] = useState("");
+  const [estamentoFilter, setEstamentoFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const estamento = ['Estudiante', 'Docente', 'Funcionario', 'Externo', 'Usuario de las instalaciones'];
 
   useEffect(() => {
     const loadComplaints = async () => {
@@ -43,12 +45,14 @@ const ComplaintsList = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [locationFilter, typeFilter, searchTerm, facultyFilter]);
+  }, [locationFilter, typeFilter, searchTerm, facultyFilter,estamentoFilter]);
 
   const filteredComplaints = complaints.filter((complaint) => {
     return (
       (locationFilter === "" ||
         (complaint.afectado_sede && complaint.afectado_sede.includes(locationFilter))) &&
+      ( typeFilter === "" ||
+        (complaint.afectado_estamento && complaint.afectado_estamento.includes(estamentoFilter))) &&
       (typeFilter === "" ||
         (complaint.prioridad && complaint.prioridad.includes(typeFilter))) &&
       (facultyFilter === "" ||
@@ -121,7 +125,7 @@ const ComplaintsList = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner message="Cargando quejas..." size="large" />
+        <LoadingSpinner message="Cargando atenciones..." size="large" />
       </div>
     );
   }
@@ -235,6 +239,23 @@ const ComplaintsList = () => {
                   <option value="Educación">Educación</option>
                   <option value="Psicología">Psicología</option>
                   <option value="Derecho">Derecho</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Estamento
+                </label>
+                <select
+                  value={estamentoFilter}
+                  onChange={(e) => setEstamentoFilter(e.target.value)}
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="">Todos los estamentos</option>
+                  {estamento.map((estamentoOption) => (
+                    <option key={estamentoOption} value={estamentoOption}>
+                      {estamentoOption}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -393,12 +414,12 @@ const ComplaintsList = () => {
             <div className="text-center py-8">
               <div className="text-4xl mb-2">📝</div>
               <h3 className="text-base font-medium text-gray-900 mb-1">
-                No se encontraron quejas
+                No se encontraron atenciones
               </h3>
               <p className="text-sm text-gray-500">
                 {filteredComplaints.length === 0 && complaints.length > 0 
                   ? "Intenta ajustar los filtros de búsqueda"
-                  : "No hay quejas registradas en el sistema"
+                  : "No hay atenciones registradas en el sistema"
                 }
               </p>
             </div>
@@ -409,7 +430,7 @@ const ComplaintsList = () => {
         {filteredComplaints.length > 0 && (
           <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-3">
             <div className="text-xs text-gray-600">
-              Mostrando {firstPageIndex + 1}-{Math.min(lastPageIndex, filteredComplaints.length)} de {filteredComplaints.length} quejas
+              Mostrando {firstPageIndex + 1}-{Math.min(lastPageIndex, filteredComplaints.length)} de {filteredComplaints.length} atenciones
             </div>
             
             <div className="flex items-center gap-1">
