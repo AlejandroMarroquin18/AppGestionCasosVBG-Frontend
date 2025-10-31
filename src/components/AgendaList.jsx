@@ -7,12 +7,9 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
 import 'moment/locale/es'
 import { saveEvent, baseURL } from "../api";
-<<<<<<< HEAD
-=======
 import { FiPlus, FiX, FiTrash2, FiEdit, FiSave, FiUsers, FiMapPin, FiLink, FiFileText, FiUser, FiCalendar } from "react-icons/fi";
 import LoadingSpinner from "../components/LoadingSpinner";
 import getCSRFToken from "../helpers/getCSRF";
->>>>>>> 549b273 (Arreglada la creacion de eventos)
 
 moment.locale('es')
 const localizer = momentLocalizer(moment);
@@ -174,14 +171,6 @@ const AgendaList = () => {
       return;
     }
 
-<<<<<<< HEAD
-    const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`);
-    const dataCaseID = await resCaseID.json();
-
-    if (!dataCaseID.exists) {
-      alert("El ID de la queja no existe en el sistema.");
-      return; // Detener envío
-=======
     // Validar ID de caso
     const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`, {
       method: "GET",
@@ -196,7 +185,6 @@ const AgendaList = () => {
     if (!dataCaseID.exists) {
       alert("El ID de la atención no existe en el sistema.");
       return;
->>>>>>> 549b273 (Arreglada la creacion de eventos)
     }
 
     const eventData = {
@@ -416,124 +404,6 @@ const handleEditSaveEvent = async (event) => {
   }
 
   return (
-<<<<<<< HEAD
-    <>
-      <div ref={calendarRef} style={{ height: "80vh", position: "relative" }}>
-        <DnDCalendar
-          
-          selectable
-          resizable
-          draggableAccessor={() => true}
-          resizableAccessor={() => true}
-          messages={messages}
-          onSelectSlot={handleSelectedDay}
-          onSelectEvent={handleSelectEvent}
-          onEventResize={handleEventResize}
-          onEventDrop={handleEventResize}
-          localizer={localizer}
-          events={formattedEvents}
-          startAccessor="start"
-          endAccessor="end"
-          defaultView="week"
-          style={{ height: "100%" }}
-          eventPropGetter={getEventStyle}
-        />
-
-        {/* Formulario flotante para crear evento */}
-        {selectedDay && (
-          <div 
-            style={{
-              top: popupPosition.top,
-              left: popupPosition.left,
-              position: "absolute",
-              backgroundColor: "white",
-              border: "1px solid #d1d5db",
-              borderRadius: "0.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-              padding: "0.5rem",
-              zIndex: 100,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
-              gap: "0.5rem",
-              width: "33.333333%",
-              height: "auto"
-            }}
-          >
-            <h4><strong>Crear reunión</strong></h4>
-            <input value={newEvent.title} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"title", e.target.value)} placeholder="Título" />
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2">
-                <input 
-                onKeyDown={(e) => e.key === "Enter" &&  newEvent.tempemail.trim() && setNewEvent({...newEvent , emails : [...newEvent.emails,newEvent.tempemail], tempemail: ""}) }
-                value={newEvent.tempemail} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"tempemail", e.target.value)} 
-                placeholder="Añadir participante" />
-                <button onClick={()=> newEvent.tempemail.trim() && setNewEvent({...newEvent , emails : [...newEvent.emails,newEvent.tempemail], tempemail: ""}) }> 
-                  Añadir 
-                </button>
-              </div>
-              <div>
-                <ul className="w-full">
-                  {newEvent.emails.map((email, index) => (
-                    <li key={index} className="flex justify-between items-center gap-2 w-full border-b py-2">
-                      <span>{email}</span>
-                      <button className="px-2 py-1" onClick={() => handleChangeInput(setNewEvent,newEvent,"emails", newEvent.emails.filter((e) => e !== email) )}>
-                        Eliminar
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>  
-            </div>
-
-
-            {/*Check de crear reunion */}
-            <h4><strong>Crear Reunión de Google Meet?</strong></h4>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={newEvent.createMeet}
-                onChange={(e) => handleChangeInput(setNewEvent,newEvent,"createMeet",e.target.checked)}
-                className="hidden"
-              />
-              <div
-                className={`w-6 h-6 rounded-full border-2 transition-all ${
-                  newEvent.createMeet ? "bg-red-500 border-red-500" : "border-gray-400"
-                }`}
-              />
-              <span className="ml-2">{newEvent.createMeet ? "Activado" : "Desactivado"}</span>
-            </label>
-
-            <input value={newEvent.location} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"location", e.target.value)} placeholder="Ubicación" />
-            
-            <input value={newEvent.caseID} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"caseID", e.target.value)} placeholder="ID de caso" />
-            <input value={newEvent.description} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"description", e.target.value)} placeholder="Descripción" />
-            <input value={newEvent.organizer} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"organizer", e.target.value)} placeholder="Organizador" />
-            <input value={newEvent.type} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"type", e.target.value)} placeholder="Tipo" />
-           
-            
-            
-            <select
-              value={newEvent.colorId}
-              onChange={(e) => handleChangeInput(setNewEvent,newEvent,"colorId",e.target.value)}
-              className={`border rounded-lg  appearance-none bg-[${eventColors[newEvent.colorId]}]`}
-            >
-              <option value="" disabled>Selecciona un color</option>
-              {Object.entries(eventColors).map(([key, color]) => (
-                <option key={key} value={key} style={{ backgroundColor: color }}>
-                  {color}
-                </option>
-              ))}
-            </select>
-            
-            <div>
-            
-            <button onClick={sendEvent}>Crear</button>
-            <button onClick={() =>{ setSelectedDay(null);setNewEvent(emptyEvent)}}>Cerrar</button>
-            </div>
-          </div>
-        )}
-=======
     <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -546,7 +416,6 @@ const handleEditSaveEvent = async (event) => {
           </p>
           <div className="w-20 h-1 bg-red-600 rounded-full mt-2"></div>
         </div>
->>>>>>> 549b273 (Arreglada la creacion de eventos)
 
         {/* Calendar Container */}
         <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
