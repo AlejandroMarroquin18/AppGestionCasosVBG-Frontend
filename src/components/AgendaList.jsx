@@ -9,7 +9,10 @@ import 'moment/locale/es'
 import { saveEvent, baseURL } from "../api";
 import { FiPlus, FiX, FiTrash2, FiEdit, FiSave, FiUsers, FiMapPin, FiLink, FiFileText, FiUser, FiCalendar } from "react-icons/fi";
 import LoadingSpinner from "../components/LoadingSpinner";
+<<<<<<< HEAD
 import getCSRFToken from "../helpers/getCSRF";
+=======
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
 
 moment.locale('es')
 const localizer = momentLocalizer(moment);
@@ -172,6 +175,7 @@ const AgendaList = () => {
     }
 
     // Validar ID de caso
+<<<<<<< HEAD
     const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`, {
       method: "GET",
       headers: {
@@ -184,6 +188,13 @@ const AgendaList = () => {
 
     if (!dataCaseID.exists) {
       alert("El ID de la atención no existe en el sistema.");
+=======
+    const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`);
+    const dataCaseID = await resCaseID.json();
+
+    if (!dataCaseID.exists) {
+      alert("El ID de la queja no existe en el sistema.");
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
       return;
     }
 
@@ -191,7 +202,11 @@ const AgendaList = () => {
       summary: newEvent.title,
       location: newEvent.location,
       description: `ID caso: ${newEvent.caseID} \n Organizador: ${newEvent.organizer} \n Tipo: ${newEvent.type} \n description: ${newEvent.description} \n`,
+<<<<<<< HEAD
       attendees: newEvent.emails ? newEvent.emails.map((email) => ({ email: email.trim() })) : [], // ← CORRECCIÓN AQUÍ
+=======
+      attendees: newEvent.emails.map((email) => ({ email: email.trim() })),
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
       start: { dateTime: newEvent.start.toISOString(), timeZone: "America/Bogota" },
       end: { dateTime: newEvent.end.toISOString(), timeZone: "America/Bogota" },
       colorId: newEvent.colorId,
@@ -216,18 +231,30 @@ const AgendaList = () => {
       startdatehour: newEvent.start.toISOString(),
       enddatehour: newEvent.end.toISOString(),
       timezone: "America/Bogota",
+<<<<<<< HEAD
       type: newEvent.type || "",
       case_id: Number(newEvent.caseID),
+=======
+      type: newEvent.type,
+      case_id: newEvent.caseID,
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
       create_meet: newEvent.createMeet,
       meet_link: "",
       google_event_id: ""
     };
+<<<<<<< HEAD
 
     eventData.backendEvent = backendEvent;
 
     try {
       const createdEvent = await createEvent(eventData);
       //añade el evento al estado local de la web
+=======
+
+    try {
+      const createdEvent = await createEvent(eventData);
+
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
       setFormattedEvents(prevEvents => [
         ...prevEvents,
         {
@@ -246,19 +273,29 @@ const AgendaList = () => {
         }
       ]);
 
+<<<<<<< HEAD
       
+=======
+      backendEvent.google_event_id = createdEvent.id;
+      backendEvent.meet_link = createdEvent.hangoutLink || "";
+      await saveEvent(backendEvent);
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
 
       setSelectedDay(null);
       setNewEvent(emptyEvent);
 
+<<<<<<< HEAD
       //alert("Evento creado exitosamente");
 
+=======
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
     } catch (error) {
       console.error("Error al crear el evento:", error);
       alert("No se pudo crear el evento. Inténtalo de nuevo.");
     }
   };
 
+<<<<<<< HEAD
   //  Redimensionar y mover evento
   const handleEventResize = async ({ event, start, end }) => {
     const id = event.id;
@@ -294,6 +331,8 @@ const AgendaList = () => {
     }
   };
 
+=======
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
   const handleDeleteEvent = async (eventId) => {
     if (!eventId) return;
 
@@ -311,6 +350,7 @@ const AgendaList = () => {
     }
   };
 
+<<<<<<< HEAD
   // Función para guardar edición de eventos
 const handleEditSaveEvent = async (event) => {
   const id = event.id;
@@ -382,6 +422,8 @@ const handleEditSaveEvent = async (event) => {
   }
 };
 
+=======
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
   const getEventStyle = (event) => {
     const backgroundColor = eventColors[event.colorId] || "#3174ad";
     return {
@@ -428,8 +470,11 @@ const handleEditSaveEvent = async (event) => {
               messages={messages}
               onSelectSlot={handleSelectedDay}
               onSelectEvent={handleSelectEvent}
+<<<<<<< HEAD
               onEventResize={handleEventResize}
               onEventDrop={handleEventResize}
+=======
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
               localizer={localizer}
               events={formattedEvents}
               startAccessor="start"
@@ -823,7 +868,11 @@ const handleEditSaveEvent = async (event) => {
                         Cancelar
                       </button>
                       <button
+<<<<<<< HEAD
                         onClick={() => { handleEditSaveEvent(selectedEvent); }}
+=======
+                        onClick={() => { /* handleEditSaveEvent(selectedEvent); */ setEditEventModal(false); }}
+>>>>>>> 4f16d8988cccddcf2471803af8714a0e44ed1e17
                         className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 text-sm"
                       >
                         <FiSave size={14} />

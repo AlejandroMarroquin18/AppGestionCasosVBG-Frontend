@@ -58,78 +58,79 @@ const ComplaintsStats = () => {
 
   };
 
-  useEffect(() => {
-    const loadComplaintStats = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getComplaintStats();
-        console.log("Complaint Statistics:", data);
-        
-        setReceivedData(data);
-        setConteosPorAnio(data);
+  // En el useEffect donde procesas los datos, actualiza los nombres de campos:
 
-        // Procesar datos de facultades
-        const facultadesList = data.conteo_por_facultad_afectado.map(item => 
-          item.afectado_facultad === '' ? 'No especificado' : item.afectado_facultad
-        );
-        const totalesFacultad = data.conteo_por_facultad_afectado.map(item => item.total);
-        setConteofacultades({facultades: facultadesList, valores: totalesFacultad});
+useEffect(() => {
+  const loadComplaintStats = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getComplaintStats();
+      console.log("Complaint Statistics:", data);
+      
+      setReceivedData(data);
+      setConteosPorAnio(data.conteo_por_anio); // Asegúrate de usar data.conteo_por_anio
 
-        // Procesar datos de géneros
-        const generoList = data.conteo_por_genero_afectado.map(item => 
-          item.afectado_identidad_genero === '' ? 'No especificado' : item.afectado_identidad_genero
-        );
-        const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
-        setConteosPorGenero({generos: generoList, valores: totalesGenero});
+      // Procesar datos de facultades - USANDO NUEVOS NOMBRES DE CAMPOS
+      const facultadesList = data.conteo_por_facultad_afectado.map(item => 
+        item.persona_afectada__facultad === null || item.persona_afectada__facultad === '' ? 'No especificado' : item.persona_afectada__facultad
+      );
+      const totalesFacultad = data.conteo_por_facultad_afectado.map(item => item.total);
+      setConteofacultades({facultades: facultadesList, valores: totalesFacultad});
 
-        // Procesar datos de sedes
-        const sedesList = data.conteo_por_sede_afectado.map(item => 
-          item.afectado_sede === '' ? 'No especificado' : item.afectado_sede
-        );
-        const totalesSedes = data.conteo_por_sede_afectado.map(item => item.total);
-        setConteosPorSedes({sedes: sedesList, valores: totalesSedes});
+      // Procesar datos de géneros - USANDO NUEVOS NOMBRES DE CAMPOS
+      const generoList = data.conteo_por_genero_afectado.map(item => 
+        item.persona_afectada__identidad_genero === null || item.persona_afectada__identidad_genero === '' ? 'No especificado' : item.persona_afectada__identidad_genero
+      );
+      const totalesGenero = data.conteo_por_genero_afectado.map(item => item.total);
+      setConteosPorGenero({generos: generoList, valores: totalesGenero});
 
-        // Procesar datos de vicerrectorías
-        const vicesList = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => 
-          item.afectado_vicerrectoria_adscrito === '' ? 'No especificado' : item.afectado_vicerrectoria_adscrito
-        );
-        const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
-        setConteosPorVicerrectorias({vicerrectorias: vicesList, valores: totalVices});
+      // Procesar datos de sedes - USANDO NUEVOS NOMBRES DE CAMPOS
+      const sedesList = data.conteo_por_sede_afectado.map(item => 
+        item.persona_afectada__sede === null || item.persona_afectada__sede === '' ? 'No especificado' : item.persona_afectada__sede
+      );
+      const totalesSedes = data.conteo_por_sede_afectado.map(item => item.total);
+      setConteosPorSedes({sedes: sedesList, valores: totalesSedes});
 
-        // Procesar datos de edades
-        const edadesList = data.edades.map(item => 
-          item.afectado_edad === '' ? 'No especificado' : item.afectado_edad
-        );
-        const totalEdades = data.edades.map(item => item.total);
-        setConteoPorEdades({edades: edadesList, valores: totalEdades});
-        // Procesar datos de comunass
-        const comunasList = data.comunas.map(item => 
-          item.afectado_comuna === '' ? 'No especificado' : item.afectado_comuna
-        );
-        const totalComunas = data.comunas.map(item => item.total);
-        setConteoPorComunas({comunas: comunasList, valores: totalComunas});
-        
-        
-        console.log("Tipo VBG data:", data.tipo_vbg);
-        // Procesar datos de tipos de VBG
-        setConteosPorTipoVBG({tipos:  Object.keys(data.tipo_vbg), valores: Object.values(data.tipo_vbg)});
-        
-        console.log("Factores de riesgo data:", data.factores_riesgo);
-        // Procesar datos de factores de riesgo
-        setConteoPorFactores({factores: Object.keys(data.factores_riesgo), valores: Object.values(data.factores_riesgo)});
+      // Procesar datos de vicerrectorías - USANDO NUEVOS NOMBRES DE CAMPOS
+      const vicesList = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => 
+        item.persona_afectada__vicerrectoria_adscrito === null || item.persona_afectada__vicerrectoria_adscrito === '' ? 'No especificado' : item.persona_afectada__vicerrectoria_adscrito
+      );
+      const totalVices = data.conteo_por_vicerrectoria_adscrita_afectado.map(item => item.total);
+      setConteosPorVicerrectorias({vicerrectorias: vicesList, valores: totalVices});
 
+      // Procesar datos de edades - USANDO NUEVOS NOMBRES DE CAMPOS
+      const edadesList = data.edades.map(item => 
+        item.persona_afectada__edad === null || item.persona_afectada__edad === '' ? 'No especificado' : item.persona_afectada__edad
+      );
+      const totalEdades = data.edades.map(item => item.total);
+      setConteoPorEdades({edades: edadesList, valores: totalEdades});
 
-        setAnios(Object.keys(data.conteo_por_anio));
+      // Procesar datos de comunas - USANDO NUEVOS NOMBRES DE CAMPOS
+      const comunasList = data.comunas.map(item => 
+        item.persona_afectada__comuna === null || item.persona_afectada__comuna === '' ? 'No especificado' : item.persona_afectada__comuna
+      );
+      const totalComunas = data.comunas.map(item => item.total);
+      setConteoPorComunas({comunas: comunasList, valores: totalComunas});
+      
+      console.log("Tipo VBG data:", data.tipo_vbg);
+      // Procesar datos de tipos de VBG
+      setConteosPorTipoVBG({tipos:  Object.keys(data.tipo_vbg), valores: Object.values(data.tipo_vbg)});
+      
+      console.log("Factores de riesgo data:", data.factores_riesgo);
+      // Procesar datos de factores de riesgo
+      setConteoPorFactores({factores: Object.keys(data.factores_riesgo), valores: Object.values(data.factores_riesgo)});
 
-      } catch (error) {
-        console.error("Error loading complaint statistics:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadComplaintStats();
-  }, []);
+      setAnios(Object.keys(data.conteo_por_anio));
+
+    } catch (error) {
+      console.error("Error loading complaint statistics:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  loadComplaintStats();
+}, []);
 
   // Función para descargar gráficos
   const downloadChart = (chartRef, filename) => {
@@ -142,15 +143,15 @@ const ComplaintsStats = () => {
   };
 
   const indicators = {
-    receivedComplaints: conteosPorAnio[currentYear] || 0,
-    referredComplaints: 12, // Este dato debería venir del backend
-    studentComplaints: receivedData.afectado_estudiantes || 0,
-    staffComplaints: receivedData.afectado_funcionarios || 0,
-    professorComplaints: receivedData.afectado_profesores || 0,
-    studentReferrals: 7, // Este dato debería venir del backend
-    staffReferrals: 3, // Este dato debería venir del backend
-    professorReferrals: 2, // Este dato debería venir del backend
-  };
+  receivedComplaints: Object.values(conteosPorAnio).reduce((sum, count) => sum + count, 0) || 0,
+  referredComplaints: (receivedData.remitidos_estudiantes || 0) + (receivedData.remitidos_profesores || 0) + (receivedData.remitidos_funcionarios || 0),
+  studentComplaints: receivedData.afectado_estudiantes || 0,
+  staffComplaints: receivedData.afectado_funcionarios || 0,
+  professorComplaints: receivedData.afectado_profesores || 0,
+  studentReferrals: receivedData.remitidos_estudiantes || 0,
+  staffReferrals: receivedData.remitidos_funcionarios || 0,
+  professorReferrals: receivedData.remitidos_profesores || 0,
+};
 
   // Datos para los gráficos
   const complaintsByFacultyData = {
@@ -240,7 +241,7 @@ const ComplaintsStats = () => {
     labels: conteosPorTipoVBG.tipos,
     datasets: [
       {
-        label: "Quejas por Tipos de violencia",
+        label: "Quejas por tipos de violencia",
         data: conteosPorTipoVBG.valores,
         backgroundColor: "rgba(168, 85, 247, 0.8)",
         borderColor: "rgba(168, 85, 247, 1)",
@@ -331,7 +332,7 @@ const ComplaintsStats = () => {
           {/* Quejas Recibidas */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">📨 Quejas Recibidas</h2>
+              <h2 className="text-lg font-semibold text-gray-800">📨 Quejas recibidas</h2>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <FiTrendingUp className="text-green-500" />
                 <span>Año {currentYear}</span>
@@ -367,7 +368,7 @@ const ComplaintsStats = () => {
           {/* Quejas Remitidas */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">🔄 Quejas Remitidas</h2>
+              <h2 className="text-lg font-semibold text-gray-800">🔄 Quejas remitidas</h2>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <FiTrendingUp className="text-green-500" />
                 <span>Año {currentYear}</span>
@@ -406,7 +407,7 @@ const ComplaintsStats = () => {
           {/* Quejas por Facultad */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por Facultad</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏛️ Quejas por facultad</h3>
               <button
                 onClick={() => downloadChart(chartRefs.faculty, 'quejas-por-facultad')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -433,7 +434,7 @@ const ComplaintsStats = () => {
           {/* Quejas por Sede */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">📍 Quejas por Sede</h3>
+              <h3 className="text-lg font-semibold text-gray-800">📍 Quejas por sede</h3>
               <button
                 onClick={() => downloadChart(chartRefs.location, 'quejas-por-sede')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -460,7 +461,7 @@ const ComplaintsStats = () => {
           {/* Evolución por Año */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">📈 Evolución por Año</h3>
+              <h3 className="text-lg font-semibold text-gray-800">📈 Evolución por año</h3>
               <button
                 onClick={() => downloadChart(chartRefs.year, 'evolucion-quejas')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -487,7 +488,7 @@ const ComplaintsStats = () => {
           {/* Distribución por Género */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">⚧️ Distribución por Género</h3>
+              <h3 className="text-lg font-semibold text-gray-800">⚧️ Distribución por género</h3>
               <button
                 onClick={() => downloadChart(chartRefs.gender, 'distribucion-genero')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -514,7 +515,7 @@ const ComplaintsStats = () => {
           {/* Quejas por Vicerrectoría */}
           <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 lg:col-span-2">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">🏢 Quejas por Vicerrectoría</h3>
+              <h3 className="text-lg font-semibold text-gray-800">🏢 Quejas por vicerrectoría</h3>
               <button
                 onClick={() => downloadChart(chartRefs.department, 'quejas-por-vicerrectoria')}
                 className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
@@ -650,19 +651,19 @@ const ComplaintsStats = () => {
 
         {/* Resumen General */}
         <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Resumen General</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Resumen general</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="p-4 bg-red-50 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{indicators.receivedComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Totales</div>
+              <div className="text-sm text-gray-600">Quejas totales</div>
             </div>
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{indicators.studentComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Estudiantes</div>
+              <div className="text-sm text-gray-600">Quejas estudiantes</div>
             </div>
             <div className="p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{indicators.referredComplaints}</div>
-              <div className="text-sm text-gray-600">Quejas Remitidas</div>
+              <div className="text-sm text-gray-600">Quejas remitidas</div>
             </div>
           </div>
         </div>
