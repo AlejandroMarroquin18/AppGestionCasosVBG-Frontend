@@ -7,6 +7,8 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import useGoogleCalendar from "../hooks/useGoogleCalendar";
 import 'moment/locale/es'
 import { saveEvent, baseURL } from "../api";
+import { FiPlus, FiX, FiTrash2, FiEdit, FiSave, FiUsers, FiMapPin, FiLink, FiFileText, FiUser, FiCalendar } from "react-icons/fi";
+import LoadingSpinner from "../components/LoadingSpinner";
 import getCSRFToken from "../helpers/getCSRF";
 
 moment.locale('es')
@@ -15,46 +17,34 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 const AgendaList = () => {
   const userToken = localStorage.getItem("userToken");
-  const { events, fetchEvents, createEvent, updateEvent, deleteEvent,fetchEventById } = useGoogleCalendar(userToken);
+  const { events, fetchEvents, createEvent, updateEvent, deleteEvent, fetchEventById } = useGoogleCalendar(userToken);
   const [selectedDay, setSelectedDay] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedEventCopy,setSelectedEventCopy]=useState(null)
+  const [selectedEventCopy, setSelectedEventCopy] = useState(null);
   const [editEventModal, setEditEventModal] = useState(false);
-  const [currentYear, setCurrentYear]=useState(new Date().getFullYear())
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [isLoading, setIsLoading] = useState(false);
   const calendarRef = React.useRef();
-  
-  
-  
-  const emptyEvent={
+
+  const emptyEvent = {
     title: "",
-    tempemail:"",
+    tempemail: "",
     emails: [],
     location: "",
     link: "",
-    createMeet:false,
-    caseID:  "" ,
+    createMeet: false,
+    caseID: "",
     description: "",
     organizer: "",
     type: "",
     start: null,
     end: null,
     colorId: "11",
-  }
+  };
+
   const [newEvent, setNewEvent] = useState(emptyEvent);
+  const [formattedEvents, setFormattedEvents] = useState([]);
 
-
-  const [formattedEvents, setFormattedEvents] = useState([
-    {
-      title: "Evento de prueba",
-      start: new Date(2025, 2, 4, 10, 0),
-      end: new Date(2025, 2, 4, 12, 0),
-      emails: ["correo@ejemplo.com"],
-      location: "Sala de reuniones A",
-      link: "https://zoom.us",
-      caseID: "12345" ,
-    },
-  ]);
   const eventColors = {
     "1": "#a4bdfc",
     "2": "#7ae7bf",
@@ -68,230 +58,208 @@ const AgendaList = () => {
     "10": "#51b749",
     "11": "#dc2127"
   };
+
+  // Nombres de colores en forma de oración
+  const colorNames = {
+    "1": "Azul lavanda claro",
+    "2": "Verde menta suave",
+    "3": "Lila pastel",
+    "4": "Coral rojizo",
+    "5": "Amarillo mostaza",
+    "6": "Naranja melocotón",
+    "7": "Turquesa brillante",
+    "8": "Gris neutro",
+    "9": "Azul royal",
+    "10": "Verde manzana",
+    "11": "Rojo intenso"
+  };
+
   const messages = {
-  today: 'Hoy',
-  previous: 'Anterior',
-  next: 'Siguiente',
-  month: 'Mes',
-  week: 'Semana',
-  day: 'Día',
-  agenda: 'Agenda',
-  date: 'Fecha',
-  time: 'Hora',
-  event: 'Evento',
-  noEventsInRange: 'No hay eventos en este rango.',
-  showMore: total => `+ Ver más (${total})`
-}
-
-
-  
+    today: 'Hoy',
+    previous: 'Anterior',
+    next: 'Siguiente',
+    month: 'Mes',
+    week: 'Semana',
+    day: 'Día',
+    agenda: 'Agenda',
+    date: 'Fecha',
+    time: 'Hora',
+    event: 'Evento',
+    noEventsInRange: 'No hay eventos en este rango.',
+    showMore: total => `+ Ver más (${total})`
+  };
 
   useEffect(() => {
     if (userToken) {
-      fetchEvents(currentYear);
+      setIsLoading(true);
+      fetchEvents(currentYear).finally(() => setIsLoading(false));
     }
-  }, [userToken]);
-
+  }, [userToken, currentYear]);
 
   useEffect(() => {
     if (events && events.length > 0) {
-      
-
-
-      const formatted = events.map(event =>  { 
+      const formatted = events.map(event => {
         const desc = event.description ?? "";
         const casoId = desc.match(/ID caso: \s*(.+) \n \n/);
         const organizador = desc.match(/Organizador: \s*(.+) \n \n/);
         const tipo = desc.match(/Tipo: \s*(.+)/);
         const descripcion = desc.match(/description: \s*(.+) \n \n/);
 
-        
-        
-        
         return {
-        id: event.id,
-        title: event.summary ,
-        start: event.start?.dateTime ? new Date(event.start.dateTime) : new Date(event.start.date), // Soporte para eventos de día completo
-        end: event.end?.dateTime ? new Date(event.end.dateTime) : new Date(event.end.date),
-        emails: event.attendees ? event.attendees.map(a => a.email) : [],
-        location: event.location || "Sin ubicación",
-        link: event.hangoutLink || "",
-        
-        colorId : event.colorId,
-
-        caseID: casoId?.[1].trim() ?? "",
-        organizer: organizador?.[1].trim() ?? "",
-        type: tipo?.[1].trim() ?? "",
-        description: descripcion?.[1].trim() ?? "",
-        /*
-        caseID: event.description ? event.description.replace("ID caso: ", " ") : "" ,
-        description: event.description || "",
-        organizer: event.description || "",
-        type: event.description || "",
-        */}})
-      ;
-  
+          id: event.id,
+          title: event.summary,
+          start: event.start?.dateTime ? new Date(event.start.dateTime) : new Date(event.start.date),
+          end: event.end?.dateTime ? new Date(event.end.dateTime) : new Date(event.end.date),
+          emails: event.attendees ? event.attendees.map(a => a.email) : [],
+          location: event.location || "Sin ubicación",
+          link: event.hangoutLink || "",
+          colorId: event.colorId,
+          caseID: casoId?.[1]?.trim() ?? "",
+          organizer: organizador?.[1]?.trim() ?? "",
+          type: tipo?.[1]?.trim() ?? "",
+          description: descripcion?.[1]?.trim() ?? "",
+        };
+      });
       setFormattedEvents(formatted);
     }
   }, [events]);
 
-  
-
-  //  Seleccionar una fecha/hora para crear un evento
   const handleSelectedDay = ({ start, end, box }) => {
-    const headerHeight = calendarRef.current.querySelector(".rbc-time-header")?.offsetHeight;
     const calendarRect = calendarRef.current.getBoundingClientRect();
     const relativeX = box?.clientX - calendarRect.left;
-    const relativeY = box?.clientY - calendarRect.top - headerHeight;
-    
-    
-    console.log("/////////////////////////////////////////////////////////");
-    console.log(box)
-    setPopupPosition({ top: box?.relativeY || 200, left: relativeX || 300 });
+    const relativeY = box?.clientY - calendarRect.top;
+
     setSelectedDay({ start, end });
-    setNewEvent({ ...newEvent, start, end });
+    setNewEvent({ ...emptyEvent, start, end });
     setSelectedEvent(null);
   };
 
-  //  Mostrar detalles del evento
   const handleSelectEvent = (event) => {
-    console.log(event)
-    setSelectedEventCopy(event)
-    setSelectedEvent(event);
-    //setPopupPosition({ top: pageY, left: pageX });
+    setSelectedEventCopy({ ...event });
+    setSelectedEvent({ ...event });
     setSelectedDay(null);
   };
 
-  //  Guardar cambios en inputs
-  const handleChangeInput = (func,vare,field, value) => {
-    if (field === "details") {
-      //func({ ...vare, caseID: { ...vare.details, caseID: value } });
-      func({ ...vare, caseID:value});
+  const handleChangeInput = (func, vare, field, value) => {
+    if (field === "caseID") {
+      func({ ...vare, caseID: value });
     } else {
       func({ ...vare, [field]: value });
     }
   };
 
-  //  Crear evento en Google Calendar
+  const addEmail = () => {
+    if (newEvent.tempemail.trim()) {
+      setNewEvent({
+        ...newEvent,
+        emails: [...newEvent.emails, newEvent.tempemail.trim()],
+        tempemail: ""
+      });
+    }
+  };
+
+  const removeEmail = (emailToRemove) => {
+    setNewEvent({
+      ...newEvent,
+      emails: newEvent.emails.filter(email => email !== emailToRemove)
+    });
+  };
+
   const sendEvent = async () => {
     if (!newEvent.title.trim()) {
       alert("El evento debe tener un título.");
       return;
     }
 
+    // Validar ID de caso
     const resCaseID = await fetch(`${baseURL}/quejas/validarquejaid/${newEvent.caseID}/`, {
-    method: "GET",
-    headers: {
-      "Authorization": `Token ${localStorage.getItem("userToken")}`,
-      "X-CSRFToken": getCSRFToken(),
-    },
-    credentials: "include",
-  });
+      method: "GET",
+      headers: {
+        "Authorization": `Token ${localStorage.getItem("userToken")}`,
+        "X-CSRFToken": getCSRFToken(),
+      },
+      credentials: "include",
+    });
     const dataCaseID = await resCaseID.json();
-    console.log(dataCaseID)
 
     if (!dataCaseID.exists) {
-      alert("El ID de la atencion no existe en el sistema.");
-      return; // Detener envío
+      alert("El ID de la atención no existe en el sistema.");
+      return;
     }
 
     const eventData = {
       summary: newEvent.title,
       location: newEvent.location,
-      description: 
-      `ID caso: ${newEvent.caseID} \n 
-      Organizador: ${newEvent.organizer} \n 
-      Tipo: ${newEvent.type} \n
-      description: ${newEvent.description} \n`,
-      attendees: newEvent.emails ? newEvent.emails.map((email) => ({ email: email.trim() })) : [],/////////////
+      description: `ID caso: ${newEvent.caseID} \n Organizador: ${newEvent.organizer} \n Tipo: ${newEvent.type} \n description: ${newEvent.description} \n`,
+      attendees: newEvent.emails ? newEvent.emails.map((email) => ({ email: email.trim() })) : [], // ← CORRECCIÓN AQUÍ
       start: { dateTime: newEvent.start.toISOString(), timeZone: "America/Bogota" },
       end: { dateTime: newEvent.end.toISOString(), timeZone: "America/Bogota" },
       colorId: newEvent.colorId,
       ...(newEvent.createMeet && {
         conferenceData: {
-            createRequest: {
-                requestId: crypto.randomUUID(), // ID único obligatorio
-                conferenceSolutionKey: { type: "hangoutsMeet" }
-            }
+          createRequest: {
+            requestId: crypto.randomUUID(),
+            conferenceSolutionKey: { type: "hangoutsMeet" }
+          }
         }
       })
-      
     };
 
-    const nrew = {
-        "title": newEvent.title,                // Título del evento
-        "description": newEvent.description,          // Descripción
-        "status": newEvent.status,               // Estado (ej: Cancelado, Aplazado)
-        "location": newEvent.location,             // Lugar
-        "attendes": newEvent.attendees, // Asistentes (correos electrónicos)
-        "color": newEvent.colorId,                // Código de color (ej: "11")
-        "organizer": newEvent.organizer,            // Organizador de la reunión
-        "startdatehour": newEvent.start.toISOString(), // Fecha y hora de inicio (ISO 8601)
-        "enddatehour": newEvent.end.toISOString(),   // Fecha y hora de finalización (ISO 8601)
-        "timezone": "America/Bogota",     // Zona horaria
-        "type": newEvent.type,                 // Tipo de reunión/orientación/asesoría
-        "case_id": newEvent.caseID,              // ID de la queja relacionada
-        "create_meet": false,             // (opcional) Si se crea Google Meet
-        "meet_link": "", // (opcional) Enlace Meet
-        "google_event_id": ""       // (opcional) ID del evento en Google Calendar
-      }
-    
-  
-    try {
-      
+    const backendEvent = {
+      title: newEvent.title,
+      description: newEvent.description,
+      status: "confirmed",
+      location: newEvent.location,
+      attendes: newEvent.emails,
+      color: newEvent.colorId,
+      organizer: newEvent.organizer,
+      startdatehour: newEvent.start.toISOString(),
+      enddatehour: newEvent.end.toISOString(),
+      timezone: "America/Bogota",
+      type: newEvent.type || "",
+      case_id: Number(newEvent.caseID),
+      create_meet: newEvent.createMeet,
+      meet_link: "",
+      google_event_id: ""
+    };
 
-      const createdEvent = await createEvent(eventData); // Esperar a que el evento se cree en Google Calendar
-  
-      // Si la creación fue exitosa, actualizar el estado con el nuevo evento
+    eventData.backendEvent = backendEvent;
+
+    try {
+      const createdEvent = await createEvent(eventData);
+      //añade el evento al estado local de la web
       setFormattedEvents(prevEvents => [
         ...prevEvents,
         {
-          id: createdEvent.id, // Agregar el ID devuelto por la API
+          id: createdEvent.id,
           title: createdEvent.summary,
           start: new Date(createdEvent.start.dateTime),
           end: new Date(createdEvent.end.dateTime),
-          emails: createdEvent.attendees ? createdEvent.attendees.map(a => a.email) : [],////////////////////
+          emails: createdEvent.attendees ? createdEvent.attendees.map(a => a.email) : [],
           location: createdEvent.location || "Sin ubicación",
           link: createdEvent.hangoutLink || "",
-          //alternativa a link
-
-          details: { caseID: createdEvent.description?.replace("Caso ID: ", "") || "" },
           colorId: createdEvent.colorId || "11",
-          
+          caseID: newEvent.caseID,
+          organizer: newEvent.organizer,
+          type: newEvent.type,
+          description: newEvent.description,
         }
       ]);
 
-      nrew["google_event_id"] = createdEvent.id;
-      nrew["meet_link"] = createdEvent.hangoutLink || "";
-      nrew["create_meet"] = newEvent.createMeet;
-
-
-      const createdBackendEvent = await saveEvent(nrew);
-
       
-  
+
       setSelectedDay(null);
-      setNewEvent({
-        title: "",
-        emails: [],//////////////////////////////////////////////////////cambio
-        location: "",
-        link: "",
-        caseID: "",
-        description: "",
-        organizer: "",
-        type: "",
-        start: null,
-        end: null,
-      });
-  
+      setNewEvent(emptyEvent);
+
+      //alert("Evento creado exitosamente");
+
     } catch (error) {
       console.error("Error al crear el evento:", error);
       alert("No se pudo crear el evento. Inténtalo de nuevo.");
     }
-
   };
 
-  //  Redimensionar evento
+  //  Redimensionar y mover evento
   const handleEventResize = async ({ event, start, end }) => {
     const id = event.id;
     const oldevent = { ...event }; // Hacer una copia del evento original
@@ -300,26 +268,25 @@ const AgendaList = () => {
     setFormattedEvents((prevEvents) =>
       prevEvents.map((ev) => (ev.id === id ? { ...ev, start, end } : ev))
     );
-  
+
     try {
       const eventEquivalent = await fetchEventById(id)
-      console.log(eventEquivalent)
       
       // Llamar a la API para actualizar el evento en Google Calendar
       const response = await updateEvent(id, {
         ...eventEquivalent,
         sequence: eventEquivalent.sequence,
-        start: { dateTime: start.toISOString(), timeZone : Intl.DateTimeFormat().resolvedOptions().timeZone },
-        end: { dateTime: end.toISOString(), timeZone : Intl.DateTimeFormat().resolvedOptions().timeZone  }
+        start: { dateTime: start.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+        end: { dateTime: end.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }
       });
-  
+
       if (!response.ok) {
         throw new Error("Error al actualizar el evento");
       }
-  
+
     } catch (error) {
       console.error("Error actualizando el evento:", error);
-  
+
       // Restaurar el evento original si la actualización falla
       setFormattedEvents((prevEvents) =>
         prevEvents.map((ev) => (ev.id === id ? oldevent : ev))
@@ -327,269 +294,558 @@ const AgendaList = () => {
     }
   };
 
-  const handleDeleteEvent= async (eventId)=>{
-
+  const handleDeleteEvent = async (eventId) => {
     if (!eventId) return;
-    
+
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
+      return;
+    }
+
     try {
-      await deleteEvent(eventId); // Intentar eliminar el evento en Google Calendar
-    
-      // Si la eliminación fue exitosa, actualizar el estado
+      await deleteEvent(eventId);
       setFormattedEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
-      setSelectedEvent(null)
+      setSelectedEvent(null);
     } catch (error) {
       console.error("Error al eliminar el evento:", error);
       alert("No se pudo eliminar el evento. Inténtalo de nuevo.");
     }
-  
-
   };
 
-  const handleEditSaveEvent = async ( event) => {
-    const id = event.id;
-    const oldevent = { ...event }; // Hacer una copia del evento original
+  // Función para guardar edición de eventos
+const handleEditSaveEvent = async (event) => {
+  const id = event.id;
+  const oldevent = { ...event }; // Hacer una copia del evento original
+  
+  try {
+    const eventEquivalent = await fetchEventById(id);
     
-    // Actualizar el estado de los eventos antes de llamar a la API
-    setFormattedEvents((prevEvents) =>
-      prevEvents.map((ev) => (ev.id === id ? { ...ev,selectedEvent } : ev))
-    );
-  
-    try {
-      const eventEquivalent = await fetchEventById(id)
-      const finalEvent={
-        ...eventEquivalent,
-        ...selectedEvent
-      }
-      console.log(finalEvent)
-      
-      // Llamar a la API para actualizar el evento en Google Calendar
-      const response = await updateEvent(id, finalEvent);
-  
-      if (!response.ok) {
-        throw new Error("Error al actualizar el evento");
-      }
-  
-    } catch (error) {
-      console.error("Error actualizando el evento:", error);
-  
-      // Restaurar el evento original si la actualización falla
-      setFormattedEvents((prevEvents) =>
-        prevEvents.map((ev) => (ev.id === id ? oldevent : ev))
-      );
+    // Preparar los datos para la actualización en formato correcto
+    const finalEvent = {
+      summary: selectedEvent.title || eventEquivalent.summary,
+      location: selectedEvent.location || eventEquivalent.location,
+      description: `ID caso: ${selectedEvent.caseID || ''} \n Organizador: ${selectedEvent.organizer || ''} \n Tipo: ${selectedEvent.type || ''} \n description: ${selectedEvent.description || ''} \n`,
+      start: { 
+        dateTime: selectedEvent.start ? selectedEvent.start.toISOString() : eventEquivalent.start.dateTime, 
+        timeZone: "America/Bogota" 
+      },
+      end: { 
+        dateTime: selectedEvent.end ? selectedEvent.end.toISOString() : eventEquivalent.end.dateTime, 
+        timeZone: "America/Bogota" 
+      },
+      colorId: selectedEvent.colorId || eventEquivalent.colorId,
+      // Mantener los campos que no se editan
+      id: eventEquivalent.id,
+      status: eventEquivalent.status,
+      sequence: eventEquivalent.sequence,
+      attendees: eventEquivalent.attendees // Mantener los asistentes originales
+    };
+
+    console.log("Datos a enviar para actualización:", finalEvent);
+    
+    // Llamar a la API para actualizar el evento en Google Calendar
+    const response = await updateEvent(id, finalEvent);
+
+    if (!response.ok) {
+      throw new Error("Error al actualizar el evento");
     }
 
+    // Si la actualización fue exitosa, actualizar el estado local
+    setFormattedEvents((prevEvents) =>
+      prevEvents.map((ev) => (ev.id === id ? { 
+        ...ev, 
+        title: selectedEvent.title,
+        location: selectedEvent.location,
+        caseID: selectedEvent.caseID,
+        organizer: selectedEvent.organizer,
+        type: selectedEvent.type,
+        description: selectedEvent.description,
+        colorId: selectedEvent.colorId,
+        start: selectedEvent.start || ev.start,
+        end: selectedEvent.end || ev.end
+      } : ev))
+    );
 
+    setEditEventModal(false);
     
-  };
+    // Mostrar mensaje de éxito
+    alert("Evento actualizado correctamente");
 
+  } catch (error) {
+    console.error("Error actualizando el evento:", error);
+
+    // Restaurar el evento original si la actualización falla
+    setFormattedEvents((prevEvents) =>
+      prevEvents.map((ev) => (ev.id === id ? oldevent : ev))
+    );
+    
+    alert("No se pudo actualizar el evento. Inténtalo de nuevo.");
+  }
+};
 
   const getEventStyle = (event) => {
-    const backgroundColor = eventColors[event.colorId] || "#3174ad"; 
-    //const backgroundColor = event.colorId || "#3174ad";
+    const backgroundColor = eventColors[event.colorId] || "#3174ad";
     return {
       style: {
         backgroundColor,
-        color: "#000", 
+        color: "#000",
         border: "none",
+        borderRadius: "4px",
+        fontSize: "12px",
       }
     };
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner message="Cargando agenda..." size="large" />
+      </div>
+    );
   }
+
   return (
-    <>
-      <div ref={calendarRef} style={{ height: "80vh", position: "relative" }}onContextMenu={(e) => {
-        e.preventDefault(); // evita que aparezca el menú del navegador
-        setSelectedDay(null);
-        setNewEvent(emptyEvent);
-      }}>
-        <div>
-        <DnDCalendar
-          
-          selectable
-          resizable
-          draggableAccessor={() => true}
-          resizableAccessor={() => true}
-          messages={messages}
-          onSelectSlot={handleSelectedDay}
-          onSelectEvent={handleSelectEvent}
-          onEventResize={handleEventResize}
-          onEventDrop={handleEventResize}
-          localizer={localizer}
-          events={formattedEvents}
-          startAccessor="start"
-          endAccessor="end"
-          defaultView="week"
-          style={{ height: "100%" }}
-          eventPropGetter={getEventStyle}
-        />
-
-        {/* Formulario flotante para crear evento */}
-        {selectedDay && (
-          <div 
-            style={{
-              top: popupPosition.top,
-              left: popupPosition.left,
-              position: "absolute",
-              backgroundColor: "white",
-              border: "1px solid #d1d5db",
-              borderRadius: "0.5rem",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-              padding: "0.5rem",
-              zIndex: 100,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
-              gap: "0.5rem",
-              width: "33.333333%",
-              height: "auto"
-            }}
-            onContextMenu={(e) => e.stopPropagation()}
-          >
-            <h4><strong>Crear reunión</strong></h4>
-            <input value={newEvent.title} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"title", e.target.value)} placeholder="Título" />
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2">
-                <input 
-                onKeyDown={(e) => e.key === "Enter" &&  newEvent.tempemail.trim() && setNewEvent({...newEvent , emails : [...newEvent.emails,newEvent.tempemail], tempemail: ""}) }
-                value={newEvent.tempemail} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"tempemail", e.target.value)} 
-                placeholder="Añadir participante" />
-                <button onClick={()=> newEvent.tempemail.trim() && setNewEvent({...newEvent , emails : [...newEvent.emails,newEvent.tempemail], tempemail: ""}) }> 
-                  Añadir 
-                </button>
-              </div>
-              <div>
-                <ul className="w-full">
-                  {newEvent.emails.map((email, index) => (
-                    <li key={index} className="flex justify-between items-center gap-2 w-full border-b py-2">
-                      <span>{email}</span>
-                      <button className="px-2 py-1" onClick={() => handleChangeInput(setNewEvent,newEvent,"emails", newEvent.emails.filter((e) => e !== email) )}>
-                        Eliminar
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>  
-            </div>
-
-
-            {/*Check de crear reunion */}
-            <h4><strong>Crear Reunión de Google Meet?</strong></h4>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={newEvent.createMeet}
-                onChange={(e) => handleChangeInput(setNewEvent,newEvent,"createMeet",e.target.checked)}
-                className="hidden"
-              />
-              <div
-                className={`w-6 h-6 rounded-full border-2 transition-all ${
-                  newEvent.createMeet ? "bg-red-500 border-red-500" : "border-gray-400"
-                }`}
-              />
-              <span className="ml-2">{newEvent.createMeet ? "Activado" : "Desactivado"}</span>
-            </label>
-
-            <input value={newEvent.location} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"location", e.target.value)} placeholder="Ubicación" />
-            
-            <input value={newEvent.caseID} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"caseID", e.target.value)} placeholder="ID de caso" />
-            <input value={newEvent.description} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"description", e.target.value)} placeholder="Descripción" />
-            <input value={newEvent.organizer} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"organizer", e.target.value)} placeholder="Organizador" />
-            <input value={newEvent.type} onChange={(e) => handleChangeInput(setNewEvent,newEvent,"type", e.target.value)} placeholder="Tipo" />
-           
-            
-            
-            <select
-              value={newEvent.colorId}
-              onChange={(e) => handleChangeInput(setNewEvent,newEvent,"colorId",e.target.value)}
-              className={`border rounded-lg  appearance-none bg-[${eventColors[newEvent.colorId]}]`}
-            >
-              <option value="" disabled>Selecciona un color</option>
-              {Object.entries(eventColors).map(([key, color]) => (
-                <option key={key} value={key} style={{ backgroundColor: color }}>
-                  {color}
-                </option>
-              ))}
-            </select>
-            
-            <div className="gap-3">
-            
-            <button className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" onClick={sendEvent}>Crear</button>
-            <button className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" onClick={() =>{ setSelectedDay(null);setNewEvent(emptyEvent)}}>Cerrar</button>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            📅 Agenda de eventos
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Gestiona y programa tus reuniones y eventos
+          </p>
+          <div className="w-20 h-1 bg-red-600 rounded-full mt-2"></div>
         </div>
 
-        {/* Detalles del evento seleccionado */}
-        {selectedEvent && (
-          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded shadow w-1/3">
-              <h3 className="text-xl font-bold mb-4">{selectedEvent.title}</h3>
-              <ul>
-                
-                <li><strong> {selectedEvent.title} </strong></li>
-                
-                <li><strong>Ubicación:</strong> 
-                
-                {!editEventModal ? (selectedEvent.location || "N/A") : 
-                <input value={selectedEvent["location"]} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"location", e.target.value)} />}</li>
-                <li>
-                  <strong>Asistentes:</strong>{" "}
-                  {selectedEvent.emails && selectedEvent.emails.length > 0 ? (
-                    <ul>
-                      {selectedEvent.emails.map((e) => (
-                        <li key={e}>{e}</li>
+        {/* Calendar Container */}
+        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+          <div ref={calendarRef} style={{ height: "70vh", position: "relative" }}>
+            <DnDCalendar
+              selectable
+              resizable
+              draggableAccessor={() => true}
+              resizableAccessor={() => true}
+              messages={messages}
+              onSelectSlot={handleSelectedDay}
+              onSelectEvent={handleSelectEvent}
+              onEventResize={handleEventResize}
+              onEventDrop={handleEventResize}
+              localizer={localizer}
+              events={formattedEvents}
+              startAccessor="start"
+              endAccessor="end"
+              defaultView="week"
+              style={{ height: "100%" }}
+              eventPropGetter={getEventStyle}
+            />
+          </div>
+        </div>
+
+        {/* Modal para crear evento */}
+        {selectedDay && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-gray-800">➕ Crear nuevo evento</h3>
+                  <button
+                    onClick={() => { setSelectedDay(null); setNewEvent(emptyEvent); }}
+                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  >
+                    <FiX size={24} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Título del evento *
+                    </label>
+                    <input
+                      type="text"
+                      value={newEvent.title}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "title", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="Ingresa el título del evento"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ID de caso *
+                    </label>
+                    <input
+                      type="text"
+                      value={newEvent.caseID}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "caseID", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="ID de la queja relacionada"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <FiMapPin className="inline mr-1" />
+                      Ubicación
+                    </label>
+                    <input
+                      type="text"
+                      value={newEvent.location}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "location", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="Lugar del evento"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <FiUser className="inline mr-1" />
+                      Organizador
+                    </label>
+                    <input
+                      type="text"
+                      value={newEvent.organizer}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "organizer", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="Nombre del organizador"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FiUsers className="inline mr-1" />
+                    Participantes
+                  </label>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      type="email"
+                      value={newEvent.tempemail}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "tempemail", e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && addEmail()}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="Correo del participante"
+                    />
+                    <button
+                      onClick={addEmail}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                    >
+                      <FiPlus size={14} />
+                    </button>
+                  </div>
+                  {newEvent.emails.length > 0 && (
+                    <div className="space-y-1">
+                      {newEvent.emails.map((email, index) => (
+                        <div key={index} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded text-sm">
+                          <span>{email}</span>
+                          <button
+                            onClick={() => removeEmail(email)}
+                            className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                          >
+                            <FiX size={14} />
+                          </button>
+                        </div>
                       ))}
-                    </ul>
-                  ) : (
-                    "N/A"
+                    </div>
                   )}
-                </li>
-                
-                <li><strong>Enlace:</strong> 
-                {selectedEvent.link || "N/A"}
-                </li>
-                
-                <li><strong>Descripcion:</strong> 
-                {selectedEvent.description || "N/A"}
-                </li>
+                </div>
 
-                <li><strong>ID Caso:</strong>
-                  {!editEventModal ? (selectedEvent.caseID || "N/A") : <input value={selectedEvent.caseID} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"caseID", e.target.value)} />}
-                </li>
-                
-                <li>
-                  <strong>Estado:</strong> 
-                    {!editEventModal ? (selectedEvent.status || "N/A") : <input value={selectedEvent.status} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"status", e.target.value)} />}
-                </li>
-                
-                
-                <li>
-                  <strong>Organizadore:</strong> 
-                    {!editEventModal ? (selectedEvent.organizer || "N/A") : <input value={selectedEvent.organizer} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"organizer", e.target.value)} />}
-                </li>
-                          
-                <li>
-                  <strong>Color:</strong> 
-                    {!editEventModal ? (eventColors[selectedEvent.colorId] || "N/A") : <input value={eventColors[selectedEvent.colorId]} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"color", e.target.value)} />}
-                </li>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tipo de evento
+                    </label>
+                    <input
+                      type="text"
+                      value={newEvent.type}
+                      onChange={(e) => handleChangeInput(setNewEvent, newEvent, "type", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      placeholder="Tipo de reunión"
+                    />
+                  </div>
 
-                <li>
-                  <strong>Tipo:</strong> 
-                    {!editEventModal ? (selectedEvent.type || "N/A") : <input value={selectedEvent.type} onChange={(e) => handleChangeInput(setSelectedEvent,selectedEvent,"type", e.target.value)} />}
-                </li>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Color del evento
+                    </label>
+                    <select
+                      value={newEvent.colorId}
+                      onChange={(e) => {
+                        e.stopPropagation(); // Detiene la propagación del evento
+                        handleChangeInput(setNewEvent, newEvent, "colorId", e.target.value);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      style={{
+                        backgroundColor: eventColors[newEvent.colorId],
+                        color: '#000'
+                      }}
+                    >
+                      {Object.entries(eventColors).map(([key, color]) => (
+                        <option key={key} value={key} style={{
+                          backgroundColor: color,
+                          color: '#000',
+                          padding: '8px'
+                        }}>
+                          {colorNames[key]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-              </ul>
-              <button onClick={() => {handleDeleteEvent(selectedEvent.id)}}>Eliminar</button>
-              {editEventModal && <button onClick={()=>handleEditSaveEvent(selectedEvent)}>Guardar</button>}
-              {editEventModal && <button onClick={()=>{setSelectedEvent(selectedEventCopy);setEditEventModal(false)}}>Cancelar</button>}
-               <button onClick={()=> setEditEventModal(true)}>Editar</button>
-              <button onClick={() =>{setSelectedEvent(null);setEditEventModal(false)}}>Cerrar</button>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FiFileText className="inline mr-1" />
+                    Descripción
+                  </label>
+                  <textarea
+                    value={newEvent.description}
+                    onChange={(e) => handleChangeInput(setNewEvent, newEvent, "description", e.target.value)}
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm resize-none"
+                    placeholder="Descripción del evento"
+                  />
+                </div>
+
+                <div className="flex items-center mb-6">
+                  <input
+                    type="checkbox"
+                    checked={newEvent.createMeet}
+                    onChange={(e) => handleChangeInput(setNewEvent, newEvent, "createMeet", e.target.checked)}
+                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  />
+                  <label className="ml-2 text-sm text-gray-700">
+                    Crear reunión de Google Meet
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => { setSelectedDay(null); setNewEvent(emptyEvent); }}
+                    className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={sendEvent}
+                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    Crear evento
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
-        
+
+        {/* Modal para detalles del evento */}
+        {selectedEvent && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-gray-800">📅 Detalles del evento</h3>
+                  <button
+                    onClick={() => { setSelectedEvent(null); setEditEventModal(false); }}
+                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  >
+                    <FiX size={24} />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                      {!editEventModal ? (
+                        <p className="text-gray-900">{selectedEvent.title}</p>
+                      ) : (
+                        <input
+                          type="text"
+                          value={selectedEvent.title}
+                          onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "title", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FiMapPin className="inline mr-1" />
+                        Ubicación
+                      </label>
+                      {!editEventModal ? (
+                        <p className="text-gray-900">{selectedEvent.location || "No especificado"}</p>
+                      ) : (
+                        <input
+                          type="text"
+                          value={selectedEvent.location}
+                          onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "location", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">ID de caso</label>
+                      {!editEventModal ? (
+                        <p className="text-gray-900">{selectedEvent.caseID || "No especificado"}</p>
+                      ) : (
+                        <input
+                          type="text"
+                          value={selectedEvent.caseID}
+                          onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "caseID", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FiUser className="inline mr-1" />
+                        Organizador
+                      </label>
+                      {!editEventModal ? (
+                        <p className="text-gray-900">{selectedEvent.organizer || "No especificado"}</p>
+                      ) : (
+                        <input
+                          type="text"
+                          value={selectedEvent.organizer}
+                          onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "organizer", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                      {!editEventModal ? (
+                        <p className="text-gray-900">{selectedEvent.type || "No especificado"}</p>
+                      ) : (
+                        <input
+                          type="text"
+                          value={selectedEvent.type}
+                          onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "type", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                      {!editEventModal ? (
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded"
+                            style={{ backgroundColor: eventColors[selectedEvent.colorId] }}
+                          ></div>
+                          <span className="text-gray-900">{colorNames[selectedEvent.colorId]}</span>
+                        </div>
+                      ) : (
+                        <select
+                          value={selectedEvent?.colorId || "11"}
+                          onChange={(e) => {
+                            e.stopPropagation(); // Detiene la propagación del evento
+                            handleChangeInput(setSelectedEvent, selectedEvent, "colorId", e.target.value);
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                          style={{
+                            backgroundColor: eventColors[selectedEvent?.colorId] || eventColors["11"],
+                            color: '#000'
+                          }}
+                        >
+                          {Object.entries(eventColors).map(([key, color]) => (
+                            <option key={key} value={key} style={{
+                              backgroundColor: color,
+                              color: '#000',
+                              padding: '8px'
+                            }}>
+                              {colorNames[key]}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FiUsers className="inline mr-1" />
+                    Participantes
+                  </label>
+                  {selectedEvent.emails && selectedEvent.emails.length > 0 ? (
+                    <div className="space-y-1">
+                      {selectedEvent.emails.map((email, index) => (
+                        <div key={index} className="bg-gray-50 px-3 py-2 rounded text-sm">
+                          {email}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">No hay participantes</p>
+                  )}
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FiFileText className="inline mr-1" />
+                    Descripción
+                  </label>
+                  {!editEventModal ? (
+                    <p className="text-gray-900">{selectedEvent.description || "No hay descripción"}</p>
+                  ) : (
+                    <textarea
+                      value={selectedEvent.description}
+                      onChange={(e) => handleChangeInput(setSelectedEvent, selectedEvent, "description", e.target.value)}
+                      rows="3"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm resize-none"
+                    />
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => handleDeleteEvent(selectedEvent.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                  >
+                    <FiTrash2 size={14} />
+                    Eliminar
+                  </button>
+                  {editEventModal ? (
+                    <>
+                      <button
+                        onClick={() => { setSelectedEvent(selectedEventCopy); setEditEventModal(false); }}
+                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200 text-sm"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={() => { handleEditSaveEvent(selectedEvent); }}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                      >
+                        <FiSave size={14} />
+                        Guardar
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setEditEventModal(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm"
+                    >
+                      <FiEdit size={14} />
+                      Editar
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
