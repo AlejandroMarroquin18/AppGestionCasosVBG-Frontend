@@ -1,7 +1,7 @@
 import getCSRFToken from "./helpers/getCSRF";
 
 //export const baseURL = process.env.REACT_APP_API_URL;
-export const baseURL = "http://192.168.20.58:8000/api";
+export const baseURL = "http://192.168.0.13:8000/api";
 
 /*------------------ SOLICITUDES DE TALLERES ------------------*/
 

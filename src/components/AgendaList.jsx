@@ -216,16 +216,18 @@ const AgendaList = () => {
       startdatehour: newEvent.start.toISOString(),
       enddatehour: newEvent.end.toISOString(),
       timezone: "America/Bogota",
-      type: newEvent.type,
-      case_id: newEvent.caseID,
+      type: newEvent.type || "",
+      case_id: Number(newEvent.caseID),
       create_meet: newEvent.createMeet,
       meet_link: "",
       google_event_id: ""
     };
 
+    eventData.backendEvent = backendEvent;
+
     try {
       const createdEvent = await createEvent(eventData);
-
+      //añade el evento al estado local de la web
       setFormattedEvents(prevEvents => [
         ...prevEvents,
         {
@@ -244,9 +246,7 @@ const AgendaList = () => {
         }
       ]);
 
-      backendEvent.google_event_id = createdEvent.id;
-      backendEvent.meet_link = createdEvent.hangoutLink || "";
-      await saveEvent(backendEvent);
+      
 
       setSelectedDay(null);
       setNewEvent(emptyEvent);
@@ -823,7 +823,7 @@ const handleEditSaveEvent = async (event) => {
                         Cancelar
                       </button>
                       <button
-                        onClick={() => { /* handleEditSaveEvent(selectedEvent); */ setEditEventModal(false); }}
+                        onClick={() => { handleEditSaveEvent(selectedEvent); }}
                         className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 text-sm"
                       >
                         <FiSave size={14} />
