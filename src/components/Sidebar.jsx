@@ -81,6 +81,34 @@ const Sidebar = () => {
     }
   ];
 
+  const isVisitor = localStorage.getItem("userRole") === "visitor";
+
+  const filteredMenuItems = menuItems.map(item => {
+    console.log(localStorage.getItem("userToken") )
+    console.log("isVisitor:", isVisitor);
+  if (!isVisitor) {
+    console.log("Not filtering ");
+    return item;}
+  console.log("Filtering ");
+  if (item.id === "complaints") {
+    return {
+      ...item,
+      submenu: item.submenu.filter(s => s.title === 'Lista de atenciones')
+    };
+  }
+
+  if (item.id === "workshop") {
+    return {
+      ...item,
+      submenu: item.submenu.filter(s => s.title === 'Ver talleres')
+    };
+  }
+
+  
+  return null;
+}).filter(Boolean);
+
+
   const isSubmenuActive = (submenuItems) => {
     return submenuItems.some(sub => location.pathname === sub.path);
   };
@@ -95,7 +123,7 @@ const Sidebar = () => {
       {/* Menú de Navegación */}
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = isMenuActive(item.path, item.submenu);
             const isSubActive = isSubmenuActive(item.submenu);
             const isOpen = openMenus[item.id];

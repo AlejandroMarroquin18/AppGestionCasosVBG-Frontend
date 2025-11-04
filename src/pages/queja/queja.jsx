@@ -941,7 +941,7 @@ const Queja = () => {
                                     )}
 
                                     <FormField
-                                        label="¿Tiene antecedentes disciplinarios?"
+                                        label="¿Tiene denuncias previas?"
                                         value={datos_agresor.agresor_tiene_denuncias}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_tiene_denuncias", e.target.value)}
                                         options={sino}
