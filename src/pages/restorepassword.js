@@ -101,7 +101,7 @@ const RestorePassword = () => {
                 <div className="hidden md:flex md:w-[70%] relative overflow-hidden">
                     <img 
                         src="/login1.jpg" 
-                        alt="Recuperar contraseña" 
+                        alt="" 
                         className="w-full h-full object-cover"
                     />
                 </div>
@@ -110,7 +110,7 @@ const RestorePassword = () => {
                 <div className="md:hidden w-full h-40 relative overflow-hidden">
                     <img 
                         src="/login2.jpg" 
-                        alt="Recuperar contraseña" 
+                        alt="" 
                         className="w-full h-full object-cover"
                     />
                 </div>
@@ -124,7 +124,7 @@ const RestorePassword = () => {
                             <div className="space-y-6">
                                 <div className="text-center mb-6">
                                     <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                                        Recuperar Contraseña
+                                        Recuperar contraseña
                                     </h1>
                                     <p className="text-gray-600 text-base">
                                         Ingresa tu correo electrónico para recuperar tu contraseña
@@ -138,10 +138,11 @@ const RestorePassword = () => {
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Correo Electrónico
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Correo electrónico
                                     </label>
                                     <input
+                                        id="email"
                                         type="email"
                                         value={email}
                                         onChange={handleEmailChange}
@@ -155,14 +156,14 @@ const RestorePassword = () => {
                                         className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
                                         onClick={handleRestorePassword}
                                     >
-                                        Enviar Código
+                                        Enviar código
                                     </button>
 
                                     <button 
                                         onClick={() => navigate('/login')}
                                         className="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-sm border border-gray-300"
                                     >
-                                        Volver al Inicio de Sesión
+                                        Volver al inicio de sesión
                                     </button>
                                 </div>
                             </div>
@@ -173,7 +174,7 @@ const RestorePassword = () => {
                             <div className="space-y-6">
                                 <div className="text-center mb-6">
                                     <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                                        Verificar Código
+                                        Verificar código
                                     </h1>
                                     <p className="text-gray-600 text-base">
                                         Ingresa el código enviado a tu correo electrónico
@@ -187,10 +188,11 @@ const RestorePassword = () => {
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Código de Verificación
+                                    <label htmlFor="codigo" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Código de verificación
                                     </label>
                                     <input
+                                        id="codigo"
                                         type="text"
                                         value={codigo}
                                         maxLength={6}
@@ -205,7 +207,7 @@ const RestorePassword = () => {
                                         className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
                                         onClick={handleSendCode}
                                     >
-                                        Verificar Código
+                                        Verificar código
                                     </button>
 
                                     <button 
@@ -223,7 +225,7 @@ const RestorePassword = () => {
                             <div className="space-y-6">
                                 <div className="text-center mb-6">
                                     <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                                        Nueva Contraseña
+                                        Nueva contraseña
                                     </h1>
                                     <p className="text-gray-600 text-base">
                                         Crea una nueva contraseña para tu cuenta
@@ -237,10 +239,11 @@ const RestorePassword = () => {
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Nueva Contraseña
+                                    <label htmlFor="new_password"className="block text-sm font-medium text-gray-700 mb-2">
+                                        Nueva contraseña
                                     </label>
                                     <input
+                                        id="new_password"
                                         type="password"
                                         value={password}
                                         onChange={handlePasswordChangeInput}
@@ -250,10 +253,11 @@ const RestorePassword = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Confirmar Contraseña
+                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Confirmar contraseña
                                     </label>
                                     <input
+                                        id="confirmPassword"
                                         type="password"
                                         value={confirmPassword}
                                         onChange={handleConfirmPasswordChangeInput}

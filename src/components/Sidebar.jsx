@@ -89,7 +89,7 @@ const Sidebar = () => {
     <>
       {/* Logo/Header */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800">Panel de Control</h1>
+        <h2 className="text-xl font-bold text-gray-800">Panel de control</h2>
       </div>
 
       {/* Menú de Navegación */}
@@ -163,6 +163,7 @@ const Sidebar = () => {
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-red rounded-lg shadow-lg border border-gray-200"
+        aria-label={isMobileOpen ? "Cerrar menú" : "Abrir menú"}
       >
         {isMobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
       </button>

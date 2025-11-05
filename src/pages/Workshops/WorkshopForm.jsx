@@ -184,10 +184,11 @@ const WorkshopForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Nombre del Taller */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-nombre" className="block text-sm font-medium text-gray-700 mb-2">
                     📝 Nombre del taller *
                   </label>
                   <input
+                    id="taller-nombre"
                     type="text"
                     name="name"
                     value={formData.name}
@@ -202,11 +203,12 @@ const WorkshopForm = () => {
 
                 {/* Fecha */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-fecha" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiCalendar className="inline mr-2" />
                     Fecha del taller *
                   </label>
                   <input
+                    id="taller-fecha"
                     type="date"
                     name="date"
                     value={formData.date || ""}
@@ -221,10 +223,11 @@ const WorkshopForm = () => {
 
                 {/* Modalidad */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-modalidad" className="block text-sm font-medium text-gray-700 mb-2">
                     🎯 Modalidad *
                   </label>
                   <select
+                    id="taller-modalidad"
                     name="modality"
                     value={formData.modality}
                     onChange={handleChange}
@@ -237,11 +240,12 @@ const WorkshopForm = () => {
 
                 {/* Hora de Inicio */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-inicio" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiClock className="inline mr-2" />
                     Hora de inicio *
                   </label>
                   <input
+                    id="taller-inicio"
                     type="time"
                     name="start_time"
                     value={formData.start_time || ""}
@@ -255,11 +259,12 @@ const WorkshopForm = () => {
 
                 {/* Hora de Finalización */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-fin" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiClock className="inline mr-2" />
                     Hora de finalización *
                   </label>
                   <input
+                    id="taller-fin"
                     type="time"
                     name="end_time"
                     value={formData.end_time || ""}
@@ -273,11 +278,12 @@ const WorkshopForm = () => {
 
                 {/* Ubicación */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-ubicacion" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiMapPin className="inline mr-2" />
                     Ubicación *
                   </label>
                   <input
+                    id="taller-ubicacion"
                     type="text"
                     name="location"
                     value={formData.location}
@@ -291,11 +297,12 @@ const WorkshopForm = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-sede" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiMapPin className="inline mr-2" />
                     Sede *
                   </label>
                   <input
+                    id="taller-sede"
                     type="text"
                     name="sede"
                     value={formData.sede}
@@ -310,11 +317,12 @@ const WorkshopForm = () => {
 
                 {/* Cupos Disponibles */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-cupos" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiUsers className="inline mr-2" />
                     Cupos disponibles *
                   </label>
                   <input
+                    id="taller-cupos"
                     type="number"
                     name="slots"
                     value={formData.slots}
@@ -371,10 +379,11 @@ const WorkshopForm = () => {
 
                 {/* Detalles */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="taller-detalles" className="block text-sm font-medium text-gray-700 mb-2">
                     📄 Detalles del taller *
                   </label>
                   <textarea
+                    id="taller-detalles"
                     name="details"
                     value={formData.details}
                     onChange={handleChange}
