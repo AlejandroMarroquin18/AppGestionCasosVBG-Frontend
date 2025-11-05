@@ -29,6 +29,7 @@ const Queja = () => {
         'Educación y Pedagogía',
         'Psicología',
         'Derecho y Ciencia Política',
+        'No aplica'
     ];
     const tipos_documentos = ['C.C', 'Tarjeta de identidad', 'Pasaporte']
     const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
@@ -40,6 +41,7 @@ const Queja = () => {
         "Vicerrectoría de Investigaciones",
         "Vicerrectoría de Regionalización",
         "Vicerrectoría de Extensión y Proyección Social",
+        "No aplica"
     ];
     const factores_riesgo_opt = ["Consumo de SPA", "Consumo de alcohol", "tenencia de armas", 'Otros']
 
@@ -130,7 +132,10 @@ const Queja = () => {
         'asistencia_juridica': '',
         'acompañamiento_solicitud_medidas_proteccion_inicial': '',
         'acompañamiento_ante_instancias_gubernamentales': '',
-        'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
+        //'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
+        "interponer_queja_al_cade":'', 
+        "interponer_queja_oficina_control_interno":'',
+        "interponer_queja_a_rectoria":'',
         'observaciones': '',
         'nombre': '',
         'sede': '',
@@ -1013,11 +1018,24 @@ const Queja = () => {
                                         options={sino}
                                     />
                                     <FormField
-                                        label="¿Requiere interponer queja formal?"
-                                        value={datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios}
-                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_comite_asusntos_internos_disciplinarios", e.target.value)}
+                                        label="¿Requiere interponer una queja formal al Comité de Asuntos Disciplinarios Estudiantiles (CADE)?"
+                                        value={datos_adicionales.interponer_queja_al_cade}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_cade", e.target.value)}
                                         options={sino}
                                     />
+                                    <FormField
+                                        label="¿Requiere interponer queja ante la oficina de control interno?"
+                                        value={datos_adicionales.interponer_queja_oficina_control_interno}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_oficina_control_interno", e.target.value)}
+                                        options={sino}
+                                    />
+                                    <FormField
+                                        label="¿Requiere interpones queja ante la Rectoría?"
+                                        value={datos_adicionales.interponer_queja_a_rectoria}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_a_rectoria", e.target.value)}
+                                        options={sino}
+                                    />
+                                    
                                     <FormField
                                         label="Observaciones adicionales"
                                         value={datos_adicionales.observaciones}

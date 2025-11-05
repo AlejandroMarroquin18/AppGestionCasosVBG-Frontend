@@ -84,12 +84,8 @@ const Sidebar = () => {
   const isVisitor = localStorage.getItem("userRole") === "visitor";
 
   const filteredMenuItems = menuItems.map(item => {
-    console.log(localStorage.getItem("userToken") )
-    console.log("isVisitor:", isVisitor);
   if (!isVisitor) {
-    console.log("Not filtering ");
     return item;}
-  console.log("Filtering ");
   if (item.id === "complaints") {
     return {
       ...item,
