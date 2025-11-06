@@ -17,7 +17,7 @@ const Queja = () => {
     const identidad_genero_opt = ['Cisgénero', 'Transgénero', 'No binario', 'Género fluido', 'Otro'];
     const orientacion_sexual_opt = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual', 'Queer', 'Demisexual', 'Otro'];
     const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica', 'Psicológica', 'Patrimonial', 'Estructural', 'Vicaria', 'Otro'];
-    const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato'];
+    const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato', 'No pertenece'];
     const facultades = [
         'Artes Integradas',
         'Ciencias Naturales y Exactas',
@@ -344,6 +344,7 @@ const Queja = () => {
                 const result = await response.json();
                 console.log("¡Formulario enviado exitosamente!", result);
                 alert("¡Formulario enviado exitosamente!");
+                window.location.reload();
                 // Opcional: limpiar el formulario o redirigir
                 // navigate('/quejas/lista');
             }

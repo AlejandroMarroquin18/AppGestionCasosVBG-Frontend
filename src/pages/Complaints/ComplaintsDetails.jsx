@@ -313,6 +313,7 @@ const ComplaintsDetails = () => {
       setQuejaDetails(data);
       setOpenModal(false);
       setEditMode(false);
+      console.log(data.json())
     } catch (error) {
       console.error("Error:", error);
       alert("Hubo un error al actualizar la queja");
@@ -410,6 +411,7 @@ const ComplaintsDetails = () => {
       const data = await updateComplaintStatus(id, estado);
       setQuejaDetails(data);
       setQuejaCopy(data);
+      console.log(data)
     } catch (error) {
       setQuejaCopy(quejaDetails);
       console.error("Error al actualizar el estado de la queja:", error);
