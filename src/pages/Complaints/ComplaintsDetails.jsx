@@ -47,6 +47,30 @@ const ComplaintsDetails = () => {
   const [registryCopy, setRegistryCopy] = useState(null);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
   const [isChangingPriority, setIsChangingPriority] = useState(false);
+  const vicerrectorias = [
+        "Vicerrectoría Académica",
+        "Vicerrectoría Administrativa",
+        "Vicerrectoría de Bienestar Universitario",
+        "Vicerrectoría de Investigaciones",
+        "Vicerrectoría de Regionalización",
+        "Vicerrectoría de Extensión y Proyección Social",
+        "No aplica",
+  ];
+  const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
+        'Pacífico', 'Palmira', 'Tuluá', 'Yumbo', 'Zarzal'];
+  const facultades = [
+        'Artes Integradas',
+        'Ciencias Naturales y Exactas',
+        'Ciencias de la Administración',
+        'Salud',
+        'Ciencias Sociales y Económicas',
+        'Humanidades',
+        'Ingeniería',
+        'Educación y Pedagogía',
+        'Psicología',
+        'Derecho y Ciencia Política',
+        'No aplica',
+  ];
 
   // Arrays de campos - COMPLETOS
   const dataTitles = [
@@ -286,11 +310,14 @@ const ComplaintsDetails = () => {
     setIsLoading(true);
     try {
       const data = await updateComplaint(id, quejaCopy);
+      console.log("Hola",data)
       setQuejaDetails(data);
       setOpenModal(false);
       setEditMode(false);
+      
     } catch (error) {
       console.error("Error:", error);
+
       alert("Hubo un error al actualizar la queja");
     } finally {
       setIsLoading(false);
@@ -386,6 +413,7 @@ const ComplaintsDetails = () => {
       const data = await updateComplaintStatus(id, estado);
       setQuejaDetails(data);
       setQuejaCopy(data);
+      console.log(data)
     } catch (error) {
       setQuejaCopy(quejaDetails);
       console.error("Error al actualizar el estado de la queja:", error);
@@ -426,12 +454,15 @@ const ComplaintsDetails = () => {
     const getSelectOptions = (key) => {
       if (key.includes('sexo')) return opcionesSexo;
       if (key.includes('estamento')) return opcionesEstamento;
+      if (key.includes('vicerrectoria_adscrito')) return vicerrectorias;
       if (key.includes('estrato')) return opcionesEstrato;
       if (key.includes('etnico_racial')) return opcionesEtnia;
       if (key.includes('discapacidad') && !key.includes('tiene')) return opcionesDiscapacidad;
       if (key.includes('identidad_genero')) return opcionesGenero;
       if (key.includes('orientacion_sexual')) return opcionesOrientacion;
       if (key.includes('tipo_vbg')) return opcionesTipoVBG;
+      if (key.includes('sede')) return sedes;
+      if (key.includes('facultad')) return facultades;
       if (key.includes('desea_') || key.includes('recibir_') || key.includes('orientacion_') ||
         key.includes('asistencia_') || key.includes('acompañamiento_') || key.includes('interponer_')) {
         return opcionesSiNo;
@@ -757,7 +788,7 @@ const ComplaintsDetails = () => {
           {renderAccordionSection("afectado", 12, 42, "🎯 Persona Afectada")}
           {renderAccordionSection("agresor", 42, 62, "⚠️ Persona Agresora")}
           {renderAccordionSection("detalles", 62, 73, "📋 Información Adicional y Servicios Solicitados")}
-
+          {/* Historial */}
           {/* Historial */}
           <Accordion className="mb-8 shadow-lg border-0 rounded-lg overflow-hidden">
             <AccordionSummary

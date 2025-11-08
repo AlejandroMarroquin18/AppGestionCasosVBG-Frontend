@@ -114,10 +114,11 @@ const Login = () => {
               <div className="space-y-5">
                 {/* Campo Email */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                     Correo electrónico
                   </label>
                   <input
+                    id="email"
                     type="email"
                     placeholder="Ingresa tu correo"
                     value={email}
@@ -129,10 +130,11 @@ const Login = () => {
 
                 {/* Campo Contraseña */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                     Contraseña
                   </label>
                   <input
+                    id="password"
                     type="password"
                     placeholder="Ingresa tu contraseña"
                     value={password}
@@ -194,11 +196,11 @@ const Login = () => {
                   </div>
                   
                   {/* Texto de registro más pequeño y menos prominente */}
-                  <div className="text-gray-400 text-[14px] mt-2">
+                  <div className="text-gray-500 text-[14px] mt-2">
                     ¿No tienes una cuenta?{' '}
                     <a 
                       href="/registrarse" 
-                      className={`text-blue-400 hover:text-blue-600 underline text-[14px] ${
+                      className={`text-blue-600 hover:text-blue-800 underline text-[14px] ${
                         isLoading ? 'pointer-events-none opacity-50' : ''
                       }`}
                     >

@@ -55,7 +55,7 @@ const Sidebar = () => {
       path: "/quejas",
       submenu: [
         { title: 'Estadísticas', path: '/quejas/estadisticas', icon: FiBarChart2 },
-        { title: 'Lista de Atenciones', path: '/quejas/lista', icon: FiList },
+        { title: 'Lista de atenciones', path: '/quejas/lista', icon: FiList },
       ]
     },
     {
@@ -81,6 +81,30 @@ const Sidebar = () => {
     }
   ];
 
+  const isVisitor = localStorage.getItem("userRole") === "visitor";
+
+  const filteredMenuItems = menuItems.map(item => {
+  if (!isVisitor) {
+    return item;}
+  if (item.id === "complaints") {
+    return {
+      ...item,
+      submenu: item.submenu.filter(s => s.title === 'Lista de atenciones')
+    };
+  }
+
+  if (item.id === "workshop") {
+    return {
+      ...item,
+      submenu: item.submenu.filter(s => s.title === 'Ver talleres')
+    };
+  }
+
+  
+  return null;
+}).filter(Boolean);
+
+
   const isSubmenuActive = (submenuItems) => {
     return submenuItems.some(sub => location.pathname === sub.path);
   };
@@ -89,13 +113,13 @@ const Sidebar = () => {
     <>
       {/* Logo/Header */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800">Panel de Control</h1>
+        <h2 className="text-xl font-bold text-gray-800">Panel de control</h2>
       </div>
 
       {/* Menú de Navegación */}
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = isMenuActive(item.path, item.submenu);
             const isSubActive = isSubmenuActive(item.submenu);
             const isOpen = openMenus[item.id];
@@ -163,6 +187,7 @@ const Sidebar = () => {
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-red rounded-lg shadow-lg border border-gray-200"
+        aria-label={isMobileOpen ? "Cerrar menú" : "Abrir menú"}
       >
         {isMobileOpen ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
       </button>

@@ -91,7 +91,7 @@ const Header = () => {
           <div className="flex-shrink-0">
             <img
               src="/logo.png"
-              alt="Logo"
+              alt="Logo de la Universidad del Valle"
               className="h-12 w-16 md:h-16 md:w-24 object-contain"
             />
           </div>
@@ -129,7 +129,7 @@ const Header = () => {
               
               {/* Rol - solo mostrar en desktop cuando no está haciendo logout */}
               {!isLoggingOut && (
-                <span className="hidden md:inline-block text-xs opacity-90">
+                <span className="hidden md:inline-block text-xs">
                   {userRole}
                 </span>
               )}

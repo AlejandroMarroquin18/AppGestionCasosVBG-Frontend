@@ -17,7 +17,7 @@ const Queja = () => {
     const identidad_genero_opt = ['Cisgénero', 'Transgénero', 'No binario', 'Género fluido', 'Otro'];
     const orientacion_sexual_opt = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual', 'Queer', 'Demisexual', 'Otro'];
     const tipoVBG_opt = ['Economica', 'Sexual', 'Fisica', 'Psicológica', 'Patrimonial', 'Estructural', 'Vicaria', 'Otro'];
-    const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato'];
+    const condicion_etnica = ['Indígena', 'Negro(a)', 'Mulato', 'No pertenece'];
     const facultades = [
         'Artes Integradas',
         'Ciencias Naturales y Exactas',
@@ -29,6 +29,7 @@ const Queja = () => {
         'Educación y Pedagogía',
         'Psicología',
         'Derecho y Ciencia Política',
+        'No aplica'
     ];
     const tipos_documentos = ['C.C', 'Tarjeta de identidad', 'Pasaporte']
     const sedes = ['Melendez', 'San Fernando', 'Buga', 'Caicedonia', 'Cartago', 'Norte del Cauca',
@@ -40,6 +41,7 @@ const Queja = () => {
         "Vicerrectoría de Investigaciones",
         "Vicerrectoría de Regionalización",
         "Vicerrectoría de Extensión y Proyección Social",
+        "No aplica"
     ];
     const factores_riesgo_opt = ["Consumo de SPA", "Consumo de alcohol", "tenencia de armas", 'Otros']
 
@@ -131,9 +133,9 @@ const Queja = () => {
         'acompañamiento_solicitud_medidas_proteccion_inicial': '',
         'acompañamiento_ante_instancias_gubernamentales': '',
         //'interponer_queja_al_comite_asusntos_internos_disciplinarios': '',
-        'interponer_queja_al_cade': '',
-        'interponer_queja_oficina_control_interno': '',
-        'interponer_queja_a_rectoria': '',
+        "interponer_queja_al_cade":'', 
+        "interponer_queja_oficina_control_interno":'',
+        "interponer_queja_a_rectoria":'',
         'observaciones': '',
         'nombre': '',
         'sede': '',
@@ -345,6 +347,7 @@ const Queja = () => {
                 const result = await response.json();
                 console.log("¡Formulario enviado exitosamente!", result);
                 alert("¡Formulario enviado exitosamente!");
+                //window.location.reload();
                 // Opcional: limpiar el formulario o redirigir
                 // navigate('/quejas/lista');
             }
@@ -947,7 +950,7 @@ const Queja = () => {
                                     )}
 
                                     <FormField
-                                        label="¿Tiene antecedentes disciplinarios?"
+                                        label="¿Tiene denuncias previas?"
                                         value={datos_agresor.agresor_tiene_denuncias}
                                         onChange={(e) => onchange(set_datos_agresor, "agresor_tiene_denuncias", e.target.value)}
                                         options={sino}
@@ -1018,12 +1021,12 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_adicionales, "acompañamiento_ante_instancias_gubernamentales", e.target.value)}
                                         options={sino}
                                     />
-                                    {/**<FormField
-                                        label="¿Requiere interponer queja formal?"
-                                        value={datos_adicionales.interponer_queja_al_comite_asusntos_internos_disciplinarios}
-                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_comite_asusntos_internos_disciplinarios", e.target.value)}
+                                    <FormField
+                                        label="¿Requiere interponer una queja formal al Comité de Asuntos Disciplinarios Estudiantiles (CADE)?"
+                                        value={datos_adicionales.interponer_queja_al_cade}
+                                        onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_al_cade", e.target.value)}
                                         options={sino}
-                                    />*/}
+                                    />
                                     <FormField
                                         label="¿Requiere interponer queja ante el comité de asuntos disciplinarios estudiantiles CADE?"
                                         value={datos_adicionales.interponer_queja_al_cade}
@@ -1042,7 +1045,7 @@ const Queja = () => {
                                         onChange={(e) => onchange(set_datos_adicionales, "interponer_queja_a_rectoria", e.target.value)}
                                         options={sino}
                                     />
-
+                                    
                                     <FormField
                                         label="Observaciones adicionales"
                                         value={datos_adicionales.observaciones}

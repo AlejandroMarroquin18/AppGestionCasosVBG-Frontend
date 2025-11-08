@@ -61,6 +61,7 @@ const AgendaStats = () => {
       try {
         const data = await fetchEventStats();
         setReceivedData(data);
+        console.log("Datos recibidos:", data);
         
         // Procesar datos de facultades
         const facultadesList = data.conteo_por_facultad_afectado.map(item => 

@@ -199,6 +199,7 @@ const WorkshopRegistrationForm = ({ workshopId }) => {
     "Raizal/palenquera/o/e",
     "Mestiza/o/e",
     "Gitana/o/e y/o room",
+    "Otro/e",
     "Ninguna"
   ]
   const disabilities = ["Ninguna", "Motriz", "Visual", "Auditiva", "Cognitiva", "Múltiple", "Otro"]

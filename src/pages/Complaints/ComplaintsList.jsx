@@ -157,6 +157,7 @@ const ComplaintsList = () => {
                   className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  aria-label="Buscar por código o nombre"
                 />
               </div>
             </div>
@@ -184,10 +185,11 @@ const ComplaintsList = () => {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label htmlFor="location" className="block text-xs font-medium text-gray-700 mb-1">
                   Sede
                 </label>
                 <select
+                  id="location"
                   value={locationFilter}
                   onChange={(e) => setLocationFilter(e.target.value)}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
@@ -203,10 +205,11 @@ const ComplaintsList = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label htmlFor="type" className="block text-xs font-medium text-gray-700 mb-1">
                   Prioridad
                 </label>
                 <select
+                  id="type"
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
@@ -221,10 +224,11 @@ const ComplaintsList = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label htmlFor="faculty" className="block text-xs font-medium text-gray-700 mb-1">
                   Facultad
                 </label>
                 <select
+                  id="faculty"
                   value={facultyFilter}
                   onChange={(e) => setFacultyFilter(e.target.value)}
                   className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-transparent"
@@ -343,6 +347,7 @@ const ComplaintsList = () => {
                         }}
                         className="text-red-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                         title="Ver detalles"
+                        aria-label="Ver detalles"
                       >
                         <FiEye size={16} />
                       </button>
@@ -401,6 +406,7 @@ const ComplaintsList = () => {
                     }}
                     className="text-red-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                     title="Ver detalles"
+                    aria-label="Ver detalles"
                   >
                     <FiEye size={14} />
                   </button>
@@ -413,9 +419,9 @@ const ComplaintsList = () => {
           {currentComplaints.length === 0 && (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">📝</div>
-              <h3 className="text-base font-medium text-gray-900 mb-1">
-                No se encontraron atenciones
-              </h3>
+              <h2 className="text-base font-medium text-gray-900 mb-1">
+                No se encontraron quejas
+              </h2>
               <p className="text-sm text-gray-500">
                 {filteredComplaints.length === 0 && complaints.length > 0 
                   ? "Intenta ajustar los filtros de búsqueda"
@@ -439,10 +445,11 @@ const ComplaintsList = () => {
                 disabled={currentPage === 1}
                 className={`p-1 rounded transition-all duration-200 flex items-center justify-center ${
                   currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
                     : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                 }`}
                 style={{ width: "32px", height: "32px" }}
+                aria-label="Página anterior"
               >
                 <FiChevronLeft size={16} />
               </button>
@@ -456,10 +463,11 @@ const ComplaintsList = () => {
                 disabled={currentPage === totalPages}
                 className={`p-1 rounded transition-all duration-200 flex items-center justify-center ${
                   currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
                     : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                 }`}
                 style={{ width: "32px", height: "32px" }}
+                aria-label="Página siguiente"
               >
                 <FiChevronRight size={16} />
               </button>
