@@ -126,7 +126,7 @@ const SignUp = () => {
               {/* Títulos */}
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  Crear Cuenta
+                  Crear cuenta
                 </h1>
               </div>
 
@@ -140,10 +140,11 @@ const SignUp = () => {
               <div className="space-y-5">
                 {/* Campo Email Institucional */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                     Correo institucional *
                   </label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
                     value={userCredentials.email}
@@ -159,10 +160,11 @@ const SignUp = () => {
 
                 {/* Campo Contraseña */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                     Contraseña *
                   </label>
                   <input
+                    id="password"
                     type="password"
                     name="password"
                     value={userCredentials.password}
@@ -175,10 +177,11 @@ const SignUp = () => {
 
                 {/* Campo Confirmar Contraseña */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirmar Contraseña *
+                  <label htmlFor="confirmPassword"className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirmar contraseña *
                   </label>
                   <input
+                    id="confirmPassword"
                     type="password"
                     name="confirmPassword"
                     value={userCredentials.confirmPassword}
@@ -205,7 +208,7 @@ const SignUp = () => {
                       Creando cuenta...
                     </span>
                   ) : (
-                    'Crear Cuenta'
+                    'Crear cuenta'
                   )}
                 </button>
 

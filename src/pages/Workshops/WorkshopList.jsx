@@ -141,6 +141,7 @@ const WorkshopList = () => {
                   className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  aria-label="Buscar por nombre del taller"
                 />
               </div>
             </div>
@@ -307,6 +308,7 @@ const WorkshopList = () => {
                           onClick={() => handleViewDetails(workshop.id)}
                           className="text-white-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                           title="Ver detalles"
+                          aria-label="Ver detalles"
                         >
                           <FiEye size={16} />
                         </button>
@@ -314,6 +316,7 @@ const WorkshopList = () => {
                           onClick={() => openDeleteModal(workshop)}
                           className="text-white-600 hover:text-red-800 transition-colors duration-200 p-1 rounded hover:bg-red-50"
                           title="Eliminar taller"
+                          aria-label="Eliminar taller"
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -426,10 +429,11 @@ const WorkshopList = () => {
                 disabled={currentPage === 1}
                 className={`p-1 rounded transition-all duration-200 flex items-center justify-center ${
                   currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
                     : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                 }`}
                 style={{ width: "32px", height: "32px" }}
+                aria-label="Página anterior"
               >
                 <FiChevronLeft size={16} />
               </button>
@@ -443,10 +447,11 @@ const WorkshopList = () => {
                 disabled={currentPage === totalPages}
                 className={`p-1 rounded transition-all duration-200 flex items-center justify-center ${
                   currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
                     : 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow'
                 }`}
                 style={{ width: "32px", height: "32px" }}
+                aria-label="Página siguiente"
               >
                 <FiChevronRight size={16} />
               </button>

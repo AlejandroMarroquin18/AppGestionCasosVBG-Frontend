@@ -391,7 +391,7 @@ const handleEditSaveEvent = async (event) => {
         color: "#000",
         border: "none",
         borderRadius: "4px",
-        fontSize: "12px",
+        fontSize: "0.875rem",
       }
     };
   };
@@ -448,10 +448,11 @@ const handleEditSaveEvent = async (event) => {
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-semibold text-gray-800">➕ Crear nuevo evento</h3>
+                  <h2 className="text-xl font-semibold text-gray-800">➕ Crear nuevo evento</h2>
                   <button
+                  aria-label="Cerrar modal"
                     onClick={() => { setSelectedDay(null); setNewEvent(emptyEvent); }}
-                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="text-gray-400 hover:text-gray-700 transition-colors duration-200"
                   >
                     <FiX size={24} />
                   </button>
@@ -459,10 +460,11 @@ const handleEditSaveEvent = async (event) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-titulo" className="block text-sm font-medium text-gray-700 mb-2">
                       Título del evento *
                     </label>
                     <input
+                      id="evento-titulo"
                       type="text"
                       value={newEvent.title}
                       onChange={(e) => handleChangeInput(setNewEvent, newEvent, "title", e.target.value)}
@@ -472,10 +474,11 @@ const handleEditSaveEvent = async (event) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-caseid" className="block text-sm font-medium text-gray-700 mb-2">
                       ID de caso *
                     </label>
                     <input
+                      id="evento-caseid"
                       type="text"
                       value={newEvent.caseID}
                       onChange={(e) => handleChangeInput(setNewEvent, newEvent, "caseID", e.target.value)}
@@ -485,11 +488,12 @@ const handleEditSaveEvent = async (event) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-ubicacion" className="block text-sm font-medium text-gray-700 mb-2">
                       <FiMapPin className="inline mr-1" />
                       Ubicación
                     </label>
                     <input
+                      id="evento-ubicacion"
                       type="text"
                       value={newEvent.location}
                       onChange={(e) => handleChangeInput(setNewEvent, newEvent, "location", e.target.value)}
@@ -499,11 +503,12 @@ const handleEditSaveEvent = async (event) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-organizador" className="block text-sm font-medium text-gray-700 mb-2">
                       <FiUser className="inline mr-1" />
                       Organizador
                     </label>
                     <input
+                      id="evento-organizador"
                       type="text"
                       value={newEvent.organizer}
                       onChange={(e) => handleChangeInput(setNewEvent, newEvent, "organizer", e.target.value)}
@@ -514,12 +519,13 @@ const handleEditSaveEvent = async (event) => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="evento-participante" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiUsers className="inline mr-1" />
                     Participantes
                   </label>
                   <div className="flex gap-2 mb-2">
                     <input
+                      id="evento-participante"
                       type="email"
                       value={newEvent.tempemail}
                       onChange={(e) => handleChangeInput(setNewEvent, newEvent, "tempemail", e.target.value)}
@@ -528,6 +534,7 @@ const handleEditSaveEvent = async (event) => {
                       placeholder="Correo del participante"
                     />
                     <button
+                      aria-label="Añadir participante"
                       onClick={addEmail}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm"
                     >
@@ -540,6 +547,7 @@ const handleEditSaveEvent = async (event) => {
                         <div key={index} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded text-sm">
                           <span>{email}</span>
                           <button
+                            aria-label={`Quitar a ${email}`}
                             onClick={() => removeEmail(email)}
                             className="text-red-600 hover:text-red-800 transition-colors duration-200"
                           >
@@ -553,7 +561,7 @@ const handleEditSaveEvent = async (event) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-tipo" className="block text-sm font-medium text-gray-700 mb-2">
                       Tipo de evento
                     </label>
                     
@@ -573,10 +581,11 @@ const handleEditSaveEvent = async (event) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="evento-color" className="block text-sm font-medium text-gray-700 mb-2">
                       Color del evento
                     </label>
                     <select
+                      id="evento-color"
                       value={newEvent.colorId}
                       onChange={(e) => {
                         e.stopPropagation(); // Detiene la propagación del evento
@@ -602,11 +611,12 @@ const handleEditSaveEvent = async (event) => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="evento-descripcion" className="block text-sm font-medium text-gray-700 mb-2">
                     <FiFileText className="inline mr-1" />
                     Descripción
                   </label>
                   <textarea
+                    id="evento-descripcion"
                     value={newEvent.description}
                     onChange={(e) => handleChangeInput(setNewEvent, newEvent, "description", e.target.value)}
                     rows="3"
@@ -617,12 +627,13 @@ const handleEditSaveEvent = async (event) => {
 
                 <div className="flex items-center mb-6">
                   <input
+                    id="evento-meet"
                     type="checkbox"
                     checked={newEvent.createMeet}
                     onChange={(e) => handleChangeInput(setNewEvent, newEvent, "createMeet", e.target.checked)}
                     className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                   />
-                  <label className="ml-2 text-sm text-gray-700">
+                  <label htmlFor="evento-meet" className="ml-2 text-sm text-gray-700">
                     Crear reunión de Google Meet
                   </label>
                 </div>
@@ -654,8 +665,9 @@ const handleEditSaveEvent = async (event) => {
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-800">📅 Detalles del evento</h3>
                   <button
+                    aria-label="Cerrar modal"
                     onClick={() => { setSelectedEvent(null); setEditEventModal(false); }}
-                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="text-gray-400 hover:text-gray-700 transition-colors duration-200"
                   >
                     <FiX size={24} />
                   </button>
@@ -793,7 +805,7 @@ const handleEditSaveEvent = async (event) => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-sm">No hay participantes</p>
+                    <p className="text-gray-600 text-sm">No hay participantes</p>
                   )}
                 </div>
 
