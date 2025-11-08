@@ -310,12 +310,14 @@ const ComplaintsDetails = () => {
     setIsLoading(true);
     try {
       const data = await updateComplaint(id, quejaCopy);
+      console.log("Hola",data)
       setQuejaDetails(data);
       setOpenModal(false);
       setEditMode(false);
-      console.log(data.json())
+      
     } catch (error) {
       console.error("Error:", error);
+
       alert("Hubo un error al actualizar la queja");
     } finally {
       setIsLoading(false);

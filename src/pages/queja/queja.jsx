@@ -344,7 +344,7 @@ const Queja = () => {
                 const result = await response.json();
                 console.log("¡Formulario enviado exitosamente!", result);
                 alert("¡Formulario enviado exitosamente!");
-                window.location.reload();
+                //window.location.reload();
                 // Opcional: limpiar el formulario o redirigir
                 // navigate('/quejas/lista');
             }
